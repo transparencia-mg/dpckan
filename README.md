@@ -1,4 +1,4 @@
-# DPKG CKAN
+# DPKG CKAN MG
 
 ## Utilização
 
