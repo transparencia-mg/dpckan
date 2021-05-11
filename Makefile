@@ -3,6 +3,7 @@ help:
 
 update-package: clean-build build publish-build ## Limpa, constroi e publica nova versão do pacote
 	@git add . && git commit -m "Atualização pacote"
+	@echo "Não se esqueça de fazer o push para o repositorio online"
 
 clean-build: ## Limpa as pastas build e dist e o arquivo .egg-info, criados para publicação do pacote
 	@echo "Limpando pastas e arquivos necessários para publicação do pacote"
