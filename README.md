@@ -5,7 +5,7 @@
 - Terminal
 
 ```
-$ pip install dpkgckan
+$ pip install dpkgckanmg
 ```
 
 - Arquivo Python
