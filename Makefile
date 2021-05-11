@@ -1,7 +1,9 @@
+SHELL=/bin/bash
+
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
-update-package: clean-build build publish-build ## Limpa, constroi e publica nova versão do pacote
+update-package: clean-build build publish-build ## Limpa, constroi e publica nova versão do pacote, necessário ativar ambiente antes de iniciar
 	@git add . && git commit -m "Atualização pacote"
 	@echo "Não se esqueça de fazer o push para o repositorio online"
 
