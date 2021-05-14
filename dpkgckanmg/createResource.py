@@ -61,4 +61,4 @@ def criarArquivo2(authorization,package_id,caminhoCompleto,separador=separador):
 #criarArquivo2('local-onde-havia-chave-acesso', 'remuneracao4', local-onde-havia-caminho-maquina ,separador)
 # if __name__ == '__main__':
 #     criarArquivo2(sys.argv[1], sys.argv[2], sys.argv[3], separador)
-print(criarArquivo2.__doc__)
+# print(criarArquivo2.__doc__)
