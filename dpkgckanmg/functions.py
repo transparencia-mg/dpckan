@@ -116,38 +116,6 @@ def criarArquivo(authorization,package_id,caminhoCompleto,separador):
               files = files)
     time.sleep(10)
 
-def criarArquivo2(authorization,package_id,caminhoCompleto,separador=separador):
-    format = caminhoCompleto.split(separador)[-1]
-    caminhoCompletoJson = caminhoCompleto.split(format)[0] + "datapackage" + '.json'
-    formato = format.split('.')[1]
-    nome = format
-    #alterar os parametros passando somente id
-    pprint.pprint("Criacao de arquivo inicializada")
-    if(caminhoCompleto.find("http") > 0):
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
-              data={"package_id":package_id,"name" : format,"url":caminhoCompleto},
-              #data=dataset_dictAtual,
-              headers={"Authorization": authorization})
-    else:
-        files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
-              data={"package_id":package_id,"name" : format},
-              #data=dataset_dictAtual,
-              headers={"Authorization": authorization},
-              files = files)
-    pprint.pprint("Criacao de arquivo finalizada")
-
-    resources = buscaDataSet(package_id,authorization)
-    for d in resources:
-        resource_id = d['id']
-        name = str(d['name'])
-        if(not name.find(".json") > 0 and name == nome):
-            pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
-            atualizaDicionario(caminhoCompletoJson,resource_id,nome,authorization,separador)
-            pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
-
-    time.sleep(10)
-
 def resource(caminhoCompleto, id, authorizaton,separador=separador):
     format = caminhoCompleto.split(separador)[-1]
     #dataset_dictAtual = comparaDataSet(dataset_dict,resources)
