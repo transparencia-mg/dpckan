@@ -672,27 +672,3 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     response_dict = json.loads(response.read())
     assert response_dict['success'] is True
 
-def publish(caminho,authorizaton,separador=separador):
-    #try:
-        #separador = os.path.sep
-        caminhoCompleto = caminho + separador + "datapackage" + '.json'
-        if(os.path.isfile(caminhoCompleto)):
-            comandoDelete = r'del /f filename'
-            so = "WINDOWS"
-            caminhoRelativo = caminho + separador + lerCaminhoRelativo(caminhoCompleto);
-            privado = True
-            autor = 'Usuario teste'
-            tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
-            if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
-               #try:
-               #nomePasta = arquivos[0]
-               nameDataPackage = caminho.split(separador)[-1]
-               pprint.pprint("Criacao de DataSet inicializada: " + nameDataPackage)
-               importaDataSet(authorizaton,"",caminho,"csv",privado,autor,type,tags,separador,"",comandoDelete,so)
-               pprint.pprint("Criacao de DataSet finalizada: " + nameDataPackage)
-               pprint.pprint("***********************************************************")
-               #except Exception as e:
-                   #print("Erro ao importar: " + arquivos[0] + " ERROR:" + e)
-    #except Exception as e:
-        #print(e)
-
