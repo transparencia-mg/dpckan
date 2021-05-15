@@ -6,10 +6,12 @@
 Welcome to dpkgckanmg's documentation!
 ======================================
 
+..automodule:: publish
+  :members:
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
 
 
 Indices and tables
