@@ -50,7 +50,7 @@ def dataSet(authorizaton,caminhoCompleto,id):
   }
 
   # We'll use the package_create function to create a new dataset.
-  request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_update',data=data_string.encode('utf-8'),headers=headers)
+  request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_update',data=data_string.encode('utf-8'),headers=headers)
 
   # Creating a dataset requires an authorization header.
   # Replace *** with your API key, from your user account on the CKAN site
