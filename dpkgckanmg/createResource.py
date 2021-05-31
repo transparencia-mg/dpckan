@@ -36,13 +36,13 @@ def criarArquivo2(authorization,package_id,caminhoCompleto,separador=separador):
   #alterar os parametros passando somente id
   pprint.pprint("Criacao de arquivo inicializada")
   if(caminhoCompleto.find("http") > 0):
-      saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
+      saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
             data={"package_id":package_id,"name" : format,"url":caminhoCompleto},
             #data=dataset_dictAtual,
             headers={"Authorization": authorization})
   else:
       files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-      saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
+      saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
             data={"package_id":package_id,"name" : format},
             #data=dataset_dictAtual,
             headers={"Authorization": authorization},

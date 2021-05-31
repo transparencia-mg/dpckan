@@ -36,7 +36,7 @@ def resource(caminhoCompleto, id, authorizaton,separador=separador):
   formato = format.split('.')[1]
   files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
   pprint.pprint("Atualizacao de arquivo inicializada")
-  resultado = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_update',
+  resultado = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_update',
             data={"id":id},
             #data=dataset_dictAtual,
             headers={"Authorization": authorizaton},

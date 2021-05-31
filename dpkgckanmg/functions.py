@@ -17,7 +17,7 @@ from frictionless_ckan_mapper import ckan_to_frictionless as converter
 separador = os.path.sep
 
 def buscaListaDadosAbertos(authorizaton):
-    request = urllib2.Request('http://homologa.cge.mg.gov.br/api/3/action/package_list')
+    request = urllib2.Request('https://homologa.cge.mg.gov.br/api/3/action/package_list')
     #request.add_header('Authorization', authorizaton)
     response_dict = json.loads(urllib2.urlopen(request, '{}').read())
     return response_dict['result']
@@ -33,7 +33,7 @@ def buscaDataSet(id,authorization):
     }
 
         data_string = quote(json.dumps(parametros))
-        request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/3/action/package_show', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/3/action/package_show', data=data_string.encode('utf-8'), headers=headers)
         #request.add_header('Authorization', authorization)
         response_dict = json.loads(urllib.request.urlopen(request).read())
         #for i in range(len(response_dict['result']['resources']))
@@ -103,13 +103,13 @@ def criarArquivo(authorization,package_id,caminhoCompleto,separador):
     nome = format
     #alterar os parametros passando somente id
     if(caminhoCompleto.find("http") > 0):
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
               data={"package_id":package_id,"name" : format,"url":caminhoCompleto},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization})
     else:
         files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
               data={"package_id":package_id,"name" : format},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization},
@@ -312,7 +312,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         }
 
         # We'll use the package_create function to create a new dataset.
-        request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
 
         # Creating a dataset requires an authorization header.
         # Replace *** with your API key, from your user account on the CKAN
@@ -430,7 +430,7 @@ def atualizaMeta():
     }
 
     # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
+    request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
 
     # Creating a dataset requires an authorization header.
     # Replace *** with your API key, from your user account on the CKAN site
@@ -482,7 +482,7 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     }
 
     # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
+    request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
 
     # Creating a dataset requires an authorization header.
     # Replace *** with your API key, from your user account on the CKAN site
@@ -540,7 +540,7 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     frictionless_package = json.dumps(frictionless_package)
 
     #return
-    #requests.post('http://homologa.cge.mg.gov.br/api/action/datastore_create',
+    #requests.post('https://homologa.cge.mg.gov.br/api/action/datastore_create',
     #              data=frictionless_package,
     #              headers={"Authorization": authorization})
 
@@ -552,7 +552,7 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     }
     #data = urllib.parse.urlencode(frictionless_package)
     # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
+    request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
 
     # Creating a dataset requires an authorization header.
     # Replace *** with your API key, from your user account on the CKAN site
