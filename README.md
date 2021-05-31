@@ -11,19 +11,19 @@ $ pip install dpkgckanmg
 - Arquivo Python
 ```
 # Publicar
-from dpkgckanmg.functions import publish
+from dpkgckanmg.publish import publish
 publish(path/dir/datapackage, ckan_key)
 
 # Criar Recurso
-from dpkgckanmg.functions import criarArquivo2
+from dpkgckanmg.createResource import criarArquivo2
 criarArquivo2(1, 2, 3)
 
 # Atualizar Data Set
-from dpkgckanmg.functions import dataSet
+from dpkgckanmg.updateDataSet import dataSet
 dataSet(1, 2, 3)
 
 # Atualizar Recurso
-from dpkgckanmg.functions import resource
+from dpkgckanmg.updateResource import resource
 resource(1, 2, 3)
 
 

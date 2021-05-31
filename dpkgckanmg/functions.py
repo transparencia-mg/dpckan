@@ -17,7 +17,7 @@ from frictionless_ckan_mapper import ckan_to_frictionless as converter
 separador = os.path.sep
 
 def buscaListaDadosAbertos(authorizaton):
-    request = urllib2.Request('http://homologa.cge.mg.gov.br/api/3/action/package_list')
+    request = urllib2.Request('https://homologa.cge.mg.gov.br/api/3/action/package_list')
     #request.add_header('Authorization', authorizaton)
     response_dict = json.loads(urllib2.urlopen(request, '{}').read())
     return response_dict['result']
@@ -33,7 +33,7 @@ def buscaDataSet(id,authorization):
     }
 
         data_string = quote(json.dumps(parametros))
-        request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/3/action/package_show', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/3/action/package_show', data=data_string.encode('utf-8'), headers=headers)
         #request.add_header('Authorization', authorization)
         response_dict = json.loads(urllib.request.urlopen(request).read())
         #for i in range(len(response_dict['result']['resources']))
@@ -103,123 +103,18 @@ def criarArquivo(authorization,package_id,caminhoCompleto,separador):
     nome = format
     #alterar os parametros passando somente id
     if(caminhoCompleto.find("http") > 0):
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
               data={"package_id":package_id,"name" : format,"url":caminhoCompleto},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization})
     else:
         files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
               data={"package_id":package_id,"name" : format},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization},
               files = files)
     time.sleep(10)
-
-def criarArquivo2(authorization,package_id,caminhoCompleto,separador=separador):
-    format = caminhoCompleto.split(separador)[-1]
-    caminhoCompletoJson = caminhoCompleto.split(format)[0] + "datapackage" + '.json'
-    formato = format.split('.')[1]
-    nome = format
-    #alterar os parametros passando somente id
-    pprint.pprint("Criacao de arquivo inicializada")
-    if(caminhoCompleto.find("http") > 0):
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
-              data={"package_id":package_id,"name" : format,"url":caminhoCompleto},
-              #data=dataset_dictAtual,
-              headers={"Authorization": authorization})
-    else:
-        files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-        saida = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_create',
-              data={"package_id":package_id,"name" : format},
-              #data=dataset_dictAtual,
-              headers={"Authorization": authorization},
-              files = files)
-    pprint.pprint("Criacao de arquivo finalizada")
-
-    resources = buscaDataSet(package_id,authorization)
-    for d in resources:
-        resource_id = d['id']
-        name = str(d['name'])
-        if(not name.find(".json") > 0 and name == nome):
-            pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
-            atualizaDicionario(caminhoCompletoJson,resource_id,nome,authorization,separador)
-            pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
-
-    time.sleep(10)
-
-def resource(caminhoCompleto, id, authorizaton,separador=separador):
-    format = caminhoCompleto.split(separador)[-1]
-    #dataset_dictAtual = comparaDataSet(dataset_dict,resources)
-    #pprint.pprint("caminhoatualizado: " + caminhoCompleto +
-    #dataset_dictAtual["name"])
-    formato = format.split('.')[1]
-    files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-    pprint.pprint("Atualizacao de arquivo inicializada")
-    resultado = requests.post('http://homologa.cge.mg.gov.br/api/action/resource_update',
-              data={"id":id},
-              #data=dataset_dictAtual,
-              headers={"Authorization": authorizaton},
-              files = files)
-    if(resultado.iter_lines.__self__.status_code == 500):
-        pprint.pprint("Erro ao atualizar arquivo")
-    elif(resultado.iter_lines.__self__.status_code == 403):
-         pprint.pprint("Acesso negado. Verifique a autorizacao de acesso.")
-    else:
-        pprint.pprint("Atualizacao de arquivo finalizada")
-
-def dataSet(authorizaton,caminhoCompleto,id):
-    pprint.pprint("Atualizacao de dataset iniciada")
-    #arquivosData = buscaArquivos(caminhoCompleto + separador +
-    #"data",separador)
-    caminhoCompletoJson = caminhoCompleto
-
-    #pprint.pprint(caminhoCompletoJson)
-        #caminhoCompletoJson = local-onde-havia-caminho-maquina
-    if(os.path.isfile(caminhoCompletoJson)):
-        dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson,authorizaton,'true',id)
-        #pprint.pprint(dataset_dict)
-    else:
-        raise Exception("Diretorio nao encontrado")
-
-    # Use the json module to dump the dictionary to a string for posting.
-    data_string = quote(dataset_dict)
-
-    headers = {
-    'Authorization': authorizaton
-    }
-
-    # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_update',data=data_string.encode('utf-8'),headers=headers)
-
-    # Creating a dataset requires an authorization header.
-    # Replace *** with your API key, from your user account on the CKAN site
-    # that you're creating the dataset on.
-    #request.add_header('Authorization', authorizaton)
-
-    # Make the HTTP request.
-    response = urllib.request.urlopen(request)
-    assert response.code == 200
-
-    # Use the json module to load CKAN's response into a dictionary.
-    response_dict = json.loads(response.read())
-    assert response_dict['success'] is True
-
-    # package_create returns the created package as its result.
-    update_package = response_dict['result']
-    pprint.pprint("Atualizacao de dataset finalizada")
-    #pprint.pprint(response_dict['result'])
-
-    #if(update_package):
-    #    for d in range(len(arquivosData)):
-    #        #pprint.pprint(caminhoCompleto + separador + "data" + separador + arquivosData[d])
-    #        if(os.path.isfile(caminhoCompleto + separador + "data" + separador + arquivosData[d])):
-    #            #pprint.pprint("entrou no criar arquivo do metadado")
-    #            pprint.pprint("------------------------------------------------")
-    #            pprint.pprint("Importacao de arquivo inicializada")
-    #            #criarArquivo(authorizaton,update_package['id'],caminhoCompleto + separador + "data" + separador + arquivosData[d],separador)
-    #            pprint.pprint("Importacao de arquivo finalizada")
-    #            pprint.pprint("------------------------------------------------")
 
 def lerDadosJson(diretorio,nomeArquivo):
     with open(diretorio) as json_file:
@@ -417,7 +312,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         }
 
         # We'll use the package_create function to create a new dataset.
-        request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
 
         # Creating a dataset requires an authorization header.
         # Replace *** with your API key, from your user account on the CKAN
@@ -535,7 +430,7 @@ def atualizaMeta():
     }
 
     # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
+    request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
 
     # Creating a dataset requires an authorization header.
     # Replace *** with your API key, from your user account on the CKAN site
@@ -587,7 +482,7 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     }
 
     # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
+    request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_update', data=data_string.encode('utf-8'), headers=headers)
 
     # Creating a dataset requires an authorization header.
     # Replace *** with your API key, from your user account on the CKAN site
@@ -645,7 +540,7 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     frictionless_package = json.dumps(frictionless_package)
 
     #return
-    #requests.post('http://homologa.cge.mg.gov.br/api/action/datastore_create',
+    #requests.post('https://homologa.cge.mg.gov.br/api/action/datastore_create',
     #              data=frictionless_package,
     #              headers={"Authorization": authorization})
 
@@ -657,7 +552,7 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     }
     #data = urllib.parse.urlencode(frictionless_package)
     # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('http://homologa.cge.mg.gov.br/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
+    request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
 
     # Creating a dataset requires an authorization header.
     # Replace *** with your API key, from your user account on the CKAN site
@@ -671,28 +566,4 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     # Use the json module to load CKAN's response into a dictionary.
     response_dict = json.loads(response.read())
     assert response_dict['success'] is True
-
-def publish(caminho,authorizaton,separador=separador):
-    #try:
-        #separador = os.path.sep
-        caminhoCompleto = caminho + separador + "datapackage" + '.json'
-        if(os.path.isfile(caminhoCompleto)):
-            comandoDelete = r'del /f filename'
-            so = "WINDOWS"
-            caminhoRelativo = caminho + separador + lerCaminhoRelativo(caminhoCompleto);
-            privado = True
-            autor = 'Usuario teste'
-            tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
-            if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
-               #try:
-               #nomePasta = arquivos[0]
-               nameDataPackage = caminho.split(separador)[-1]
-               pprint.pprint("Criacao de DataSet inicializada: " + nameDataPackage)
-               importaDataSet(authorizaton,"",caminho,"csv",privado,autor,type,tags,separador,"",comandoDelete,so)
-               pprint.pprint("Criacao de DataSet finalizada: " + nameDataPackage)
-               pprint.pprint("***********************************************************")
-               #except Exception as e:
-                   #print("Erro ao importar: " + arquivos[0] + " ERROR:" + e)
-    #except Exception as e:
-        #print(e)
 
