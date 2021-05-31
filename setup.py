@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.0.1.9010'
+VERSION = '0.0.1.9013'
 DESCRIPTION = 'Funções para gestão de pacotes de dados no portal dados.mg.gov.br'
 
 # Setting up
