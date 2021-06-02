@@ -13,16 +13,17 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-
+from package_information import name, copyright, author, version
 
 # -- Project information -----------------------------------------------------
 
-project = 'dpkgckanmg'
-copyright = '2021, DTA/CGE-MG'
-author = 'DTA/CGE-MG'
+# Busca informações do arquivo ../setup.py (importação somente foi possível devido a linha 15)
+project = name
+copyright = copyright
+author = author
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1.9012'
+release = version
 
 
 # -- General configuration ---------------------------------------------------
