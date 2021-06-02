@@ -9,9 +9,11 @@ clean-build: ## Limpa as pastas build e dist e o arquivo .egg-info, criados para
 	@rm --force --recursive build/
 	@rm --force --recursive dist/
 	@rm --force --recursive *.egg-info
+	@rm --force --recursive LICENCE.txt
 
-build: ## Constroi as pastas e arquivos necessários para publicação do pacote
+build: package_information.py ## Constroi as pastas e arquivos necessários para publicação do pacote
 	@echo "Construindo pacote"
+	@python package_information.py
 	@python setup.py sdist bdist_wheel
 
 publish-build: ## Publica pacote em Pypi
