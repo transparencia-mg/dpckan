@@ -15,8 +15,11 @@ $ pip install dpkgckanmg
 - Arquivo Python
 ```
 # Publicar
+# package_path: Caminho do arquivo datapackage.json
+  ckan_key: ckan key do usuário no ambiente desejado
+  environment: escolher entre "homologa" e"portal" (homologa default)
 from dpkgckanmg import publish
-publish(path/dir/datapackage, ckan_key)
+publish(package_path, ckan_key, environment)
 
 # Criar Recurso
 from dpkgckanmg import criarArquivo2

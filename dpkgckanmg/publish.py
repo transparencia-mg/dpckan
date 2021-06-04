@@ -14,7 +14,7 @@ from dpkgckanmg.functions import separador,buscaListaDadosAbertos,buscaDataSet,c
 
 def publish(package_path, ckan_key, environment='homologa'):
   """
-  Função responsável pela publicação de um conjunto de dados.
+  Função responsável pela publicação de um conjunto de dados no ambiente desejado.
 
   Parameters
   ----------
