@@ -14,21 +14,20 @@ from dpkgckanmg.functions import separador,buscaListaDadosAbertos,buscaDataSet,c
 
 def publish(caminho,authorizaton):
   """
-  Summary line.
-
-  Extended description of function.
+  Função responsável pela publicação de um conjunto de dados.
 
   Parameters
   ----------
-  arg1 : int
-      Description of arg1
-  arg2 : str
-      Description of arg2
+  package_path : string
+      Caminho aonde o arquivo datapackage.json a ser publicado se encontra
+  autorization : string
+      ckan key do usuário no ambiente desejado
 
   Returns
   -------
-  int
-      Description of return value
+  string
+      Conjunto publicado no ambiente desejado e mensagem de sucesso:
+      "Criacao de DataSet finalizada: <nome-do-conjunto>"
 
   """
   #try:
