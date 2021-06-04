@@ -282,8 +282,9 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
     return dataset_dict
 
 
-def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so):
+def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so, informed_environment='homologa'):
     try:
+        url = environment(informed_environment)
         arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
 
         #+ separador + url
@@ -312,7 +313,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         }
 
         # We'll use the package_create function to create a new dataset.
-        request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request(f'https://{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
 
         # Creating a dataset requires an authorization header.
         # Replace *** with your API key, from your user account on the CKAN
@@ -567,3 +568,12 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     response_dict = json.loads(response.read())
     assert response_dict['success'] is True
 
+def environment(informed_environment):
+  url = ''
+  if informed_environment == 'homologa':
+    url = 'homologa.cge.mg.gov.br'
+  elif informed_environment == 'portal':
+    url = 'https://dados.mg.gov.br/'
+  else:
+    url = 'homologa.cge.mg.gov.br'
+  return url
