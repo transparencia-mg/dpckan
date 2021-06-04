@@ -12,7 +12,7 @@ import codecs
 from dpkgckanmg.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo
 
 
-def publish(caminho,authorizaton,separador=separador):
+def publish(caminho,authorizaton):
   """
   Summary line.
 
@@ -33,20 +33,21 @@ def publish(caminho,authorizaton,separador=separador):
   """
   #try:
   #separador = os.path.sep
-  caminhoCompleto = caminho + separador + "datapackage" + '.json'
+  os_forward_slash_publish = separador
+  caminhoCompleto = caminho + os_forward_slash_publish + "datapackage" + '.json'
   if(os.path.isfile(caminhoCompleto)):
       comandoDelete = r'del /f filename'
       so = "WINDOWS"
-      caminhoRelativo = caminho + separador + lerCaminhoRelativo(caminhoCompleto);
+      caminhoRelativo = caminho + os_forward_slash_publish + lerCaminhoRelativo(caminhoCompleto);
       privado = True
       autor = 'Usuario teste'
       tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
       if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
          #try:
          #nomePasta = arquivos[0]
-         nameDataPackage = caminho.split(separador)[-1]
+         nameDataPackage = caminho.split(os_forward_slash_publish)[-1]
          pprint.pprint("Criacao de DataSet inicializada: " + nameDataPackage)
-         importaDataSet(authorizaton,"",caminho,"csv",privado,autor,type,tags,separador,"",comandoDelete,so)
+         importaDataSet(authorizaton,"",caminho,"csv",privado,autor,type,tags,os_forward_slash_publish,"",comandoDelete,so)
          pprint.pprint("Criacao de DataSet finalizada: " + nameDataPackage)
          pprint.pprint("***********************************************************")
          #except Exception as e:
