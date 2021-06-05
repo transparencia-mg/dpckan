@@ -4,22 +4,58 @@
 
 Pacote Python criado pela [Diretoria de Transparência Ativa - DTA](https://www.cge.mg.gov.br/a-cge/quem-e-quem/subcontroladoria-de-transparencia-e-integridade) da [Controladoria Geral do Estado de Minas Gerais - CGE/MG](https://www.cge.mg.gov.br/) com intuito de automatizar a publicação/manutenção de conjunto de dados abertos no [Portal de Dados Abertos do Estado de Minas Gerais](https://dados.mg.gov.br/). Trabalho realizado seguindo padrões internacionais de documentação e utilização de conjuntos de dados abertos, tais como [Frictionless Data](https://frictionlessdata.io/) e ferramentas open source como [CKAN](https://ckan.org/).
 
+Obs.: "#" Utlizados nas caixas de código abaixo são comentários e deverão ser observados atentamente antes da execução de qualquer comando
+
 ## Utilização
 
-- Terminal
+- Instalação
 
 ```
 $ pip install dpkgckanmg
 ```
 
-- Arquivo Python
+- Trabalhando com variáveis de ambiente
+
+A utilizaçao deste pacote exige a utilizaçao de chaves CKAN, tanto do ambiente de [homologação](https://homologa.cge.mg.gov.br/) quanto de [produção](https://dados.mg.gov.br/). Para solicitar login de acesso mande um e-mail para dadosabertos@cge.mg.gov.br.
+
+
+Sugerimos a criação de um arquivo .env na raiz do pacote (bem como o cadastro .gitignore do mesmo) para utilização destas chaves sem a sincronização das mesmas com o repositório online. O pacote "python-dotenv" necessário para carregamento das chaves cadastradas no arquivo .env, será instalado juntamente com o pacote. Sendo assim, sugerimos os seguintes passos para criaçao do arquivo .env:
+
 ```
-# Publicar
-# package_path: Caminho do arquivo datapackage.json
-  ckan_key: ckan key do usuário no ambiente desejado
-  environment: escolher entre "homologa" e"portal" (homologa default)
+# Criação arquivo .env com estrutura para receber chaves CKAN homologação e produção
+# Após a criação, abra o arquivo e inclua as chaves em seus respectivos ambientes
+$ echo "CKAN_HOMOLOGA=''\nCKAN_PORTAL=''" > .env
+
+# Inclua ".env" na última linha do arquivo .gitignore existente na raiz do conjunto. Caso .gitignore não exista execute o comando abaixo:
+# CUIDADO: Caso comando abaixo seja executado em um conjunto cujo .gitignore exista toda configuração preexistente no mesmo será apagada
+$ echo ".env" > .gitignore
+```
+
+
+- Publicação de conjuntos (Arquivo Python ou terminal)
+  - publish(package_path, ckan_key, environment):
+    - package_path: caminho do arquivo datapackage.json
+    - ckan_key: chave ckan do usuário no ambiente desejado
+    - environment: escolher entre "homologa" e"portal" (homologa default)
+
+```
+# Publicação em ambiente de homologação - Executar na raiz do conjunto (local onde datapackage.json está armazenado)
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from dpkgckanmg import publish
-publish(package_path, ckan_key, environment)
+publish("./", os.getenv('CKAN_HOMOLOGA'), "homologa")
+
+
+# Publicação em ambiente de produção - Executar na raiz do conjunto (local onde datapackage.json está armazenado)
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from dpkgckanmg import publish
+publish("./", os.getenv('CKAN_PORTAL'), "portal")
+```
 
 # Criar Recurso
 from dpkgckanmg import criarArquivo2
