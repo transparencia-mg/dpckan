@@ -8,3 +8,5 @@ setuptools==49.2.1
 six==1.15.0
 urllib3==1.26.4
 python-dotenv==0.17.1
+sphinx==4.0.2
+sphinx-rtd-theme==0.5.2
