@@ -26,5 +26,9 @@ if __name__ == '__main__':
           "Operating System :: Unix",
           "Operating System :: MacOS :: MacOS X",
           "Operating System :: Microsoft :: Windows",
-      ]
+      ],
+      entry_points="""
+        [console_scripts]
+        dpckan=dpckan.cli:publish
+      """
   )
