@@ -4,7 +4,11 @@ from dpckan.functions import is_datapackage_present
 from dpckan.functions import get_ckan_key
 
 @click.command()
-@click.option('--env', '-e', required=True, help='Ambiente aonde datasete será publicado (homologacao ou producao')
+@click.option('--env',
+              '-e',
+              required=True,
+              help='Ambiente aonde datasete será publicado (homologacao ou producao',
+              prompt='Qual ambiente deseja publicar/atualizar seu dataset? homologacao ou producao?')
 # @click.argument('env' ,default='homologacao')
 def publish(env):
   """
