@@ -29,6 +29,6 @@ if __name__ == '__main__':
       ],
       entry_points="""
         [console_scripts]
-        dpckan=dpckan.cli:publish
+        dpckan=dpckan.cli:cli
       """
   )
