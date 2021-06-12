@@ -1,0 +1,71 @@
+{
+  "datapackage_resource_id_producao": "abc123"
+  "profile": "tabular-data-package",
+  "resources": [
+    {
+      "name": "letters",
+      "path": "data/letters-vowels.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "integer",
+            "format": "default",
+            "title": "Incremental counter",
+            "description": "An integer counter for the rows"
+          },
+          {
+            "name": "letter",
+            "type": "string",
+            "format": "default",
+            "title": "Alfhabet letter",
+            "description": "A lower case alfabet letter",
+            "constraints": {
+              "enum": ["a", "e", "i", "o", "u"]
+            }
+          },
+          {
+            "name": "vowel",
+            "type": "boolean",
+            "format": "default",
+            "title": "Grammer of letter",
+            "description": "Is the letter a vowel?"
+          }
+        ]
+      },
+      "dialect": {
+      "delimiter": ";",
+      "header": true
+    },
+      "title": "This is the actual data",
+      "format": "csv",
+      "encoding": "UTF-8",
+      "description": "This file contains the actual data"
+    }
+  ],
+  "keywords": [
+    "letters",
+    "english grammar"
+  ],
+  "name": "letters-vowel",
+  "title": "A vowel letters dataset",
+  "description": "This is a dataset that say if a given letter is a vowel",
+  "homepage": "https://github.com/fjuniorr",
+  "version": "0.1.0",
+  "owner_org": "secretaria-de-estado-de-planejamento-e-gestao-seplag",
+  "contributors": [
+    {
+      "title": "Francisco Alves",
+      "role": "publisher",
+      "organization": "gabinete-militar-do-governador-gmg"
+    }
+  ],
+  "licenses": [
+    {
+      "name": "CC0-1.0",
+      "title": "CC0 1.0",
+      "path": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+  ]
+}

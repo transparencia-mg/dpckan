@@ -24,3 +24,4 @@ tests:
 	@echo "Realizando Testes"
 	@cd dpckan/tests/000001 && python -m unittest
 	@cd dpckan/tests/000002 && python -m unittest
+	@cd dpckan/tests/000003 && python -m unittest
