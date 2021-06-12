@@ -19,3 +19,8 @@ build: package_information.py ## Constroi as pastas e arquivos necessários para
 publish-build: ## Publica pacote em Pypi
 	@echo "Publicando pacote. Caso não tenha atualizado a versão no arquivo setup.py encerre e rode novamente"
 	@twine upload dist/*
+
+tests:
+	@echo "Realizando Testes"
+	@cd dpckan/tests/000001 && python -m unittest
+	@cd dpckan/tests/000002 && python -m unittest
