@@ -4,7 +4,7 @@ from dpckan.publish import publish
 
 class TestDatasetWithoutDatapackageFile(unittest.TestCase):
   """
-    Conjunto de testes em datasets que não apresentam arquivo datapackage.json na raiz do conjunto
+    Testing error for lack of datapackage file inside dataset home directory
   """
   def test_homologa_env(self):
     runner = CliRunner()
