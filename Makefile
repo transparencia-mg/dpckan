@@ -22,4 +22,4 @@ publish-build: ## Publica pacote em Pypi
 
 tests:
 	@echo "Realizando Testes"
-	@find -name 'test_dataset_*py' -exec python '{}' \;
+	@python -m unittest discover -s dpckan/tests -p "test_*.py"

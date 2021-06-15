@@ -11,7 +11,7 @@ def clone_online_repo(file):
   """
   branch = get_file_name(file)
   online_repo = "git@github.com:dados-mg/dpckan-tests.git"
-  os.system(f'git clone -b {branch} --single-branch {online_repo} .')
+  os.system(f'git clone -q -b {branch} --single-branch {online_repo} .')
 
 def get_file_name(file):
   """
