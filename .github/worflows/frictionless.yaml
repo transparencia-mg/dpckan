@@ -17,4 +17,4 @@ jobs:
         with:
           python-version: '3.9'
       - run: pip install .
-      - run: make tests
+      - run: python -m unittest discover -s dpckan/tests -p "test_*.py"
