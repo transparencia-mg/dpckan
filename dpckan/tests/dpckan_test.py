@@ -10,7 +10,7 @@ def clone_online_repo(file):
     To work the test_dataset_* file name must be the same as the branch
   """
   branch = get_file_name(file)
-  online_repo = "git@github.com:dados-mg/dpckan-tests.git"
+  online_repo = "https://github.com/dados-mg/dpckan-tests.git"
   os.system(f'git clone -q -b {branch} --single-branch {online_repo} .')
 
 def get_file_name(file):
