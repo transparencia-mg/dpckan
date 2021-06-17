@@ -15,6 +15,7 @@ def publish(env):
     A função deverá ser executada no diretório raiz do Dataset, local aonde o arquivo datapackage.json se encontra.
     Chave Ckan do ambiente desejado deverá ser fornecida durante processo de publicação/atualização
 
+    Documentar melhor a função
 
   """
   datapackage_id = is_datapackage_present(env)
