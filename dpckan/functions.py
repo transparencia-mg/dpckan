@@ -11,6 +11,8 @@ import json
 import codecs
 import importlib
 import time
+from pathlib import Path
+from dotenv import load_dotenv
 from urllib.parse import quote
 from frictionless_ckan_mapper import ckan_to_frictionless as converter
 
@@ -282,9 +284,9 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
     return dataset_dict
 
 
-def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so, informed_environment='homologa'):
+def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
     try:
-        url = environment(informed_environment)
+        url = env
         arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
 
         #+ separador + url
@@ -568,12 +570,14 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     response_dict = json.loads(response.read())
     assert response_dict['success'] is True
 
-def environment(informed_environment):
-  url = ''
-  if informed_environment == 'homologa':
-    url = 'homologa.cge.mg.gov.br'
-  elif informed_environment == 'portal':
-    url = 'https://dados.mg.gov.br/'
+def get_ckan_informations(env):
+  env_path = Path('.', '.env')
+  load_dotenv(dotenv_path=env_path)
+  ckan_informations = {}
+  if env == None:
+    ckan_informations['host'] = os.getenv('CKAN_HOST')
+    ckan_informations['key'] = os.getenv('CKAN_KEY')
   else:
-    url = 'homologa.cge.mg.gov.br'
-  return url
+    ckan_informations['host'] = os.getenv(f'CKAN_HOST_{env.upper()}')
+    ckan_informations['key'] = os.getenv(f'CKAN_KEY_{env.upper()}')
+  return ckan_informations

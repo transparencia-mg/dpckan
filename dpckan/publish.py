@@ -8,7 +8,7 @@ import collections
 import sys
 import codecs
 import click
-from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo
+from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo,get_ckan_informations
 
 @click.command()
 @click.option('--env',
@@ -17,7 +17,7 @@ from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criar
                 Flag que completará as variáveis de ambiente CKAN_HOST e CKAN_KEY.
                 Exemplo --env HOMOLOGA para CKAN_HOST_HOMOLOGA e CKAN_KEY_HOMOLOGA
               ''')
-def publish(package_path, ckan_key, environment='homologa'):
+def publish(env):
   """
   Função responsável pela publicação de um conjunto de dados no ambiente desejado.
 
@@ -37,6 +37,7 @@ def publish(package_path, ckan_key, environment='homologa'):
       "Criacao de DataSet finalizada: <nome-do-conjunto>"
   """
   os_forward_slash_publish = separador
+  package_path = "."
   caminhoCompleto = package_path + os_forward_slash_publish + "datapackage" + '.json'
   if(os.path.isfile(caminhoCompleto)):
       comandoDelete = r'del /f filename'
@@ -48,7 +49,7 @@ def publish(package_path, ckan_key, environment='homologa'):
       if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
          nameDataPackage = package_path.split(os_forward_slash_publish)[-1]
          pprint.pprint("Criacao de DataSet inicializada: " + nameDataPackage)
-         importaDataSet(ckan_key,"",package_path,"csv",privado,autor,type,tags,os_forward_slash_publish,"",comandoDelete,so,environment)
+         importaDataSet(get_ckan_informations(env)['key'],"",package_path,"csv",privado,autor,type,tags,os_forward_slash_publish,"",comandoDelete,so,get_ckan_informations(env)['host'])
          pprint.pprint("Criacao de DataSet finalizada: " + nameDataPackage)
          pprint.pprint("***********************************************************")
 
