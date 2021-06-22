@@ -9,6 +9,7 @@ import sys
 import codecs
 import click
 from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo,get_ckan_informations
+from dpckan.functions import is_datapackage_present
 
 @click.command()
 @click.option('--env',

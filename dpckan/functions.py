@@ -11,6 +11,7 @@ import json
 import codecs
 import importlib
 import time
+import click
 from pathlib import Path
 from dotenv import load_dotenv
 from urllib.parse import quote
