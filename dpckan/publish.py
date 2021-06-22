@@ -36,6 +36,8 @@ def publish(env):
       Conjunto publicado no ambiente desejado e mensagem de sucesso:
       "Criacao de DataSet finalizada: <nome-do-conjunto>"
   """
+  click.echo("----Verificações iniciais do Dataset----")
+  is_datapackage_present(get_ckan_informations(env))
   os_forward_slash_publish = separador
   package_path = "."
   caminhoCompleto = package_path + os_forward_slash_publish + "datapackage" + '.json'

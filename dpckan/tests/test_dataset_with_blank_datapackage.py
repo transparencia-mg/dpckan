@@ -19,9 +19,6 @@ class TestDatasetWithBlankDatapackage(unittest.TestCase):
       result = runner.invoke(publish)
       dpckan_test.clean_temp_folders()
       self.assertNotEqual(result.exit_code, 0)
-      self.assertEqual(result.output,
-                        "----Arquivo datapackage.json com algum problema de sintaxe ou em branco----\n")
-
 
   def test_production_env(self):
     """
@@ -33,9 +30,7 @@ class TestDatasetWithBlankDatapackage(unittest.TestCase):
       result = runner.invoke(publish)
       dpckan_test.clean_temp_folders()
       self.assertNotEqual(result.exit_code, 0)
-      self.assertEqual(result.output,
-                        "----Arquivo datapackage.json com algum problema de sintaxe ou em branco----\n")
 
 if __name__ == '__main__':
   unittest.main()
-  dpckan_test.clean_temp_folders()
+

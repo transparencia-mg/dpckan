@@ -19,8 +19,6 @@ class TestDatasetWithoutDatapackageFile(unittest.TestCase):
       result = runner.invoke(publish)
       dpckan_test.clean_temp_folders()
       self.assertNotEqual(result.exit_code, 0)
-      self.assertEqual(result.output,
-                        "----Arquivo datapackage.json não encontrado na raiz do dataset----\n")
 
   def test_production_env(self):
     """
@@ -32,8 +30,6 @@ class TestDatasetWithoutDatapackageFile(unittest.TestCase):
       result = runner.invoke(publish)
       dpckan_test.clean_temp_folders()
       self.assertNotEqual(result.exit_code, 0)
-      self.assertEqual(result.output,
-                        "----Arquivo datapackage.json não encontrado na raiz do dataset----\n")
 
 if __name__ == '__main__':
   unittest.main()

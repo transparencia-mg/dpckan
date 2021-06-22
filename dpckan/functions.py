@@ -581,3 +581,42 @@ def get_ckan_informations(env):
     ckan_informations['host'] = os.getenv(f'CKAN_HOST_{env.upper()}')
     ckan_informations['key'] = os.getenv(f'CKAN_KEY_{env.upper()}')
   return ckan_informations
+
+def is_datapackage_present(env):
+  """
+  Verifica a existência da chave "datapackage_resource_id" no arquivo datapackage.json para o ambiente desejado (homologação ou produção)
+  Existência da chave "datapackage_resource_id" significa que pacote já foi publicado no ambiente desejado
+  Arquivo datapackage.json deve estar na raiz do dataset
+  Trata erro para:
+   - datapackage.json inexistente
+   - algum erro de sintaxe no arquivo datapackage.json, ou até mesmo arquivo existente mas em branco
+
+  Parameters
+  ----------
+    env
+    homologacao: homologa.cge.mg.gov.br/
+    producao: dados.mg.gov.br/
+
+
+  Returns
+  -------
+  string
+    valor correspondente a chave "datapackage_resource_id" do ambiente solicitado, quando a mesma existir
+  None
+    quando a chave não existir
+  """
+  try:
+    with codecs.open('datapackage.json','r', 'utf-8-sig') as json_file:
+      datapackage_keys = json.load(json_file)
+      if f"datapackage_resource_id_{env}" in datapackage_keys.keys():
+        click.echo("----Iniciando atualização do Dataset----")
+        return datapackage_keys[f"datapackage_resource_id_{env}"]
+      else:
+        click.echo("----Iniciando Publicação do Dataset----")
+        return None
+  except FileNotFoundError:
+    click.echo("----Arquivo datapackage.json não encontrado na raiz do dataset----")
+    sys.exit(1)
+  except json.decoder.JSONDecodeError:
+    click.echo("----Arquivo datapackage.json com algum problema de sintaxe ou em branco----")
+    sys.exit(1)
