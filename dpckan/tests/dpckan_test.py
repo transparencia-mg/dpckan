@@ -25,6 +25,3 @@ def get_file_path():
     This folder must reproduce a dataset error that must be prevented
   """
   return os.path.dirname(os.path.realpath(__file__))
-
-def clean_temp_folders():
-  os.system(f'cd {get_file_path()} && rm -rf tmp*')
