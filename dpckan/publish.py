@@ -7,9 +7,15 @@ import json
 import collections
 import sys
 import codecs
+import click
 from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo
 
-
+@click.command(name='publish')
+@click.option('--env',
+              '-e',
+              required=True,
+              help='Ambiente aonde datasete será publicado (homologacao ou producao',
+              prompt='Qual ambiente deseja publicar/atualizar seu dataset? homologacao ou producao?')
 def publish(package_path, ckan_key, environment='homologa'):
   """
   Função responsável pela publicação de um conjunto de dados no ambiente desejado.
