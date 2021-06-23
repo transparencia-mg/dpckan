@@ -8,37 +8,35 @@ import collections
 import sys
 import codecs
 import click
-from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo,get_ckan_informations
-from dpckan.functions import is_datapackage_present
+from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo
+
 
 @click.command()
-@click.option('--env',
-              '-e',
-              help='''
-                Flag que completará as variáveis de ambiente CKAN_HOST e CKAN_KEY.
-                Exemplo --env HOMOLOGA para CKAN_HOST_HOMOLOGA e CKAN_KEY_HOMOLOGA
-              ''')
-def publish(env):
+@click.option('--host', '-H', envvar='CKAN_HOST', required=True,
+              prompt="Variável de ambiente CKAN_HOST não identificada, favor informar. Exemplo: https://dados.mg.gov.br",
+              help="Ckan host, exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br")  # -H para respeitar convenção de -h ser help
+@click.option('--key', '-k', envvar='CKAN_KEY', required=True,
+              prompt="Variável de ambiente CKAN_KEY não identificada, favor informar",
+              help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
+def publish(host, key):
   """
-  Função responsável pela publicação de um conjunto de dados no ambiente desejado.
+  Função responsável pela publicação/atualização de um conjunto de dados no ambiente (host) desejado.
 
-  Por padrão, função buscará Host e Key da instância CKAN para qual e deseja publicar/atualizar dataset
-  nas variáveis de ambiente CKAN_HOST e CKAN_KEY. Caso usuário deseja cadastrar mais de uma instância,
-  basta acrescentar uma "flag" ao final destes dois nomes, exemplo CKAN_HOST_HOMOLOGA e CKAN_KEY_HOMOLOGA
+  Por padrão, função buscará host e key da instância CKAN para qual e deseja publicar/atualizar dataset
+  nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou até mesmo em arquivo .env na raiz do dataset.
 
   Parameters
   ----------
-  env: string (não obrigatório)
-    Flag complementando as variáveis de ambiente padrão CKAN_HOST e CKAN_KEY
+  host: string (não obrigatório para variáveis cadastradas ou na máquina ou em arquivos .env)
+    host ou ambiente da instância CKAN para a qual se deseja publicar/atualizar dataset
+  key: string (não obrigatório para variáveis cadastradas ou na máquina ou em arquivos .env)
+    Chave CKAN do usuário e ambiente para a qual se deseja publicar/atualizar dataset
 
   Returns
   -------
   string
-      Conjunto publicado no ambiente desejado e mensagem de sucesso:
-      "Criacao de DataSet finalizada: <nome-do-conjunto>"
+      Conjunto publicado/atualizado no ambiente desejado
   """
-  click.echo("----Verificações iniciais do Dataset----")
-  is_datapackage_present(get_ckan_informations(env))
   os_forward_slash_publish = separador
   package_path = "."
   caminhoCompleto = package_path + os_forward_slash_publish + "datapackage" + '.json'
@@ -52,7 +50,7 @@ def publish(env):
       if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
          nameDataPackage = package_path.split(os_forward_slash_publish)[-1]
          pprint.pprint("Criacao de DataSet inicializada: " + nameDataPackage)
-         importaDataSet(get_ckan_informations(env)['key'],"",package_path,"csv",privado,autor,type,tags,os_forward_slash_publish,"",comandoDelete,so,get_ckan_informations(env)['host'])
+         importaDataSet(key,"",package_path,"csv",privado,autor,type,tags,os_forward_slash_publish,"",comandoDelete,so,host)
          pprint.pprint("Criacao de DataSet finalizada: " + nameDataPackage)
          pprint.pprint("***********************************************************")
 
