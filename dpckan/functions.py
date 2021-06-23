@@ -12,8 +12,6 @@ import codecs
 import importlib
 import time
 import click
-from pathlib import Path
-from dotenv import load_dotenv
 from urllib.parse import quote
 from frictionless_ckan_mapper import ckan_to_frictionless as converter
 
@@ -316,7 +314,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         }
 
         # We'll use the package_create function to create a new dataset.
-        request = urllib.request.Request(f'https://{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request(f'{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
 
         # Creating a dataset requires an authorization header.
         # Replace *** with your API key, from your user account on the CKAN
@@ -571,18 +569,6 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     response_dict = json.loads(response.read())
     assert response_dict['success'] is True
 
-def get_ckan_informations(env):
-  env_path = Path('.', '.env')
-  load_dotenv(dotenv_path=env_path)
-  ckan_informations = {}
-  if env == None:
-    ckan_informations['host'] = os.getenv('CKAN_HOST')
-    ckan_informations['key'] = os.getenv('CKAN_KEY')
-  else:
-    ckan_informations['host'] = os.getenv(f'CKAN_HOST_{env.upper()}')
-    ckan_informations['key'] = os.getenv(f'CKAN_KEY_{env.upper()}')
-  return ckan_informations
-
 def is_datapackage_present(env):
   """
   Verifica a existência da chave "datapackage_resource_id" no arquivo datapackage.json para o ambiente desejado (homologação ou produção)
@@ -621,3 +607,5 @@ def is_datapackage_present(env):
   except json.decoder.JSONDecodeError:
     click.echo("----Arquivo datapackage.json com algum problema de sintaxe ou em branco----")
     sys.exit(1)
+
+
