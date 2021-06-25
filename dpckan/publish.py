@@ -8,8 +8,7 @@ import collections
 import sys
 import codecs
 import click
-from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo
-
+from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo, delete_dataset
 
 @click.command()
 @click.option('--host', '-H', envvar='CKAN_HOST', required=True,
@@ -38,6 +37,9 @@ def publish(host, key):
   os_forward_slash_publish = separador
   package_path = "."
   caminhoCompleto = package_path + os_forward_slash_publish + "datapackage" + '.json'
+  dataset_dict = lerDadosJsonMapeado(caminhoCompleto,key,'false','null')
+  # Deleting dataset if it exists
+  delete_dataset(host, key, json.loads(dataset_dict)['name'])
   if(os.path.isfile(caminhoCompleto)):
       comandoDelete = r'del /f filename'
       so = "WINDOWS"

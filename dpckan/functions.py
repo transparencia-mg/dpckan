@@ -14,6 +14,7 @@ import time
 import click
 from urllib.parse import quote
 from frictionless_ckan_mapper import ckan_to_frictionless as converter
+from ckanapi import RemoteCKAN
 
 separador = os.path.sep
 
@@ -608,4 +609,6 @@ def is_datapackage_present(env):
     click.echo("----Arquivo datapackage.json com algum problema de sintaxe ou em branco----")
     sys.exit(1)
 
-
+def delete_dataset(host, key, dataset_name):
+  demo = RemoteCKAN(host, apikey=key)
+  demo.action.package_delete(id=dataset_name)
