@@ -13,10 +13,8 @@ from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criar
 
 @click.command()
 @click.option('--host', '-H', envvar='CKAN_HOST', required=True,
-              prompt="Variável de ambiente CKAN_HOST não identificada, favor informar. Exemplo: https://dados.mg.gov.br",
               help="Ckan host, exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br")  # -H para respeitar convenção de -h ser help
 @click.option('--key', '-k', envvar='CKAN_KEY', required=True,
-              prompt="Variável de ambiente CKAN_KEY não identificada, favor informar",
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
 def publish(host, key):
   """
