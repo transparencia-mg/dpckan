@@ -17,6 +17,10 @@ from frictionless_ckan_mapper import ckan_to_frictionless as converter
 from ckanapi import RemoteCKAN
 
 separador = os.path.sep
+os_slash = os.path.sep
+
+def datapackage_path():
+  return f'.{os_slash}datapackage.json'
 
 def buscaListaDadosAbertos(authorizaton):
     request = urllib2.Request('https://homologa.cge.mg.gov.br/api/3/action/package_list')

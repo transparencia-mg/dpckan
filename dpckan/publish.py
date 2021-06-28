@@ -9,6 +9,7 @@ import sys
 import codecs
 import click
 from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo, delete_dataset
+from dpckan.functions import os_slash,datapackage_path
 from dpckan.validations import run_validations
 
 @click.command()
@@ -40,14 +41,14 @@ def publish(host, key):
   run_validations()
   os_forward_slash_publish = separador
   package_path = "."
-  caminhoCompleto = package_path + os_forward_slash_publish + "datapackage" + '.json'
-  dataset_dict = lerDadosJsonMapeado(host,caminhoCompleto,key,'false','null')
+  path_datapackage = datapackage_path()
+  dataset_dict = lerDadosJsonMapeado(host,path_datapackage,key,'false','null')
   # Deleting dataset if it exists
   delete_dataset(host, key, json.loads(dataset_dict)['name'])
-  if(os.path.isfile(caminhoCompleto)):
+  if(os.path.isfile(path_datapackage)):
       comandoDelete = r'del /f filename'
       so = "WINDOWS"
-      caminhoRelativo = package_path + os_forward_slash_publish + lerCaminhoRelativo(caminhoCompleto);
+      caminhoRelativo = package_path + os_forward_slash_publish + lerCaminhoRelativo(path_datapackage);
       privado = True
       autor = 'Usuario teste'
       tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
