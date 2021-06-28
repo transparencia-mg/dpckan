@@ -99,19 +99,19 @@ def removePastaArquivos(diretorio,separador,comando,so,arquivo):
                 comandoCompleto = comando + arquivoDel
                 os.system(comandoCompleto)
 
-def criarArquivo(authorization,package_id,caminhoCompleto,separador):
+def criarArquivo(url,authorization,package_id,caminhoCompleto,separador):
     format = caminhoCompleto.split(separador)[-1]
     formato = format.split('.')[1]
     nome = format
     #alterar os parametros passando somente id
     if(caminhoCompleto.find("http") > 0):
-        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post(f'{url}/api/action/resource_create',
               data={"package_id":package_id,"name" : format,"url":caminhoCompleto},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization})
     else:
         files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post(f'{url}/api/action/resource_create',
               data={"package_id":package_id,"name" : format},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization},
@@ -352,7 +352,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
             caminhoCompleto = diretorio + separador + arquivosDataJson[d]
             pprint.pprint("------------------------------------------------")
             pprint.pprint("Importacao de arquivo inicializada: " + arquivosDataJson[d])
-            criarArquivo(authorization,id,caminhoCompleto,separador)
+            criarArquivo(url,authorization,id,caminhoCompleto,separador)
             pprint.pprint("Importacao de arquivo finalizada: " + arquivosDataJson[d])
             pprint.pprint("------------------------------------------------")
     except Exception as e:
@@ -370,7 +370,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
                 #pprint.pprint(caminhoCompleto)
                 pprint.pprint("------------------------------------------------")
                 pprint.pprint("Importacao de arquivo inicializada: " + arquivosData[d])
-                criarArquivo(authorization,id,caminhoCompleto,separador)
+                criarArquivo(url,authorization,id,caminhoCompleto,separador)
                 pprint.pprint("Importacao de arquivo finalizada: " + arquivosData[d])
                 pprint.pprint("------------------------------------------------")
     except Exception as e:
