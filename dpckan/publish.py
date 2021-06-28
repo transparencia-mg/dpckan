@@ -1,16 +1,11 @@
 import urllib
-import json
-import pprint
 import os
 import requests
 import json
-import collections
-import sys
-import codecs
 import click
-from dpckan.functions import buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo, delete_dataset
-from dpckan.functions import os_slash,datapackage_path
 from dpckan.validations import run_validations
+from dpckan.functions import (os_slash, datapackage_path, lerDadosJsonMapeado,
+                              delete_dataset, lerCaminhoRelativo, importaDataSet)
 
 @click.command()
 @click.option('--host', '-H', envvar='CKAN_HOST', required=True,
@@ -53,4 +48,3 @@ def publish(host, key):
       if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
          importaDataSet(key,"",".","csv",privado,autor,type,tags,os_slash,"",comandoDelete,so,host)
          click.echo('----Publicação/atualização datasest finalizada----')
-
