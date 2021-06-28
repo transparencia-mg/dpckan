@@ -25,6 +25,21 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       delete_dataset(os.environ.get('CKAN_HOST'), os.environ.get('CKAN_KEY'), dataset_dict['name'])
       self.assertEqual(result.exit_code, 0)
 
+  def test_prod_env(self):
+    """
+      Testing dataset publication sucessfully producao environment
+    """
+    runner = CliRunner()
+    with runner.isolated_filesystem(temp_dir=get_file_path()):
+      clone_online_repo(__file__)
+      result = runner.invoke(publish, ['--host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
+                             '--key', f"{os.environ.get('CKAN_KEY_PRODUCAO')}"])
+      # Deleting dataset after test
+      path_datapackage = datapackage_path()
+      dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
+      delete_dataset(os.environ.get('CKAN_HOST_PRODUCAO'), os.environ.get('CKAN_KEY_PRODUCAO'), dataset_dict['name'])
+      self.assertEqual(result.exit_code, 0)
+
 if __name__ == '__main__':
   unittest.main()
 
