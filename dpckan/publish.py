@@ -39,7 +39,6 @@ def publish(host, key):
   click.echo("----Iniciando publicação/atualização datasest----")
   click.echo(f"----Publicação/atualização datasest em {host}----")
   run_validations()
-  package_path = "."
   path_datapackage = datapackage_path()
   dataset_dict = lerDadosJsonMapeado(host,path_datapackage,key,'false','null')
   # Deleting dataset if it exists
@@ -47,11 +46,11 @@ def publish(host, key):
   if(os.path.isfile(path_datapackage)):
       comandoDelete = r'del /f filename'
       so = "WINDOWS"
-      caminhoRelativo = package_path + os_slash + lerCaminhoRelativo(path_datapackage);
+      caminhoRelativo = os_slash + lerCaminhoRelativo(path_datapackage);
       privado = True
       autor = 'Usuario teste'
       tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
       if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
-         importaDataSet(key,"",package_path,"csv",privado,autor,type,tags,os_slash,"",comandoDelete,so,host)
+         importaDataSet(key,"",".","csv",privado,autor,type,tags,os_slash,"",comandoDelete,so,host)
          click.echo('----Publicação/atualização datasest finalizada----')
 
