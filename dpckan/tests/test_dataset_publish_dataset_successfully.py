@@ -18,9 +18,7 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
     runner = CliRunner()
     with runner.isolated_filesystem(temp_dir=get_file_path()):
       clone_online_repo(__file__)
-      result = runner.invoke(publish,
-                             ["--host", "$CKAN_HOST_HOMOLOGACAO",
-                             "--key", "$CKAN_KEY_HOMOLOGACAO"])
+      result = runner.invoke(publish)
       self.assertEqual(result.exit_code, 0)
 
 if __name__ == '__main__':
