@@ -35,9 +35,9 @@ def publish(host, key):
   click.echo(f"----Publicação/atualização datasest em {host}----")
   run_validations()
   path_datapackage = datapackage_path()
-  dataset_dict = lerDadosJsonMapeado(host,path_datapackage,key,'false','null')
+  dataset_dict = json.loads(lerDadosJsonMapeado(host,path_datapackage,key,'false','null'))
   # Deleting dataset if it exists
-  delete_dataset(host, key, json.loads(dataset_dict)['name'])
+  delete_dataset(host, key, dataset_dict['name'])
   if(os.path.isfile(path_datapackage)):
       comandoDelete = r'del /f filename'
       so = "WINDOWS"

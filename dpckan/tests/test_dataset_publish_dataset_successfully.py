@@ -1,11 +1,11 @@
 import os
+import json
 from click.testing import CliRunner
 import unittest
 from dpckan.tests import clone_online_repo
 from dpckan.tests import get_file_path
 from dpckan.publish import publish
-from dpckan.functions import delete_dataset
-
+from dpckan.functions import (delete_dataset, datapackage_path, lerDadosJsonMapeado)
 
 class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
   """

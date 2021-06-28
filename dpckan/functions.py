@@ -184,8 +184,6 @@ def lerCaminhoRelativo(diretorio):
                    else:
                      return t['path']
 
-
-
 def lerDadosJsonMapeado(url,diretorio,authorization,isUpdate,id):
     listaParametros = ["license_title","maintainer","relationships_as_object","private","maintainer_email","num_tags","id","metadata_created","metadata_modified","author_email","state","version","creator_user_id","type","num_resources","groups","license_id","relationships_as_subject","isopen","url","owner_org","extras","title","revision_id","update"]
     with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
