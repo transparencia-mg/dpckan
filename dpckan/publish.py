@@ -9,6 +9,7 @@ import sys
 import codecs
 import click
 from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo, delete_dataset
+from dpckan.validations import run_validations
 
 @click.command()
 @click.option('--host', '-H', envvar='CKAN_HOST', required=True,
@@ -34,6 +35,9 @@ def publish(host, key):
   string
       Conjunto publicado/atualizado no ambiente desejado
   """
+  click.echo("----Iniciando publicação/atualização datasest----")
+  click.echo(f"----Publicação/atualização datasest em {host}----")
+  run_validations()
   os_forward_slash_publish = separador
   package_path = "."
   caminhoCompleto = package_path + os_forward_slash_publish + "datapackage" + '.json'
