@@ -16,10 +16,17 @@ from urllib.parse import quote
 from frictionless_ckan_mapper import ckan_to_frictionless as converter
 from ckanapi import RemoteCKAN
 
+# Excluir quando todas as funções estiverem refatoradas
+# Código contará apenas com varável os_slash, definido abaixo
 separador = os.path.sep
+
+# Helps functions identify which slash user operating system uses
 os_slash = os.path.sep
 
 def datapackage_path():
+  """
+    Return the exact path to datapackage.json file. It must to be in the root directory
+  """
   return f'.{os_slash}datapackage.json'
 
 def buscaListaDadosAbertos(authorizaton):

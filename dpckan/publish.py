@@ -17,19 +17,19 @@ def publish(host, key):
   Função responsável pela publicação/atualização de um conjunto de dados no ambiente (host) desejado.
 
   Por padrão, função buscará host e key da instância CKAN para qual e deseja publicar/atualizar dataset
-  nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou até mesmo em arquivo .env na raiz do dataset.
+  nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou em arquivo .env na raiz do dataset.
 
   Parameters
   ----------
-  host: string (não obrigatório para variáveis cadastradas ou na máquina ou em arquivos .env)
-    host ou ambiente da instância CKAN para a qual se deseja publicar/atualizar dataset
-  key: string (não obrigatório para variáveis cadastradas ou na máquina ou em arquivos .env)
+  host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
+    host ou ambiente da instância CKAN para a qual se deseja publicar/atualizar dataset.
+    Exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br
+  key: string (não obrigatório caso variável CKAN_KEY esteja cadastrada na máquina ou em arquivo .env)
     Chave CKAN do usuário e ambiente para a qual se deseja publicar/atualizar dataset
 
   Returns
   -------
-  string
-      Conjunto publicado/atualizado no ambiente desejado
+    Dataset publicado/atualizado no ambiente desejado
   """
   click.echo("----Iniciando publicação/atualização datasest----")
   click.echo(f"----Publicação/atualização datasest em {host}----")
