@@ -184,95 +184,59 @@ def lerCaminhoRelativo(diretorio):
                    else:
                      return t['path']
 
-def lerDadosJsonMapeado(url,diretorio,authorization,isUpdate,id):
-    listaParametros = ["license_title","maintainer","relationships_as_object","private","maintainer_email","num_tags","id","metadata_created","metadata_modified","author_email","state","version","creator_user_id","type","num_resources","groups","license_id","relationships_as_subject","isopen","url","owner_org","extras","title","revision_id","update"]
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
-        #pprint.pprint(json_file)
-        data = json.load(json_file)
-        #pprint.pprint(data)
-        tagsJson = {}
-        tagsJson['tags'] = []
-        tagsDicionario = {}
-        tagsDicionario['fields'] = []
-        dataset_dict = {}
-        #isUpdate = 'false'
-
-        if(id == 'null'):
-            id = 'null'
-
-        for m in data.keys():
-                #pprint.pprint(t)
-                if(str(m) == 'keywords'):
-                    for t in data[m]:
-                        tagsJson['tags'].append({'name': t})
-                    #pprint.pprint(tagsJson)
-                    y = { 'tags' : tagsJson['tags'] }
-                    dataset_dict.update(y)
-                elif(str(m) == 'fields'):
-                    for t in data[m]:
-                        tagsDicionario['fields'].append({'id': t})
-                    #pprint.pprint(tagsJson)
-                    y = { 'fields' : tagsDicionario['fields'] }
-                    dataset_dict.update(y)
-                elif ((str(m) == 'resources')):
-                    y = { str(m) : str(data[m]) }
-                    #dataset_dict.update(y)
-                elif (str(m) == 'name'):
-                    y = { str(m) : str(data[m]) }
-                    dataset_dict.update(y)
-                elif (str(m) == 'description'):
-                    y = { 'notes' : str(data[m]) }
-                    dataset_dict.update(y)
-                elif (str(m) == 'path'):
-                    y = { 'url' : str(data[m]) }
-                    dataset_dict.update(y)
-                elif (str(m) == 'package_id'):
-                    id = str(data[m])
-                    y = { 'id' : id }
-                    dataset_dict.update(y)
-                elif (str(m) == 'update'):
-                    isUpdate = 'true'
-                elif (str(m) == 'contributors'):
-                    for c in data[m]:
-                        if(c['title']):
-                            y = { "author" : c["title"] }
-                            dataset_dict.update(y)
-                        if(c['role'] == "publisher"):
-                          y = { "owner_org" : c["organization"] }
-                          dataset_dict.update(y)
-                else:
-                    if(str(m) in listaParametros):
-                        y = { str(m) : str(data[m]) }
-                        dataset_dict.update(y)
-
-        if(isUpdate == 'true'):
-            resources = buscaDataSet(url,id,authorization)
-            y = { 'resources' : resources }
+def lerDadosJsonMapeado(diretorio):
+  listaParametros = ["license_title", "maintainer", "relationships_as_object",
+                     "private", "maintainer_email", "num_tags", "id", "metadata_created",
+                     "metadata_modified", "author_email", "state", "version", "creator_user_id",
+                     "type", "num_resources", "groups", "license_id", "relationships_as_subject", "isopen",
+                     "url", "owner_org", "extras", "title", "revision_id", "update"]
+  with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+    data = json.load(json_file)
+    tagsJson = {}
+    tagsJson['tags'] = []
+    tagsDicionario = {}
+    tagsDicionario['fields'] = []
+    dataset_dict = {}
+    for m in data.keys():
+      if(str(m) == 'keywords'):
+        for t in data[m]:
+          tagsJson['tags'].append({'name': t})
+        y = { 'tags' : tagsJson['tags'] }
+        dataset_dict.update(y)
+      elif(str(m) == 'fields'):
+        for t in data[m]:
+            tagsDicionario['fields'].append({'id': t})
+        y = { 'fields' : tagsDicionario['fields'] }
+        dataset_dict.update(y)
+      elif ((str(m) == 'resources')):
+        y = { str(m) : str(data[m]) }
+      elif (str(m) == 'name'):
+        y = { str(m) : str(data[m]) }
+        dataset_dict.update(y)
+      elif (str(m) == 'description'):
+        y = { 'notes' : str(data[m]) }
+        dataset_dict.update(y)
+      elif (str(m) == 'path'):
+        y = { 'url' : str(data[m]) }
+        dataset_dict.update(y)
+      elif (str(m) == 'package_id'):
+        id = str(data[m])
+        y = { 'id' : id }
+        dataset_dict.update(y)
+      elif (str(m) == 'update'):
+        isUpdate = 'true'
+      elif (str(m) == 'contributors'):
+        for c in data[m]:
+          if(c['title']):
+              y = { "author" : c["title"] }
+              dataset_dict.update(y)
+          if(c['role'] == "publisher"):
+            y = { "owner_org" : c["organization"] }
             dataset_dict.update(y)
-
-        #encontrou = 'false'
-        #for m in data.keys():
-        #    if(str(m) == 'owner_org'):
-        #        encontrou = 'true'
-
-        #if(encontrou == 'false'):
-        #    y = {'owner_org': 'controladoria-geral-do-estado-cge'}
-        #    dataset_dict.update(y)
-
-                #pprint.pprint(tagsJson['tags'])
-                #dataset_dict = {
-                #'title': str(data['title']).replace('_',' ').upper(),
-                #'name': nomeArquivo,
-                #'notes': str(data['notes']).replace('_',' '),
-                #'private': str(data['private']),
-                #'author': data['author'].replace("\'u",''),
-                #'tags': tagsJson['tags'],
-                #'maintainer': str(data['maintainer']),
-                #'maintainer_email': str(data['maintainer_email']),
-                #'type': data['type'].replace("\'u",''),
-                #'owner_org': 'controladoria-geral-do-estado'
-                #}
-        #pprint.pprint(dataset_dict)
+      else:
+        if(str(m) in listaParametros):
+          y = { str(m) : str(data[m]) }
+          dataset_dict.update(y)
     dataset_dict = json.dumps(dataset_dict)
     return dataset_dict
 
@@ -304,7 +268,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         #pprint.pprint(caminhoCompletoJson)
         #caminhoCompletoJson = local-onde-havia-caminho-maquina
         if(os.path.isfile(caminhoCompletoJson)):
-            dataset_dict = lerDadosJsonMapeado(url,caminhoCompletoJson,authorization,'false','null')
+            dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
         # Use the json module to dump the dictionary to a string for posting.
 
         arqPub = []
@@ -469,7 +433,7 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     #pprint.pprint(caminhoCompletoJson)
         #caminhoCompletoJson = local-onde-havia-caminho-maquina
     if(os.path.isfile(caminhoCompletoJson)):
-        dataset_dict = lerDadosJsonMapeado(url,caminhoCompletoJson,url,authorization,'null')
+        dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
         #pprint.pprint(dataset_dict)
     else:
         #pprint.pprint(caminhoCompletoJson)
