@@ -8,7 +8,7 @@ import collections
 import sys
 import codecs
 import click
-from dpckan.functions import separador,buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo, delete_dataset
+from dpckan.functions import buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta,atualizaDicionario,lerCaminhoRelativo, delete_dataset
 from dpckan.functions import os_slash,datapackage_path
 from dpckan.validations import run_validations
 
@@ -39,7 +39,6 @@ def publish(host, key):
   click.echo("----Iniciando publicação/atualização datasest----")
   click.echo(f"----Publicação/atualização datasest em {host}----")
   run_validations()
-  os_forward_slash_publish = separador
   package_path = "."
   path_datapackage = datapackage_path()
   dataset_dict = lerDadosJsonMapeado(host,path_datapackage,key,'false','null')
@@ -48,14 +47,11 @@ def publish(host, key):
   if(os.path.isfile(path_datapackage)):
       comandoDelete = r'del /f filename'
       so = "WINDOWS"
-      caminhoRelativo = package_path + os_forward_slash_publish + lerCaminhoRelativo(path_datapackage);
+      caminhoRelativo = package_path + os_slash + lerCaminhoRelativo(path_datapackage);
       privado = True
       autor = 'Usuario teste'
       tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
       if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
-         nameDataPackage = package_path.split(os_forward_slash_publish)[-1]
-         pprint.pprint("Criacao de DataSet inicializada: " + nameDataPackage)
-         importaDataSet(key,"",package_path,"csv",privado,autor,type,tags,os_forward_slash_publish,"",comandoDelete,so,host)
-         pprint.pprint("Criacao de DataSet finalizada: " + nameDataPackage)
-         pprint.pprint("***********************************************************")
+         importaDataSet(key,"",package_path,"csv",privado,autor,type,tags,os_slash,"",comandoDelete,so,host)
+         click.echo('----Publicação/atualização datasest finalizada----')
 
