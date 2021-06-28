@@ -41,7 +41,7 @@ def publish(host, key):
   os_forward_slash_publish = separador
   package_path = "."
   caminhoCompleto = package_path + os_forward_slash_publish + "datapackage" + '.json'
-  dataset_dict = lerDadosJsonMapeado(caminhoCompleto,key,'false','null')
+  dataset_dict = lerDadosJsonMapeado(host,caminhoCompleto,key,'false','null')
   # Deleting dataset if it exists
   delete_dataset(host, key, json.loads(dataset_dict)['name'])
   if(os.path.isfile(caminhoCompleto)):
