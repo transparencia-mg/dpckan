@@ -585,3 +585,10 @@ def is_datapackage_present(env):
 def delete_dataset(host, key, dataset_name):
   demo = RemoteCKAN(host, apikey=key)
   demo.action.package_delete(id=dataset_name)
+
+def is_dataset_alread_published(host, dataset_name):
+  demo = RemoteCKAN(host)
+  if dataset_name in demo.action.package_list():
+    return True
+  else:
+    return False

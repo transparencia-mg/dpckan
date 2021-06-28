@@ -3,11 +3,25 @@ import json
 import codecs
 import sys
 import click
+from ckanapi import RemoteCKAN
 
-def run_validations():
+def run_validations(host, key):
+  """
+    Run validations before dataset publication
+  """
   click.echo("----Iniciando verificações----")
   is_datapackage_present()
+  is_host_valid(host)
   click.echo("----Verificações realizadas com sucesso----")
+
+def is_host_valid(host):
+  demo = RemoteCKAN(host)
+  try:
+    ckan_exist = demo.action.site_read()
+    click.echo(f'----Host {host} válido----')
+  except:
+    click.echo(f'----Host {host} inválido----')
+    sys.exit(1)
 
 def is_datapackage_present():
   """
@@ -37,6 +51,8 @@ def is_datapackage_present():
       datapackage_keys = json.load(json_file)
       if f"name" in datapackage_keys.keys():
         click.echo(f"----Nome do dataset: {datapackage_keys['name']}----")
+      else:
+        click.echo("----Arquivo datapackage.json sem a chave 'name' obrigatória----")
   except FileNotFoundError:
     click.echo("----Arquivo datapackage.json não encontrado na raiz do dataset----")
     sys.exit(1)

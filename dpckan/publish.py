@@ -5,7 +5,8 @@ import json
 import click
 from dpckan.validations import run_validations
 from dpckan.functions import (os_slash, datapackage_path, lerDadosJsonMapeado,
-                              delete_dataset, lerCaminhoRelativo, importaDataSet)
+                              delete_dataset, lerCaminhoRelativo, importaDataSet,
+                              is_dataset_alread_published)
 
 @click.command()
 @click.option('--host', '-H', envvar='CKAN_HOST', required=True,
@@ -33,11 +34,13 @@ def publish(host, key):
   """
   click.echo("----Iniciando publicação/atualização datasest----")
   click.echo(f"----Publicação/atualização datasest em {host}----")
-  run_validations()
   path_datapackage = datapackage_path()
   dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
-  # Deleting dataset if it exists
-  delete_dataset(host, key, dataset_dict['name'])
+  published_dataset = is_dataset_alread_published(host, dataset_dict['name'])
+  run_validations(host, key)
+  if published_dataset:
+    # Deleting dataset if it exists
+    delete_dataset(host, key, dataset_dict['name'])
   if(os.path.isfile(path_datapackage)):
       comandoDelete = r'del /f filename'
       so = "WINDOWS"
