@@ -11,10 +11,23 @@ import json
 import codecs
 import importlib
 import time
+import click
 from urllib.parse import quote
 from frictionless_ckan_mapper import ckan_to_frictionless as converter
+from ckanapi import RemoteCKAN
 
+# Excluir quando todas as funções estiverem refatoradas
+# Código contará apenas com varável os_slash, definido abaixo
 separador = os.path.sep
+
+# Helps functions identify which slash user operating system uses
+os_slash = os.path.sep
+
+def datapackage_path():
+  """
+    Return the exact path to datapackage.json file. It must to be in the root directory
+  """
+  return f'.{os_slash}datapackage.json'
 
 def buscaListaDadosAbertos(authorizaton):
     request = urllib2.Request('https://homologa.cge.mg.gov.br/api/3/action/package_list')
@@ -22,7 +35,7 @@ def buscaListaDadosAbertos(authorizaton):
     response_dict = json.loads(urllib2.urlopen(request, '{}').read())
     return response_dict['result']
 
-def buscaDataSet(id,authorization):
+def buscaDataSet(url,id,authorization):
         parametros = {
             'id': id
         }
@@ -33,7 +46,7 @@ def buscaDataSet(id,authorization):
     }
 
         data_string = quote(json.dumps(parametros))
-        request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/3/action/package_show', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request(f'{url}/api/3/action/package_show', data=data_string.encode('utf-8'), headers=headers)
         #request.add_header('Authorization', authorization)
         response_dict = json.loads(urllib.request.urlopen(request).read())
         #for i in range(len(response_dict['result']['resources']))
@@ -97,19 +110,19 @@ def removePastaArquivos(diretorio,separador,comando,so,arquivo):
                 comandoCompleto = comando + arquivoDel
                 os.system(comandoCompleto)
 
-def criarArquivo(authorization,package_id,caminhoCompleto,separador):
+def criarArquivo(url,authorization,package_id,caminhoCompleto,separador):
     format = caminhoCompleto.split(separador)[-1]
     formato = format.split('.')[1]
     nome = format
     #alterar os parametros passando somente id
     if(caminhoCompleto.find("http") > 0):
-        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post(f'{url}/api/action/resource_create',
               data={"package_id":package_id,"name" : format,"url":caminhoCompleto},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization})
     else:
         files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-        saida = requests.post('https://homologa.cge.mg.gov.br/api/action/resource_create',
+        saida = requests.post(f'{url}/api/action/resource_create',
               data={"package_id":package_id,"name" : format},
               #data=dataset_dictAtual,
               headers={"Authorization": authorization},
@@ -171,97 +184,59 @@ def lerCaminhoRelativo(diretorio):
                    else:
                      return t['path']
 
-
-
-def lerDadosJsonMapeado(diretorio,authorization,isUpdate,id):
-    listaParametros = ["license_title","maintainer","relationships_as_object","private","maintainer_email","num_tags","id","metadata_created","metadata_modified","author_email","state","version","creator_user_id","type","num_resources","groups","license_id","relationships_as_subject","isopen","url","owner_org","extras","title","revision_id","update"]
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
-        #pprint.pprint(json_file)
-        data = json.load(json_file)
-        #pprint.pprint(data)
-        tagsJson = {}
-        tagsJson['tags'] = []
-        tagsDicionario = {}
-        tagsDicionario['fields'] = []
-        dataset_dict = {}
-        #isUpdate = 'false'
-
-        if(id == 'null'):
-            id = 'null'
-
-        for m in data.keys():
-                #pprint.pprint(t)
-                if(str(m) == 'keywords'):
-                    for t in data[m]:
-                        tagsJson['tags'].append({'name': t})
-                    #pprint.pprint(tagsJson)
-                    y = { 'tags' : tagsJson['tags'] }
-                    dataset_dict.update(y)
-                elif(str(m) == 'fields'):
-                    for t in data[m]:
-                        tagsDicionario['fields'].append({'id': t})
-                    #pprint.pprint(tagsJson)
-                    y = { 'fields' : tagsDicionario['fields'] }
-                    dataset_dict.update(y)
-                elif ((str(m) == 'resources')):
-                    y = { str(m) : str(data[m]) }
-                    #dataset_dict.update(y)
-                elif (str(m) == 'name'):
-                    y = { str(m) : str(data[m]) }
-                    dataset_dict.update(y)
-                elif (str(m) == 'description'):
-                    y = { 'notes' : str(data[m]) }
-                    dataset_dict.update(y)
-                elif (str(m) == 'path'):
-                    y = { 'url' : str(data[m]) }
-                    dataset_dict.update(y)
-                elif (str(m) == 'package_id'):
-                    id = str(data[m])
-                    y = { 'id' : id }
-                    dataset_dict.update(y)
-                elif (str(m) == 'update'):
-                    isUpdate = 'true'
-                elif (str(m) == 'contributors'):
-                    for c in data[m]:
-                        if(c['title']):
-                            y = { "author" : c["title"] }
-                            dataset_dict.update(y)
-                        if(c['role'] == "publisher"):
-                          y = { "owner_org" : c["organization"] }
-                          dataset_dict.update(y)
-                else:
-                    if(str(m) in listaParametros):
-                        y = { str(m) : str(data[m]) }
-                        dataset_dict.update(y)
-
-        if(isUpdate == 'true'):
-            resources = buscaDataSet(id,authorization)
-            y = { 'resources' : resources }
+def lerDadosJsonMapeado(diretorio):
+  listaParametros = ["license_title", "maintainer", "relationships_as_object",
+                     "private", "maintainer_email", "num_tags", "id", "metadata_created",
+                     "metadata_modified", "author_email", "state", "version", "creator_user_id",
+                     "type", "num_resources", "groups", "license_id", "relationships_as_subject", "isopen",
+                     "url", "owner_org", "extras", "title", "revision_id", "update"]
+  with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+    data = json.load(json_file)
+    tagsJson = {}
+    tagsJson['tags'] = []
+    tagsDicionario = {}
+    tagsDicionario['fields'] = []
+    dataset_dict = {}
+    for m in data.keys():
+      if(str(m) == 'keywords'):
+        for t in data[m]:
+          tagsJson['tags'].append({'name': t})
+        y = { 'tags' : tagsJson['tags'] }
+        dataset_dict.update(y)
+      elif(str(m) == 'fields'):
+        for t in data[m]:
+            tagsDicionario['fields'].append({'id': t})
+        y = { 'fields' : tagsDicionario['fields'] }
+        dataset_dict.update(y)
+      elif ((str(m) == 'resources')):
+        y = { str(m) : str(data[m]) }
+      elif (str(m) == 'name'):
+        y = { str(m) : str(data[m]) }
+        dataset_dict.update(y)
+      elif (str(m) == 'description'):
+        y = { 'notes' : str(data[m]) }
+        dataset_dict.update(y)
+      elif (str(m) == 'path'):
+        y = { 'url' : str(data[m]) }
+        dataset_dict.update(y)
+      elif (str(m) == 'package_id'):
+        id = str(data[m])
+        y = { 'id' : id }
+        dataset_dict.update(y)
+      elif (str(m) == 'update'):
+        isUpdate = 'true'
+      elif (str(m) == 'contributors'):
+        for c in data[m]:
+          if(c['title']):
+              y = { "author" : c["title"] }
+              dataset_dict.update(y)
+          if(c['role'] == "publisher"):
+            y = { "owner_org" : c["organization"] }
             dataset_dict.update(y)
-
-        #encontrou = 'false'
-        #for m in data.keys():
-        #    if(str(m) == 'owner_org'):
-        #        encontrou = 'true'
-
-        #if(encontrou == 'false'):
-        #    y = {'owner_org': 'controladoria-geral-do-estado-cge'}
-        #    dataset_dict.update(y)
-
-                #pprint.pprint(tagsJson['tags'])
-                #dataset_dict = {
-                #'title': str(data['title']).replace('_',' ').upper(),
-                #'name': nomeArquivo,
-                #'notes': str(data['notes']).replace('_',' '),
-                #'private': str(data['private']),
-                #'author': data['author'].replace("\'u",''),
-                #'tags': tagsJson['tags'],
-                #'maintainer': str(data['maintainer']),
-                #'maintainer_email': str(data['maintainer_email']),
-                #'type': data['type'].replace("\'u",''),
-                #'owner_org': 'controladoria-geral-do-estado'
-                #}
-        #pprint.pprint(dataset_dict)
+      else:
+        if(str(m) in listaParametros):
+          y = { str(m) : str(data[m]) }
+          dataset_dict.update(y)
     dataset_dict = json.dumps(dataset_dict)
     return dataset_dict
 
@@ -282,8 +257,9 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
     return dataset_dict
 
 
-def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so):
+def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
     try:
+        url = env
         arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
 
         #+ separador + url
@@ -292,7 +268,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         #pprint.pprint(caminhoCompletoJson)
         #caminhoCompletoJson = local-onde-havia-caminho-maquina
         if(os.path.isfile(caminhoCompletoJson)):
-            dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson,authorization,'false','null')
+            dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
         # Use the json module to dump the dictionary to a string for posting.
 
         arqPub = []
@@ -312,7 +288,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         }
 
         # We'll use the package_create function to create a new dataset.
-        request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
+        request = urllib.request.Request(f'{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
 
         # Creating a dataset requires an authorization header.
         # Replace *** with your API key, from your user account on the CKAN
@@ -349,7 +325,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
             caminhoCompleto = diretorio + separador + arquivosDataJson[d]
             pprint.pprint("------------------------------------------------")
             pprint.pprint("Importacao de arquivo inicializada: " + arquivosDataJson[d])
-            criarArquivo(authorization,id,caminhoCompleto,separador)
+            criarArquivo(url,authorization,id,caminhoCompleto,separador)
             pprint.pprint("Importacao de arquivo finalizada: " + arquivosDataJson[d])
             pprint.pprint("------------------------------------------------")
     except Exception as e:
@@ -367,20 +343,20 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
                 #pprint.pprint(caminhoCompleto)
                 pprint.pprint("------------------------------------------------")
                 pprint.pprint("Importacao de arquivo inicializada: " + arquivosData[d])
-                criarArquivo(authorization,id,caminhoCompleto,separador)
+                criarArquivo(url,authorization,id,caminhoCompleto,separador)
                 pprint.pprint("Importacao de arquivo finalizada: " + arquivosData[d])
                 pprint.pprint("------------------------------------------------")
     except Exception as e:
         print("Nao foi possivel realizar a importacao do arquivo de dados. Erro: " + e)
 
     try:
-        resources = buscaDataSet(id,authorization)
+        resources = buscaDataSet(url,id,authorization)
         for d in resources:
             resource_id = d['id']
             name = str(d['name'])
             if(not name.find(".json") > 0):
                 pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
-                atualizaDicionario(caminhoCompletoJson,resource_id,name,authorization,separador)
+                atualizaDicionario(url,caminhoCompletoJson,resource_id,name,authorization,separador)
                 pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
     except Exception as e:
         print("Nao foi possivel atualizar o dicionario de dados. Erro: " + e)
@@ -457,7 +433,7 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     #pprint.pprint(caminhoCompletoJson)
         #caminhoCompletoJson = local-onde-havia-caminho-maquina
     if(os.path.isfile(caminhoCompletoJson)):
-        dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson,url,authorization,'null')
+        dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
         #pprint.pprint(dataset_dict)
     else:
         #pprint.pprint(caminhoCompletoJson)
@@ -501,7 +477,7 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     update_package = response_dict['result']
     #pprint.pprint(response_dict['result'])
 
-def atualizaDicionario(datapackage,resource_id,resource,authorization,separador):
+def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separador):
     with codecs.open(datapackage,'r', 'utf-8-sig') as json_file:
         data = json.load(json_file)
         ckan_dict = data
@@ -552,7 +528,7 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     }
     #data = urllib.parse.urlencode(frictionless_package)
     # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request('https://homologa.cge.mg.gov.br/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
+    request = urllib.request.Request(f'{url}/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
 
     # Creating a dataset requires an authorization header.
     # Replace *** with your API key, from your user account on the CKAN site
@@ -567,3 +543,52 @@ def atualizaDicionario(datapackage,resource_id,resource,authorization,separador)
     response_dict = json.loads(response.read())
     assert response_dict['success'] is True
 
+def is_datapackage_present(env):
+  """
+  Verifica a existência da chave "datapackage_resource_id" no arquivo datapackage.json para o ambiente desejado (homologação ou produção)
+  Existência da chave "datapackage_resource_id" significa que pacote já foi publicado no ambiente desejado
+  Arquivo datapackage.json deve estar na raiz do dataset
+  Trata erro para:
+   - datapackage.json inexistente
+   - algum erro de sintaxe no arquivo datapackage.json, ou até mesmo arquivo existente mas em branco
+
+  Parameters
+  ----------
+    env
+    homologacao: homologa.cge.mg.gov.br/
+    producao: dados.mg.gov.br/
+
+
+  Returns
+  -------
+  string
+    valor correspondente a chave "datapackage_resource_id" do ambiente solicitado, quando a mesma existir
+  None
+    quando a chave não existir
+  """
+  try:
+    with codecs.open('datapackage.json','r', 'utf-8-sig') as json_file:
+      datapackage_keys = json.load(json_file)
+      if f"datapackage_resource_id_{env}" in datapackage_keys.keys():
+        click.echo("----Iniciando atualização do Dataset----")
+        return datapackage_keys[f"datapackage_resource_id_{env}"]
+      else:
+        click.echo("----Iniciando Publicação do Dataset----")
+        return None
+  except FileNotFoundError:
+    click.echo("----Arquivo datapackage.json não encontrado na raiz do dataset----")
+    sys.exit(1)
+  except json.decoder.JSONDecodeError:
+    click.echo("----Arquivo datapackage.json com algum problema de sintaxe ou em branco----")
+    sys.exit(1)
+
+def delete_dataset(host, key, dataset_name):
+  demo = RemoteCKAN(host, apikey=key)
+  demo.action.package_delete(id=dataset_name)
+
+def is_dataset_alread_published(host, dataset_name):
+  demo = RemoteCKAN(host)
+  if dataset_name in demo.action.package_list():
+    return True
+  else:
+    return False

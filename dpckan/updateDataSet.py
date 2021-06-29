@@ -6,9 +6,7 @@ import requests
 import json
 import collections
 import sys
-# lembrar que ao chamar from functions import... erro para encontrar "functions" ao chamar a função utilizando "from dpkgckanmg.publish import publish"
-# ao utilizar o método abaixo erro para encontrar "dpkgckanmg" ao chamar a função no final deste arquivo
-from dpkgckanmg.functions import buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta
+from dpckan.functions import buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta
 
 def dataSet(authorizaton,caminhoCompleto,id):
   """
