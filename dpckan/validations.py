@@ -53,6 +53,7 @@ def is_datapackage_present():
         click.echo(f"----Nome do dataset: {datapackage_keys['name']}----")
       else:
         click.echo("----Arquivo datapackage.json sem a chave 'name' obrigatória----")
+        sys.exit(1)
   except FileNotFoundError:
     click.echo("----Arquivo datapackage.json não encontrado na raiz do dataset----")
     sys.exit(1)

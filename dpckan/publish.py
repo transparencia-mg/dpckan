@@ -34,6 +34,7 @@ def publish(host, key):
   """
   click.echo("----Iniciando publicação/atualização datasest----")
   click.echo(f"----Publicação/atualização datasest em {host}----")
+  run_validations(host, key)
   path_datapackage = datapackage_path()
   dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
   published_dataset = is_dataset_alread_published(host, dataset_dict['name'])
