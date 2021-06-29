@@ -37,7 +37,8 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       # Deleting dataset after test
       path_datapackage = datapackage_path()
       dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
-      delete_dataset(os.environ.get('CKAN_HOST_PRODUCAO'), os.environ.get('CKAN_KEY_PRODUCAO'), dataset_dict['name'])
+      print(dataset_dict['name'])
+      delete_dataset(os.environ.get('CKAN_HOST_PRODUCAO'), os.environ.get('CKAN_KEY_PRODUCAO'), "letters-vowel-teste")
       self.assertEqual(result.exit_code, 0)
 
 if __name__ == '__main__':
