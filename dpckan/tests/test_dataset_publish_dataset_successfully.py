@@ -38,9 +38,9 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       path_datapackage = datapackage_path()
       dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
       print("QUAL AMBIENTE?")
-      print(${{secret.CKAN_HOST_PRODUCAO}})
+      print(os.environ.get('CKAN_HOST_PRODUCAO'))
       print("QUAL AMBIENTE?")
-      delete_dataset("https://dados.mg.gov.br/", os.environ.get('CKAN_KEY_PRODUCAO'), dataset_dict['name'])
+      delete_dataset(os.environ.get('CKAN_HOST_PRODUCAO'), os.environ.get('CKAN_KEY_PRODUCAO'), dataset_dict['name'])
       self.assertEqual(result.exit_code, 0)
 
 if __name__ == '__main__':

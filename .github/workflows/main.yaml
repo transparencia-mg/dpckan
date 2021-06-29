@@ -1,5 +1,11 @@
 name: package-tests
 
+env:
+  CKAN_HOST: ${{ secrets.CKAN_HOST }}
+  CKAN_KEY: ${{ secrets.CKAN_KEY }}
+  CKAN_HOST_PRODUCAO: ${{ secrets.CKAN_HOST_PRODUCAO }}
+  CKAN_KEY_PRODUCAO: ${{ secrets.CKAN_KEY_PRODUCAO }}
+
 on: [push, pull_request]
 
 jobs:
