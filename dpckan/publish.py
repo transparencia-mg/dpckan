@@ -38,7 +38,6 @@ def publish(host, key):
   path_datapackage = datapackage_path()
   dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
   published_dataset = is_dataset_alread_published(host, dataset_dict['name'])
-  run_validations(host, key)
   if published_dataset:
     # Deleting dataset if it exists
     delete_dataset(host, key, dataset_dict['name'])
