@@ -20,9 +20,9 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       clone_online_repo(__file__)
       result = runner.invoke(publish)
       # Deleting dataset after test
-      path_datapackage = datapackage_path()
-      dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
-      delete_dataset(os.environ.get('CKAN_HOST'), os.environ.get('CKAN_KEY'), dataset_dict['name'])
+      # path_datapackage = datapackage_path()
+      # dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
+      # delete_dataset(os.environ.get('CKAN_HOST'), os.environ.get('CKAN_KEY'), dataset_dict['name'])
       self.assertEqual(result.exit_code, 0)
 
   def test_prod_env(self):
@@ -37,9 +37,6 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       # Deleting dataset after test
       path_datapackage = datapackage_path()
       dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
-      print("QUAL AMBIENTE?")
-      print(os.environ.get('CKAN_HOST_PRODUCAO'))
-      print("QUAL AMBIENTE?")
       delete_dataset(os.environ.get('CKAN_HOST_PRODUCAO'), os.environ.get('CKAN_KEY_PRODUCAO'), dataset_dict['name'])
       self.assertEqual(result.exit_code, 0)
 
