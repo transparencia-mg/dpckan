@@ -267,10 +267,11 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
 
 def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
   try:
+    load_complete_json()
     url = env
     arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
-
-    caminhoCompletoJson = diretorio + separador + "datapackage" + '.json'
+    complete_json_path = f".{os_slash}complete_datapackage{os_slash}datapackage.json"
+    caminhoCompletoJson = complete_json_path
     if(os.path.isfile(caminhoCompletoJson)):
         dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
 
@@ -303,14 +304,11 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
       id = str(created_package['id']).replace('u','')
 
     try:
-      arquivosDataJson = buscaArquivos(diretorio,separador,bool(True))
-      for d in range(len(arquivosDataJson)):
-        caminhoCompleto = diretorio + separador + arquivosDataJson[d]
-        pprint.pprint("------------------------------------------------")
-        pprint.pprint("Importacao de arquivo inicializada: " + arquivosDataJson[d])
-        criarArquivo(url,authorization,id,caminhoCompleto,separador)
-        pprint.pprint("Importacao de arquivo finalizada: " + arquivosDataJson[d])
-        pprint.pprint("------------------------------------------------")
+      pprint.pprint("------------------------------------------------")
+      pprint.pprint("Importacao de arquivo datapackage.json inicializada.")
+      criarArquivo(url,authorization,id,caminhoCompletoJson,separador)
+      pprint.pprint("Importacao de arquivo datapackage.json finalizada.")
+      pprint.pprint("------------------------------------------------")
     except Exception:
       delete_dataset(url, authorization, dataset_name)
       print(f"Nao foi possive importar o arquivo contendo os metadados")
