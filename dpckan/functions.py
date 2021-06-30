@@ -157,7 +157,7 @@ def lerDadosJson(diretorio,nomeArquivo):
 
 def load_complete_json():
   os.system('rm -rf complete_datapackage && mkdir complete_datapackage')
-  with open("complete_datapackage/datapackage.json", 'w') as complete_datapackage:
+  with open("complete_datapackage/datapackage.json", 'wb') as complete_datapackage:
     with open("datapackage.json") as datapackage_file:
       data = json.load(datapackage_file)
       for key in data.keys():
@@ -169,7 +169,7 @@ def load_complete_json():
             if isinstance(field['dialect'], str):
               with open(field['dialect']) as dialect_file:
                 field['dialect'] = json.load(dialect_file)
-    json.dump(data, complete_datapackage, indent=2)
+    json.dump(data, codecs.getwriter('utf-8')(complete_datapackage), ensure_ascii=False, indent=2)
 
 def lerCaminhoRelativo(diretorio):
     separador = os.path.sep
