@@ -258,115 +258,88 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
 
 
 def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
-    try:
-        url = env
-        arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
+  try:
+    url = env
+    arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
 
-        #+ separador + url
-        #caminhoCompletoJson = caminhoCompleto.replace(format,'json')
-        caminhoCompletoJson = diretorio + separador + "datapackage" + '.json'
-        #pprint.pprint(caminhoCompletoJson)
-        #caminhoCompletoJson = local-onde-havia-caminho-maquina
-        if(os.path.isfile(caminhoCompletoJson)):
-            dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
-        # Use the json module to dump the dictionary to a string for posting.
+    caminhoCompletoJson = diretorio + separador + "datapackage" + '.json'
+    if(os.path.isfile(caminhoCompletoJson)):
+        dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
 
-        arqPub = []
-        with codecs.open(caminhoCompletoJson,'r', 'utf-8-sig') as json_file:
-        #pprint.pprint(json_file)
-            data = json.load(json_file)
-            for j in data:
-                if(j == 'resources'):
-                    r = data[j]
-                    for s in r:
-                        arqPub.append(str(s['path']).split('/')[-1])
+    arqPub = []
+    with codecs.open(caminhoCompletoJson,'r', 'utf-8-sig') as json_file:
+      data = json.load(json_file)
+      for j in data:
+          if(j == 'resources'):
+              r = data[j]
+              for s in r:
+                  arqPub.append(str(s['path']).split('/')[-1])
 
-        data_string = quote(dataset_dict)
+    data_string = quote(dataset_dict)
+    dataset_name = json.loads(dataset_dict)['name']
 
-        headers = {
-        'Authorization': authorization
-        }
+    headers = {
+      'Authorization': authorization
+    }
 
-        # We'll use the package_create function to create a new dataset.
-        request = urllib.request.Request(f'{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
+    request = urllib.request.Request(f'{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
 
-        # Creating a dataset requires an authorization header.
-        # Replace *** with your API key, from your user account on the CKAN
-        # site
-        # that you're creating the dataset on.
-        #request.add_header('Authorization', authorization)
+    response = urllib.request.urlopen(request)
+    assert response.code == 200
 
-        # Make the HTTP request.
-        response = urllib.request.urlopen(request) #urllib.urlopen(request, data_string)
-        assert response.code == 200
+    response_dict = json.loads(response.read())
+    assert response_dict['success'] is True
 
-        # Use the json module to load CKAN's response into a dictionary.
-        response_dict = json.loads(response.read())
-        assert response_dict['success'] is True
-
-        # package_create returns the created package as its result.
-        created_package = response_dict['result']
-        #pprint.pprint(created_package)
-        if(created_package['id']):
-            #caminhoCompleto = diretorio + '\\' + url + '\\' + url + '.' +
-            #format
-            id = str(created_package['id']).replace('u','')
-        #pprint.pprint(arquivosData)
-
-    except Exception as e:
-        if(e.code == 409):
-            print("O pacote de dados ja existe. Verifique as informacoes e tente novamente.")
-        else:
-            print("Nao foi possivel realizar a importacao do arquivo. Erro: " + e)
+    created_package = response_dict['result']
+    if(created_package['id']):
+      id = str(created_package['id']).replace('u','')
 
     try:
-        arquivosDataJson = buscaArquivos(diretorio,separador,bool(True))
-        for d in range(len(arquivosDataJson)):
-            caminhoCompleto = diretorio + separador + arquivosDataJson[d]
-            pprint.pprint("------------------------------------------------")
-            pprint.pprint("Importacao de arquivo inicializada: " + arquivosDataJson[d])
-            criarArquivo(url,authorization,id,caminhoCompleto,separador)
-            pprint.pprint("Importacao de arquivo finalizada: " + arquivosDataJson[d])
-            pprint.pprint("------------------------------------------------")
-    except Exception as e:
-        print("Nao foi possive importar o arquivo contendo os metadados. Erro: " + e)
+      arquivosDataJson = buscaArquivos(diretorio,separador,bool(True))
+      for d in range(len(arquivosDataJson)):
+        caminhoCompleto = diretorio + separador + arquivosDataJson[d]
+        pprint.pprint("------------------------------------------------")
+        pprint.pprint("Importacao de arquivo inicializada: " + arquivosDataJson[d])
+        criarArquivo(url,authorization,id,caminhoCompleto,separador)
+        pprint.pprint("Importacao de arquivo finalizada: " + arquivosDataJson[d])
+        pprint.pprint("------------------------------------------------")
+    except Exception:
+      delete_dataset(url, authorization, dataset_name)
+      print(f"Nao foi possive importar o arquivo contendo os metadados")
+      sys.exit(1)
 
     try:
-        for d in range(len(arquivosData)):
-            #pprint.pprint("Arquivolido")
-            #pprint.pprint(arquivosData[d])
-            caminhoCompleto = diretorio + separador + "data" + separador + arquivosData[d]
-            #pprint.pprint(caminhoCompleto)
-            existe = arquivosData[d] in arqPub
-            if(os.path.isfile(caminhoCompleto) and existe):
-                #pprint.pprint("CriaArquivo")
-                #pprint.pprint(caminhoCompleto)
-                pprint.pprint("------------------------------------------------")
-                pprint.pprint("Importacao de arquivo inicializada: " + arquivosData[d])
-                criarArquivo(url,authorization,id,caminhoCompleto,separador)
-                pprint.pprint("Importacao de arquivo finalizada: " + arquivosData[d])
-                pprint.pprint("------------------------------------------------")
-    except Exception as e:
-        print("Nao foi possivel realizar a importacao do arquivo de dados. Erro: " + e)
+      for d in range(len(arquivosData)):
+        caminhoCompleto = diretorio + separador + "data" + separador + arquivosData[d]
+        existe = arquivosData[d] in arqPub
+        if(os.path.isfile(caminhoCompleto) and existe):
+          pprint.pprint("------------------------------------------------")
+          pprint.pprint("Importacao de arquivo inicializada: " + arquivosData[d])
+          criarArquivo(url,authorization,id,caminhoCompleto,separador)
+          pprint.pprint("Importacao de arquivo finalizada: " + arquivosData[d])
+          pprint.pprint("------------------------------------------------")
+    except Exception:
+      delete_dataset(url, authorization, dataset_name)
+      print(f"Nao foi possivel realizar a importacao do arquivo de dados")
+      sys.exit(1)
 
     try:
-        resources = buscaDataSet(url,id,authorization)
-        for d in resources:
-            resource_id = d['id']
-            name = str(d['name'])
-            if(not name.find(".json") > 0):
-                pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
-                atualizaDicionario(url,caminhoCompletoJson,resource_id,name,authorization,separador)
-                pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
-    except Exception as e:
-        print("Nao foi possivel atualizar o dicionario de dados. Erro: " + e)
+      resources = buscaDataSet(url,id,authorization)
+      for d in resources:
+        resource_id = d['id']
+        name = str(d['name'])
+        if(not name.find(".json") > 0):
+            pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
+            atualizaDicionario(url,caminhoCompletoJson,resource_id,name,authorization,separador)
+            pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
+    except Exception:
+      delete_dataset(url, authorization, dataset_name)
+      print("Nao foi possivel atualizar o dicionario de dados")
+      sys.exit(1)
 
-    except Exception as e:
-        if(e.code == 409):
-            print("O pacote de dados ja existe. Verifique as informacoes e tente novamente.")
-        else:
-            print("Ocorreu um erro inesperado. Erro: " + e)
-
+  except Exception:
+    print("Não foi possível criar o dataset.")
+    sys.exit(1)
 
 def comparaDataSet(dataset_dict,resources):
     dataset_dictNovo = {}
@@ -488,7 +461,14 @@ def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separa
                             name = str(n['path']).split('/')[-1]
                             if(name == resource):
                                 schema = n['schema']
-                                fieldsList = n['schema']['fields']
+                                if isinstance(n['schema'], dict):
+                                  fieldsList = n['schema']['fields']
+                                else:
+                                  with codecs.open(schema,'r', 'utf-8-sig') as json_file:
+                                    print("KKKKKKKKKKKKKKKKKKKKK")
+                                    print(json.load(json_file)['fields'])
+                                    print(type(json.load(json_file)['fields']))
+                                    fieldsList = json.load(json_file)['fields']
                                 resource_id = { "resource_id" : resource_id }
                                 dataset_dict.update(resource_id)
                                 force = { "force" : "True" }
