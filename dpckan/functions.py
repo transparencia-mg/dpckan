@@ -155,13 +155,17 @@ def lerDadosJson(diretorio,nomeArquivo):
         }]
     return dataset_dict
 
-def lerDadosJsonResources(diretorio):
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
-        data = json.load(json_file)
-        dataset_dict = [{
-            'resources': str(data['resources'])
-        }]
-    return dataset_dict
+def load_complete_json():
+  with open("test.json", 'w') as complete_datapackage:
+    with open("datapackage.json") as datapackage_file:
+      data = json.load(datapackage_file)
+      for key in data.keys():
+        if key == 'resources':
+          for field in data['resources']:
+            if isinstance(field['schema'], str):
+              with open(field['schema']) as schema_file:
+                field['schema'] = json.load(schema_file)
+    json.dump(data, complete_datapackage, indent=2)
 
 def lerCaminhoRelativo(diretorio):
     separador = os.path.sep
