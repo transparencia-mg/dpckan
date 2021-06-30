@@ -451,77 +451,56 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     #pprint.pprint(response_dict['result'])
 
 def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separador):
-    with codecs.open(datapackage,'r', 'utf-8-sig') as json_file:
-        data = json.load(json_file)
-        ckan_dict = data
-        dataset_dict = {}
-        for m in data.keys():
-            if(str(m) == 'resources'):
-                        for n in data[m]:
-                            name = str(n['path']).split('/')[-1]
-                            if(name == resource):
-                                schema = n['schema']
-                                if isinstance(n['schema'], dict):
-                                  fieldsList = n['schema']['fields']
-                                else:
-                                  with codecs.open(schema,'r', 'utf-8-sig') as json_file:
-                                    print("KKKKKKKKKKKKKKKKKKKKK")
-                                    print(json.load(json_file)['fields'])
-                                    print(type(json.load(json_file)['fields']))
-                                    fieldsList = json.load(json_file)['fields']
-                                resource_id = { "resource_id" : resource_id }
-                                dataset_dict.update(resource_id)
-                                force = { "force" : "True" }
-                                dataset_dict.update(force)
-                                fields = []
-                                #fields['fields'] = []
-                                for p in fieldsList:
-                                    if 'type_override' in p.keys():
-                                        metaInfo = {"label": p["title"], "notes" : p["description"] , "type_override" : p["type_override"] }
-                                    else:
-                                        metaInfo = { "label": p["title"], "notes" : p["description"] }
-                                    if p["type"] == "string":
-                                        tipo = "text"
-                                    else:
-                                        tipo = p["type"]
+  with codecs.open(datapackage,'r', 'utf-8-sig') as json_file:
+    data = json.load(json_file)
+    ckan_dict = data
+    dataset_dict = {}
+    for m in data.keys():
+      if(str(m) == 'resources'):
+        for n in data[m]:
+          name = str(n['path']).split('/')[-1]
+          if(name == resource):
+            schema = n['schema']
+            if isinstance(n['schema'], dict):
+              fieldsList = n['schema']['fields']
+            else:
+              with codecs.open(schema,'r', 'utf-8-sig') as json_file:
+                fieldsList = json.load(json_file)['fields']
+            resource_id = { "resource_id" : resource_id }
+            dataset_dict.update(resource_id)
+            force = { "force" : "True" }
+            dataset_dict.update(force)
+            fields = []
+            for p in fieldsList:
+              if 'type_override' in p.keys():
+                  metaInfo = {"label": p["title"], "notes" : p["description"] , "type_override" : p["type_override"] }
+              else:
+                  metaInfo = { "label": p["title"], "notes" : p["description"] }
+              if p["type"] == "string":
+                  tipo = "text"
+              else:
+                  tipo = p["type"]
 
-                                    field = { "type" : tipo, "id" : p["name"] , "info" : metaInfo }
+              field = { "type" : tipo, "id" : p["name"] , "info" : metaInfo }
 
-                                    fields.append(field)
-                                #pprint.pprint(fields)
-                                fieldsFull = { "fields" : fields}
-                                dataset_dict.update(fieldsFull)
+              fields.append(field)
+            fieldsFull = { "fields" : fields}
+            dataset_dict.update(fieldsFull)
 
-    frictionless_package = converter.dataset(dataset_dict)
-    frictionless_package = json.dumps(frictionless_package)
+  frictionless_package = converter.dataset(dataset_dict)
+  frictionless_package = json.dumps(frictionless_package)
 
-    #return
-    #requests.post('https://homologa.cge.mg.gov.br/api/action/datastore_create',
-    #              data=frictionless_package,
-    #              headers={"Authorization": authorization})
-
-     # Use the json module to dump the dictionary to a string for posting.
-    #data_string = quote(frictionless_package)
-
-    headers = {
+  headers = {
     'Authorization': authorization
-    }
-    #data = urllib.parse.urlencode(frictionless_package)
-    # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request(f'{url}/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
+  }
 
-    # Creating a dataset requires an authorization header.
-    # Replace *** with your API key, from your user account on the CKAN site
-    # that you're creating the dataset on.
-    #request.add_header('Authorization', authorization)
+  request = urllib.request.Request(f'{url}/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
 
-    # Make the HTTP request.
-    response = urllib.request.urlopen(request)
-    assert response.code == 200
-    time.sleep(10)
-    # Use the json module to load CKAN's response into a dictionary.
-    response_dict = json.loads(response.read())
-    assert response_dict['success'] is True
+  response = urllib.request.urlopen(request)
+  assert response.code == 200
+  time.sleep(10)
+  response_dict = json.loads(response.read())
+  assert response_dict['success'] is True
 
 def is_datapackage_present(env):
   """
