@@ -1,6 +1,5 @@
 import os
 import json
-import codecs
 import sys
 import click
 from ckanapi import RemoteCKAN
@@ -47,7 +46,7 @@ def is_datapackage_present():
     quando a chave não existir
   """
   try:
-    with codecs.open('datapackage.json','r', 'utf-8-sig') as json_file:
+    with open('datapackage.json','r', encoding="utf-8") as json_file:
       datapackage_keys = json.load(json_file)
       if f"name" in datapackage_keys.keys():
         click.echo(f"----Nome do dataset: {datapackage_keys['name']}----")
