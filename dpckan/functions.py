@@ -8,7 +8,6 @@ import sys
 import shutil
 import time
 import json
-import codecs
 import importlib
 import time
 import click
@@ -157,23 +156,23 @@ def lerDadosJson(diretorio,nomeArquivo):
 
 def load_complete_json():
   os.system('rm -rf complete_datapackage && mkdir complete_datapackage')
-  with open("complete_datapackage/datapackage.json", 'wb') as complete_datapackage:
-    with open("datapackage.json") as datapackage_file:
+  with open("complete_datapackage/datapackage.json", 'w', encoding="utf-8") as complete_datapackage:
+    with open("datapackage.json", "r", encoding="utf-8") as datapackage_file:
       data = json.load(datapackage_file)
       for key in data.keys():
         if key == 'resources':
           for field in data['resources']:
             if isinstance(field['schema'], str):
-              with open(field['schema']) as schema_file:
+              with open(field['schema'], "r", encoding="utf-8") as schema_file:
                 field['schema'] = json.load(schema_file)
             if isinstance(field['dialect'], str):
-              with open(field['dialect']) as dialect_file:
+              with open(field['dialect'], "r", encoding="utf-8") as dialect_file:
                 field['dialect'] = json.load(dialect_file)
-    json.dump(data, codecs.getwriter('utf-8')(complete_datapackage), ensure_ascii=False, indent=2)
+    json.dump(data, complete_datapackage, ensure_ascii=False, indent=2)
 
 def lerCaminhoRelativo(diretorio):
     separador = os.path.sep
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+    with open(diretorio,'r', encoding="utf-8") as json_file:
         data = json.load(json_file)
         for m in data.keys():
             if(m == 'resources'):
@@ -198,7 +197,7 @@ def lerDadosJsonMapeado(diretorio):
                      "metadata_modified", "author_email", "state", "version", "creator_user_id",
                      "type", "num_resources", "groups", "license_id", "relationships_as_subject", "isopen",
                      "url", "owner_org", "extras", "title", "revision_id", "update"]
-  with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+  with open(diretorio,'r', encoding="utf-8") as json_file:
     data = json.load(json_file)
     tagsJson = {}
     tagsJson['tags'] = []
@@ -252,7 +251,7 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
     nome = diretorio.split(separador)[-1]
     dataset_dict = {}
     tagsDicionario['fields'] = []
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+    with open(diretorio,'r', encoding="utf-8") as json_file:
        data = json.load(json_file)
        for m in data.keys():
            if ((str(m) == 'resources')):
@@ -276,7 +275,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
 
     arqPub = []
-    with codecs.open(caminhoCompletoJson,'r', 'utf-8-sig') as json_file:
+    with open(caminhoCompletoJson,'r', encoding="utf-8") as json_file:
       data = json.load(json_file)
       for j in data:
           if(j == 'resources'):
@@ -457,7 +456,7 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     #pprint.pprint(response_dict['result'])
 
 def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separador):
-  with codecs.open(datapackage,'r', 'utf-8-sig') as json_file:
+  with open(datapackage,'r', encoding="utf-8") as json_file:
     data = json.load(json_file)
     ckan_dict = data
     dataset_dict = {}
@@ -470,7 +469,7 @@ def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separa
             if isinstance(n['schema'], dict):
               fieldsList = n['schema']['fields']
             else:
-              with codecs.open(schema,'r', 'utf-8-sig') as json_file:
+              with open(schema,'r', encoding="utf-8") as json_file:
                 fieldsList = json.load(json_file)['fields']
             resource_id = { "resource_id" : resource_id }
             dataset_dict.update(resource_id)
