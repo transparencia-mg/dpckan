@@ -50,4 +50,5 @@ def publish(host, key):
       tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
       if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
          importaDataSet(key,"",".","csv",privado,autor,type,tags,os_slash,"",comandoDelete,so,host)
-         click.echo('----Publicação/atualização datasest finalizada----')
+         os.system('rm -rf complete_datapackage')
+         click.echo('----Publicação/atualização dataset finalizada----')

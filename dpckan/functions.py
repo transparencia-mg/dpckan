@@ -8,13 +8,13 @@ import sys
 import shutil
 import time
 import json
-import codecs
 import importlib
 import time
 import click
 from urllib.parse import quote
 from frictionless_ckan_mapper import ckan_to_frictionless as converter
 from ckanapi import RemoteCKAN
+from frictionless import Package
 
 # Excluir quando todas as funções estiverem refatoradas
 # Código contará apenas com varável os_slash, definido abaixo
@@ -155,17 +155,16 @@ def lerDadosJson(diretorio,nomeArquivo):
         }]
     return dataset_dict
 
-def lerDadosJsonResources(diretorio):
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
-        data = json.load(json_file)
-        dataset_dict = [{
-            'resources': str(data['resources'])
-        }]
-    return dataset_dict
+def load_complete_datapackage(source):
+  datapackage = Package(source)
+  for resource_name in datapackage.resource_names:
+    datapackage.get_resource(resource_name).dialect.expand()
+    datapackage.get_resource(resource_name).schema.expand()
+  return datapackage
 
 def lerCaminhoRelativo(diretorio):
     separador = os.path.sep
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+    with open(diretorio,'r', encoding="utf-8") as json_file:
         data = json.load(json_file)
         for m in data.keys():
             if(m == 'resources'):
@@ -190,7 +189,7 @@ def lerDadosJsonMapeado(diretorio):
                      "metadata_modified", "author_email", "state", "version", "creator_user_id",
                      "type", "num_resources", "groups", "license_id", "relationships_as_subject", "isopen",
                      "url", "owner_org", "extras", "title", "revision_id", "update"]
-  with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+  with open(diretorio,'r', encoding="utf-8") as json_file:
     data = json.load(json_file)
     tagsJson = {}
     tagsJson['tags'] = []
@@ -244,7 +243,7 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
     nome = diretorio.split(separador)[-1]
     dataset_dict = {}
     tagsDicionario['fields'] = []
-    with codecs.open(diretorio,'r', 'utf-8-sig') as json_file:
+    with open(diretorio,'r', encoding="utf-8") as json_file:
        data = json.load(json_file)
        for m in data.keys():
            if ((str(m) == 'resources')):
@@ -258,115 +257,83 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
 
 
 def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
-    try:
-        url = env
-        arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
+  # try:
+    datapackage = load_complete_datapackage("./datapackage.json")
+    url = env
+    caminhoCompletoJson = f".{os_slash}datapackage.json"
+    if(os.path.isfile(caminhoCompletoJson)):
+        dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
 
-        #+ separador + url
-        #caminhoCompletoJson = caminhoCompleto.replace(format,'json')
-        caminhoCompletoJson = diretorio + separador + "datapackage" + '.json'
-        #pprint.pprint(caminhoCompletoJson)
-        #caminhoCompletoJson = local-onde-havia-caminho-maquina
-        if(os.path.isfile(caminhoCompletoJson)):
-            dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
-        # Use the json module to dump the dictionary to a string for posting.
+    arqPub = []
+    with open(caminhoCompletoJson,'r', encoding="utf-8") as json_file:
+      data = json.load(json_file)
+      for j in data:
+          if(j == 'resources'):
+              r = data[j]
+              for s in r:
+                  arqPub.append(str(s['path']).split('/')[-1])
 
-        arqPub = []
-        with codecs.open(caminhoCompletoJson,'r', 'utf-8-sig') as json_file:
-        #pprint.pprint(json_file)
-            data = json.load(json_file)
-            for j in data:
-                if(j == 'resources'):
-                    r = data[j]
-                    for s in r:
-                        arqPub.append(str(s['path']).split('/')[-1])
+    data_string = quote(dataset_dict)
+    dataset_name = json.loads(dataset_dict)['name']
 
-        data_string = quote(dataset_dict)
+    headers = {
+      'Authorization': authorization
+    }
 
-        headers = {
-        'Authorization': authorization
-        }
+    request = urllib.request.Request(f'{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
 
-        # We'll use the package_create function to create a new dataset.
-        request = urllib.request.Request(f'{url}/api/action/package_create', data=data_string.encode('utf-8'), headers=headers)
+    response = urllib.request.urlopen(request)
+    assert response.code == 200
 
-        # Creating a dataset requires an authorization header.
-        # Replace *** with your API key, from your user account on the CKAN
-        # site
-        # that you're creating the dataset on.
-        #request.add_header('Authorization', authorization)
+    response_dict = json.loads(response.read())
+    assert response_dict['success'] is True
 
-        # Make the HTTP request.
-        response = urllib.request.urlopen(request) #urllib.urlopen(request, data_string)
-        assert response.code == 200
-
-        # Use the json module to load CKAN's response into a dictionary.
-        response_dict = json.loads(response.read())
-        assert response_dict['success'] is True
-
-        # package_create returns the created package as its result.
-        created_package = response_dict['result']
-        #pprint.pprint(created_package)
-        if(created_package['id']):
-            #caminhoCompleto = diretorio + '\\' + url + '\\' + url + '.' +
-            #format
-            id = str(created_package['id']).replace('u','')
-        #pprint.pprint(arquivosData)
-
-    except Exception as e:
-        if(e.code == 409):
-            print("O pacote de dados ja existe. Verifique as informacoes e tente novamente.")
-        else:
-            print("Nao foi possivel realizar a importacao do arquivo. Erro: " + e)
+    created_package = response_dict['result']
+    if(created_package['id']):
+      id = str(created_package['id']).replace('u','')
 
     try:
-        arquivosDataJson = buscaArquivos(diretorio,separador,bool(True))
-        for d in range(len(arquivosDataJson)):
-            caminhoCompleto = diretorio + separador + arquivosDataJson[d]
-            pprint.pprint("------------------------------------------------")
-            pprint.pprint("Importacao de arquivo inicializada: " + arquivosDataJson[d])
-            criarArquivo(url,authorization,id,caminhoCompleto,separador)
-            pprint.pprint("Importacao de arquivo finalizada: " + arquivosDataJson[d])
-            pprint.pprint("------------------------------------------------")
-    except Exception as e:
-        print("Nao foi possive importar o arquivo contendo os metadados. Erro: " + e)
+      pprint.pprint("------------------------------------------------")
+      pprint.pprint("Importacao de arquivo datapackage.json inicializada.")
+      criarArquivo(url,authorization,id,caminhoCompletoJson,separador)
+      pprint.pprint("Importacao de arquivo datapackage.json finalizada.")
+      pprint.pprint("------------------------------------------------")
+    except Exception:
+      delete_dataset(url, authorization, dataset_name)
+      print(f"Nao foi possive importar o arquivo contendo os metadados")
+      sys.exit(1)
 
     try:
-        for d in range(len(arquivosData)):
-            #pprint.pprint("Arquivolido")
-            #pprint.pprint(arquivosData[d])
-            caminhoCompleto = diretorio + separador + "data" + separador + arquivosData[d]
-            #pprint.pprint(caminhoCompleto)
-            existe = arquivosData[d] in arqPub
-            if(os.path.isfile(caminhoCompleto) and existe):
-                #pprint.pprint("CriaArquivo")
-                #pprint.pprint(caminhoCompleto)
-                pprint.pprint("------------------------------------------------")
-                pprint.pprint("Importacao de arquivo inicializada: " + arquivosData[d])
-                criarArquivo(url,authorization,id,caminhoCompleto,separador)
-                pprint.pprint("Importacao de arquivo finalizada: " + arquivosData[d])
-                pprint.pprint("------------------------------------------------")
-    except Exception as e:
-        print("Nao foi possivel realizar a importacao do arquivo de dados. Erro: " + e)
+      for resource_name in datapackage.resource_names:
+        pprint.pprint("------------------------------------------------")
+        pprint.pprint("Importacao de arquivo inicializada: " + datapackage.get_resource(resource_name).name)
+        criarArquivo(url,authorization,id,datapackage.get_resource(resource_name).path,separador)
+        pprint.pprint("Importacao de arquivo finalizada: " + datapackage.get_resource(resource_name).name)
+        pprint.pprint("------------------------------------------------")
+    except Exception:
+      delete_dataset(url, authorization, dataset_name)
+      print(f"Nao foi possivel realizar a importacao do arquivo de dados")
+      sys.exit(1)
 
     try:
-        resources = buscaDataSet(url,id,authorization)
-        for d in resources:
-            resource_id = d['id']
-            name = str(d['name'])
-            if(not name.find(".json") > 0):
-                pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
-                atualizaDicionario(url,caminhoCompletoJson,resource_id,name,authorization,separador)
-                pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
-    except Exception as e:
-        print("Nao foi possivel atualizar o dicionario de dados. Erro: " + e)
+      resources = buscaDataSet(url,id,authorization)
+      for d in resources:
+        resource_id = d['id']
+        name = str(d['name'])
+        if(not name.find(".json") > 0):
+          pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
+          atualizaDicionario(url,datapackage,resource_id,name,authorization,separador)
+          pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
+    except urllib.error.HTTPError as e:
+      print(e.read().decode())
+    except Exception:
+      delete_dataset(url, authorization, dataset_name)
+      print("Nao foi possivel atualizar o dicionario de dados")
+      sys.exit(1)
 
-    except Exception as e:
-        if(e.code == 409):
-            print("O pacote de dados ja existe. Verifique as informacoes e tente novamente.")
-        else:
-            print("Ocorreu um erro inesperado. Erro: " + e)
-
+  # except Exception:
+  #   print("Não foi possível criar o dataset.")
+  #   sys.exit(1)
 
 def comparaDataSet(dataset_dict,resources):
     dataset_dictNovo = {}
@@ -478,109 +445,51 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     #pprint.pprint(response_dict['result'])
 
 def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separador):
-    with codecs.open(datapackage,'r', 'utf-8-sig') as json_file:
-        data = json.load(json_file)
-        ckan_dict = data
-        dataset_dict = {}
-        for m in data.keys():
-            if(str(m) == 'resources'):
-                        for n in data[m]:
-                            name = str(n['path']).split('/')[-1]
-                            if(name == resource):
-                                schema = n['schema']
-                                fieldsList = n['schema']['fields']
-                                resource_id = { "resource_id" : resource_id }
-                                dataset_dict.update(resource_id)
-                                force = { "force" : "True" }
-                                dataset_dict.update(force)
-                                fields = []
-                                #fields['fields'] = []
-                                for p in fieldsList:
-                                    if 'type_override' in p.keys():
-                                        metaInfo = {"label": p["title"], "notes" : p["description"] , "type_override" : p["type_override"] }
-                                    else:
-                                        metaInfo = { "label": p["title"], "notes" : p["description"] }
-                                    if p["type"] == "string":
-                                        tipo = "text"
-                                    else:
-                                        tipo = p["type"]
+  data = datapackage.to_dict()
+  ckan_dict = data
+  dataset_dict = {}
+  for m in data.keys():
+    if(str(m) == 'resources'):
+      for n in data[m]:
+        name = str(n['path']).split('/')[-1]
+        if(name == resource):
+          schema = n['schema']
+          fieldsList = n['schema']['fields']
+          resource_id = { "resource_id" : resource_id }
+          dataset_dict.update(resource_id)
+          force = { "force" : "True" }
+          dataset_dict.update(force)
+          fields = []
+          for p in fieldsList:
+            if 'type_override' in p.keys():
+                metaInfo = {"label": p["title"], "notes" : p["description"] , "type_override" : p["type_override"] }
+            else:
+                metaInfo = { "label": p["title"], "notes" : p["description"] }
+            if p["type"] == "string":
+                tipo = "text"
+            else:
+                tipo = p["type"]
 
-                                    field = { "type" : tipo, "id" : p["name"] , "info" : metaInfo }
+            field = { "type" : tipo, "id" : p["name"] , "info" : metaInfo }
 
-                                    fields.append(field)
-                                #pprint.pprint(fields)
-                                fieldsFull = { "fields" : fields}
-                                dataset_dict.update(fieldsFull)
+            fields.append(field)
+          fieldsFull = { "fields" : fields}
+          dataset_dict.update(fieldsFull)
 
-    frictionless_package = converter.dataset(dataset_dict)
-    frictionless_package = json.dumps(frictionless_package)
+  frictionless_package = converter.dataset(dataset_dict)
+  frictionless_package = json.dumps(frictionless_package)
 
-    #return
-    #requests.post('https://homologa.cge.mg.gov.br/api/action/datastore_create',
-    #              data=frictionless_package,
-    #              headers={"Authorization": authorization})
-
-     # Use the json module to dump the dictionary to a string for posting.
-    #data_string = quote(frictionless_package)
-
-    headers = {
+  headers = {
     'Authorization': authorization
-    }
-    #data = urllib.parse.urlencode(frictionless_package)
-    # We'll use the package_create function to create a new dataset.
-    request = urllib.request.Request(f'{url}/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
+  }
 
-    # Creating a dataset requires an authorization header.
-    # Replace *** with your API key, from your user account on the CKAN site
-    # that you're creating the dataset on.
-    #request.add_header('Authorization', authorization)
+  request = urllib.request.Request(f'{url}/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
 
-    # Make the HTTP request.
-    response = urllib.request.urlopen(request)
-    assert response.code == 200
-    time.sleep(10)
-    # Use the json module to load CKAN's response into a dictionary.
-    response_dict = json.loads(response.read())
-    assert response_dict['success'] is True
-
-def is_datapackage_present(env):
-  """
-  Verifica a existência da chave "datapackage_resource_id" no arquivo datapackage.json para o ambiente desejado (homologação ou produção)
-  Existência da chave "datapackage_resource_id" significa que pacote já foi publicado no ambiente desejado
-  Arquivo datapackage.json deve estar na raiz do dataset
-  Trata erro para:
-   - datapackage.json inexistente
-   - algum erro de sintaxe no arquivo datapackage.json, ou até mesmo arquivo existente mas em branco
-
-  Parameters
-  ----------
-    env
-    homologacao: homologa.cge.mg.gov.br/
-    producao: dados.mg.gov.br/
-
-
-  Returns
-  -------
-  string
-    valor correspondente a chave "datapackage_resource_id" do ambiente solicitado, quando a mesma existir
-  None
-    quando a chave não existir
-  """
-  try:
-    with codecs.open('datapackage.json','r', 'utf-8-sig') as json_file:
-      datapackage_keys = json.load(json_file)
-      if f"datapackage_resource_id_{env}" in datapackage_keys.keys():
-        click.echo("----Iniciando atualização do Dataset----")
-        return datapackage_keys[f"datapackage_resource_id_{env}"]
-      else:
-        click.echo("----Iniciando Publicação do Dataset----")
-        return None
-  except FileNotFoundError:
-    click.echo("----Arquivo datapackage.json não encontrado na raiz do dataset----")
-    sys.exit(1)
-  except json.decoder.JSONDecodeError:
-    click.echo("----Arquivo datapackage.json com algum problema de sintaxe ou em branco----")
-    sys.exit(1)
+  response = urllib.request.urlopen(request)
+  assert response.code == 200
+  time.sleep(10)
+  response_dict = json.loads(response.read())
+  assert response_dict['success'] is True
 
 def delete_dataset(host, key, dataset_name):
   demo = RemoteCKAN(host, apikey=key)
