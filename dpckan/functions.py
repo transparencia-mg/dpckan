@@ -257,7 +257,7 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
 
 
 def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
-  # try:
+  try:
     datapackage = load_complete_datapackage("./datapackage.json")
     url = env
     caminhoCompletoJson = f".{os_slash}datapackage.json"
@@ -322,7 +322,7 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         name = str(d['name'])
         if(not name.find(".json") > 0):
           pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
-          atualizaDicionario(url,datapackage,resource_id,name,authorization,separador)
+          resources_metadata_create(url,datapackage,resource_id,name,authorization)
           pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
     except urllib.error.HTTPError as e:
       print(e.read().decode())
@@ -331,9 +331,9 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
       print("Nao foi possivel atualizar o dicionario de dados")
       sys.exit(1)
 
-  # except Exception:
-  #   print("Não foi possível criar o dataset.")
-  #   sys.exit(1)
+  except Exception:
+    print("Não foi possível criar o dataset.")
+    sys.exit(1)
 
 def comparaDataSet(dataset_dict,resources):
     dataset_dictNovo = {}
@@ -444,46 +444,40 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     update_package = response_dict['result']
     #pprint.pprint(response_dict['result'])
 
-def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separador):
+def resources_metadata_create(url,datapackage,resource_id,resource,authorization):
   data = datapackage.to_dict()
-  ckan_dict = data
   dataset_dict = {}
-  for m in data.keys():
-    if(str(m) == 'resources'):
-      for n in data[m]:
-        name = str(n['path']).split('/')[-1]
+  for data_key in data.keys():
+    if(str(data_key) == 'resources'):
+      for resource_key in data[data_key]:
+        name = str(resource_key['path']).split('/')[-1]
         if(name == resource):
-          schema = n['schema']
-          fieldsList = n['schema']['fields']
+          schema = resource_key['schema']
+          resource_schema = resource_key['schema']['fields']
           resource_id = { "resource_id" : resource_id }
           dataset_dict.update(resource_id)
           force = { "force" : "True" }
           dataset_dict.update(force)
           fields = []
-          for p in fieldsList:
-            if 'type_override' in p.keys():
-                metaInfo = {"label": p["title"], "notes" : p["description"] , "type_override" : p["type_override"] }
+          for field in resource_schema:
+            if 'type_override' in field.keys():
+                meta_info = {"label": field["title"], "notes" : field["description"] , "type_override" : field["type_override"] }
             else:
-                metaInfo = { "label": p["title"], "notes" : p["description"] }
-            if p["type"] == "string":
+                meta_info = { "label": field["title"], "notes" : field["description"] }
+            if field["type"] == "string":
                 tipo = "text"
             else:
-                tipo = p["type"]
+                tipo = field["type"]
 
-            field = { "type" : tipo, "id" : p["name"] , "info" : metaInfo }
-
+            field = { "type" : tipo, "id" : field["name"] , "info" : meta_info }
             fields.append(field)
-          fieldsFull = { "fields" : fields}
-          dataset_dict.update(fieldsFull)
+          dataset_dict.update({ "fields" : fields})
 
-  frictionless_package = converter.dataset(dataset_dict)
-  frictionless_package = json.dumps(frictionless_package)
+  frictionless_package = json.dumps(converter.dataset(dataset_dict)).encode('utf-8')
 
-  headers = {
-    'Authorization': authorization
-  }
-
-  request = urllib.request.Request(f'{url}/api/action/datastore_create', data=frictionless_package.encode('utf-8'), headers=headers)
+  request = urllib.request.Request(f'{url}/api/action/datastore_create',
+                                   data=frictionless_package,
+                                   headers={ 'Authorization': authorization })
 
   response = urllib.request.urlopen(request)
   assert response.code == 200
