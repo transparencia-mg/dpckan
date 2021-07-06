@@ -14,6 +14,7 @@ import click
 from urllib.parse import quote
 from frictionless_ckan_mapper import ckan_to_frictionless as converter
 from ckanapi import RemoteCKAN
+from frictionless import Package
 
 # Excluir quando todas as funções estiverem refatoradas
 # Código contará apenas com varável os_slash, definido abaixo
@@ -154,21 +155,12 @@ def lerDadosJson(diretorio,nomeArquivo):
         }]
     return dataset_dict
 
-def load_complete_json():
-  os.system('rm -rf complete_datapackage && mkdir complete_datapackage')
-  with open("complete_datapackage/datapackage.json", 'w', encoding="utf-8") as complete_datapackage:
-    with open("datapackage.json", "r", encoding="utf-8") as datapackage_file:
-      data = json.load(datapackage_file)
-      for key in data.keys():
-        if key == 'resources':
-          for field in data['resources']:
-            if isinstance(field['schema'], str):
-              with open(field['schema'], "r", encoding="utf-8") as schema_file:
-                field['schema'] = json.load(schema_file)
-            if isinstance(field['dialect'], str):
-              with open(field['dialect'], "r", encoding="utf-8") as dialect_file:
-                field['dialect'] = json.load(dialect_file)
-    json.dump(data, complete_datapackage, ensure_ascii=False, indent=2)
+def load_complete_datapackage(source):
+  datapackage = Package(source)
+  for resource_name in datapackage.resource_names:
+    datapackage.get_resource(resource_name).dialect.expand()
+    datapackage.get_resource(resource_name).schema.expand()
+  return datapackage
 
 def lerCaminhoRelativo(diretorio):
     separador = os.path.sep
@@ -265,12 +257,10 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
 
 
 def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
-  try:
-    load_complete_json()
+  # try:
+    datapackage = load_complete_datapackage("./datapackage.json")
     url = env
-    arquivosData = buscaArquivos(diretorio + separador + "data",separador,bool(False))
-    complete_json_path = f".{os_slash}complete_datapackage{os_slash}datapackage.json"
-    caminhoCompletoJson = complete_json_path
+    caminhoCompletoJson = f".{os_slash}datapackage.json"
     if(os.path.isfile(caminhoCompletoJson)):
         dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson)
 
@@ -314,15 +304,12 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
       sys.exit(1)
 
     try:
-      for d in range(len(arquivosData)):
-        caminhoCompleto = diretorio + separador + "data" + separador + arquivosData[d]
-        existe = arquivosData[d] in arqPub
-        if(os.path.isfile(caminhoCompleto) and existe):
-          pprint.pprint("------------------------------------------------")
-          pprint.pprint("Importacao de arquivo inicializada: " + arquivosData[d])
-          criarArquivo(url,authorization,id,caminhoCompleto,separador)
-          pprint.pprint("Importacao de arquivo finalizada: " + arquivosData[d])
-          pprint.pprint("------------------------------------------------")
+      for resource_name in datapackage.resource_names:
+        pprint.pprint("------------------------------------------------")
+        pprint.pprint("Importacao de arquivo inicializada: " + datapackage.get_resource(resource_name).name)
+        criarArquivo(url,authorization,id,datapackage.get_resource(resource_name).path,separador)
+        pprint.pprint("Importacao de arquivo finalizada: " + datapackage.get_resource(resource_name).name)
+        pprint.pprint("------------------------------------------------")
     except Exception:
       delete_dataset(url, authorization, dataset_name)
       print(f"Nao foi possivel realizar a importacao do arquivo de dados")
@@ -334,17 +321,19 @@ def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,se
         resource_id = d['id']
         name = str(d['name'])
         if(not name.find(".json") > 0):
-            pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
-            atualizaDicionario(url,caminhoCompletoJson,resource_id,name,authorization,separador)
-            pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
+          pprint.pprint("Atualizacao de dicionario de dados inicializada: " + name)
+          atualizaDicionario(url,datapackage,resource_id,name,authorization,separador)
+          pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
+    except urllib.error.HTTPError as e:
+      print(e.read().decode())
     except Exception:
       delete_dataset(url, authorization, dataset_name)
       print("Nao foi possivel atualizar o dicionario de dados")
       sys.exit(1)
 
-  except Exception:
-    print("Não foi possível criar o dataset.")
-    sys.exit(1)
+  # except Exception:
+  #   print("Não foi possível criar o dataset.")
+  #   sys.exit(1)
 
 def comparaDataSet(dataset_dict,resources):
     dataset_dictNovo = {}
@@ -456,41 +445,36 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     #pprint.pprint(response_dict['result'])
 
 def atualizaDicionario(url,datapackage,resource_id,resource,authorization,separador):
-  with open(datapackage,'r', encoding="utf-8") as json_file:
-    data = json.load(json_file)
-    ckan_dict = data
-    dataset_dict = {}
-    for m in data.keys():
-      if(str(m) == 'resources'):
-        for n in data[m]:
-          name = str(n['path']).split('/')[-1]
-          if(name == resource):
-            schema = n['schema']
-            if isinstance(n['schema'], dict):
-              fieldsList = n['schema']['fields']
+  data = datapackage.to_dict()
+  ckan_dict = data
+  dataset_dict = {}
+  for m in data.keys():
+    if(str(m) == 'resources'):
+      for n in data[m]:
+        name = str(n['path']).split('/')[-1]
+        if(name == resource):
+          schema = n['schema']
+          fieldsList = n['schema']['fields']
+          resource_id = { "resource_id" : resource_id }
+          dataset_dict.update(resource_id)
+          force = { "force" : "True" }
+          dataset_dict.update(force)
+          fields = []
+          for p in fieldsList:
+            if 'type_override' in p.keys():
+                metaInfo = {"label": p["title"], "notes" : p["description"] , "type_override" : p["type_override"] }
             else:
-              with open(schema,'r', encoding="utf-8") as json_file:
-                fieldsList = json.load(json_file)['fields']
-            resource_id = { "resource_id" : resource_id }
-            dataset_dict.update(resource_id)
-            force = { "force" : "True" }
-            dataset_dict.update(force)
-            fields = []
-            for p in fieldsList:
-              if 'type_override' in p.keys():
-                  metaInfo = {"label": p["title"], "notes" : p["description"] , "type_override" : p["type_override"] }
-              else:
-                  metaInfo = { "label": p["title"], "notes" : p["description"] }
-              if p["type"] == "string":
-                  tipo = "text"
-              else:
-                  tipo = p["type"]
+                metaInfo = { "label": p["title"], "notes" : p["description"] }
+            if p["type"] == "string":
+                tipo = "text"
+            else:
+                tipo = p["type"]
 
-              field = { "type" : tipo, "id" : p["name"] , "info" : metaInfo }
+            field = { "type" : tipo, "id" : p["name"] , "info" : metaInfo }
 
-              fields.append(field)
-            fieldsFull = { "fields" : fields}
-            dataset_dict.update(fieldsFull)
+            fields.append(field)
+          fieldsFull = { "fields" : fields}
+          dataset_dict.update(fieldsFull)
 
   frictionless_package = converter.dataset(dataset_dict)
   frictionless_package = json.dumps(frictionless_package)
