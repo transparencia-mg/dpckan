@@ -6,7 +6,7 @@ import requests
 import json
 import collections
 import sys
-from dpckan.functions import separador, buscaListaDadosAbertos,buscaDataSet,criarArquivo,importaDataSet,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta
+from dpckan.functions import separador, buscaListaDadosAbertos,buscaDataSet,criarArquivo,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta
 from dpckan.updateResource import resource
 
 def criarArquivo2(authorization,package_id,caminhoCompleto,separador=separador):

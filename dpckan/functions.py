@@ -256,7 +256,7 @@ def lerDadosJsonMapeadoResources(diretorio,authorization,isUpdate,id,separador):
     return dataset_dict
 
 
-def importaDataSet(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,comandoDelete,so,env):
+def dataset_create(authorization,url,diretorio,format,privado,autor,type,tags,separador,caminhoPasta,env):
   try:
     datapackage = load_complete_datapackage("./datapackage.json")
     url = env

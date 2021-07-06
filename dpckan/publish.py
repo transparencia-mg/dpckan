@@ -5,7 +5,7 @@ import json
 import click
 from dpckan.validations import run_validations
 from dpckan.functions import (os_slash, datapackage_path, lerDadosJsonMapeado,
-                              delete_dataset, lerCaminhoRelativo, importaDataSet,
+                              delete_dataset, lerCaminhoRelativo, dataset_create,
                               is_dataset_alread_published)
 
 @click.command()
@@ -42,13 +42,10 @@ def publish(host, key):
     # Deleting dataset if it exists
     delete_dataset(host, key, dataset_dict['name'])
   if(os.path.isfile(path_datapackage)):
-      comandoDelete = r'del /f filename'
-      so = "WINDOWS"
-      caminhoRelativo = os_slash + lerCaminhoRelativo(path_datapackage);
-      privado = True
-      autor = 'Usuario teste'
-      tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
-      if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
-         importaDataSet(key,"",".","csv",privado,autor,type,tags,os_slash,"",comandoDelete,so,host)
-         os.system('rm -rf complete_datapackage')
-         click.echo('----Publicação/atualização dataset finalizada----')
+    caminhoRelativo = os_slash + lerCaminhoRelativo(path_datapackage);
+    privado = True
+    autor = 'Usuario teste'
+    tags = [{"name": "my_tag"}, {"name": "my-other-tag"}]
+    if ((caminhoRelativo.find('http')) or (len(os.listdir(caminhoRelativo)) > 0)):
+      dataset_create(key,"",".","csv",privado,autor,type,tags,os_slash,"",host)
+      click.echo('----Publicação/atualização dataset finalizada----')
