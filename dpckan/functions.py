@@ -215,7 +215,7 @@ def lerDadosJsonMapeado(diretorio):
       elif (str(m) == 'description'):
         y = { 'notes' : str(data[m]) }
         dataset_dict.update(y)
-      elif (str(m) == 'path'):
+      elif (str(m) == 'homepage'):
         y = { 'url' : str(data[m]) }
         dataset_dict.update(y)
       elif (str(m) == 'package_id'):
