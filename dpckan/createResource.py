@@ -6,8 +6,10 @@ import requests
 import json
 import collections
 import sys
-from dpckan.functions import separador, buscaListaDadosAbertos,buscaDataSet,criarArquivo,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta
 from dpckan.updateResource import resource
+from dpckan.functions import (separador, buscaListaDadosAbertos, buscaDataSet,
+                              buscaPastaArquivos, removePastaArquivos,
+                              buscaArquivos, atualizaMeta)
 
 def criarArquivo2(authorization,package_id,caminhoCompleto,separador=separador):
   """
@@ -58,8 +60,3 @@ def criarArquivo2(authorization,package_id,caminhoCompleto,separador=separador):
           pprint.pprint("Atualizacao de dicionario de dados finalizada: " + name)
 
   time.sleep(10)
-
-#criarArquivo2('local-onde-havia-chave-acesso', 'remuneracao4', local-onde-havia-caminho-maquina ,separador)
-# if __name__ == '__main__':
-#     criarArquivo2(sys.argv[1], sys.argv[2], sys.argv[3], separador)
-# print(criarArquivo2.__doc__)

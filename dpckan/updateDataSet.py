@@ -6,7 +6,9 @@ import requests
 import json
 import collections
 import sys
-from dpckan.functions import buscaListaDadosAbertos,buscaDataSet,criarArquivo,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta
+from dpckan.functions import (buscaListaDadosAbertos, buscaDataSet,
+                              buscaPastaArquivos, removePastaArquivos,
+                              frictionless_to_ckan_dictionary, buscaArquivos, atualizaMeta)
 
 def dataSet(authorizaton,caminhoCompleto,id):
   """
@@ -35,7 +37,7 @@ def dataSet(authorizaton,caminhoCompleto,id):
   #pprint.pprint(caminhoCompletoJson)
       #caminhoCompletoJson = local-onde-havia-caminho-maquina
   if(os.path.isfile(caminhoCompletoJson)):
-      dataset_dict = lerDadosJsonMapeado(caminhoCompletoJson,authorizaton,'true',id)
+      dataset_dict = frictionless_to_ckan_dictionary(caminhoCompletoJson,authorizaton,'true',id)
       #pprint.pprint(dataset_dict)
   else:
       raise Exception("Diretorio nao encontrado")
@@ -66,20 +68,4 @@ def dataSet(authorizaton,caminhoCompleto,id):
   # package_create returns the created package as its result.
   update_package = response_dict['result']
   pprint.pprint("Atualizacao de dataset finalizada")
-  #pprint.pprint(response_dict['result'])
 
-  #if(update_package):
-  #    for d in range(len(arquivosData)):
-  #        #pprint.pprint(caminhoCompleto + separador + "data" + separador + arquivosData[d])
-  #        if(os.path.isfile(caminhoCompleto + separador + "data" + separador + arquivosData[d])):
-  #            #pprint.pprint("entrou no criar arquivo do metadado")
-  #            pprint.pprint("------------------------------------------------")
-  #            pprint.pprint("Importacao de arquivo inicializada")
-  #            #criarArquivo(authorizaton,update_package['id'],caminhoCompleto + separador + "data" + separador + arquivosData[d],separador)
-  #            pprint.pprint("Importacao de arquivo finalizada")
-  #            pprint.pprint("------------------------------------------------")
-
-#dataSet('local-onde-havia-chave-acesso',local-onde-havia-caminho-maquina,'local-onde-havia-chave-acesso')
-# if __name__ == '__main__':
-#     dataSet(sys.argv[1], sys.argv[2], sys.argv[3])
-# print(dataSet.__doc__)

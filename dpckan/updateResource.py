@@ -6,7 +6,9 @@ import requests
 import json
 import collections
 import sys
-from dpckan.functions import separador, buscaListaDadosAbertos,buscaDataSet,criarArquivo,buscaPastaArquivos,removePastaArquivos,lerDadosJsonMapeado,buscaArquivos,atualizaMeta
+from dpckan.functions import (separador, buscaListaDadosAbertos,
+                              buscaDataSet, buscaPastaArquivos,
+                              removePastaArquivos, buscaArquivos, atualizaMeta)
 
 def resource(caminhoCompleto, id, authorizaton,separador=separador):
   """
@@ -45,8 +47,3 @@ def resource(caminhoCompleto, id, authorizaton,separador=separador):
        pprint.pprint("Acesso negado. Verifique a autorizacao de acesso.")
   else:
       pprint.pprint("Atualizacao de arquivo finalizada")
-
-#resource(local-onde-havia-caminho-maquina,'local-onde-havia-chave-acesso', 'local-onde-havia-chave-acesso', separador)
-# if __name__ == '__main__':
-#     resource(sys.argv[1], sys.argv[2], sys.argv[3], separador)
-# print(resource.__doc__)
