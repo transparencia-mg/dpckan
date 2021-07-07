@@ -215,7 +215,7 @@ def lerDadosJsonMapeado(diretorio):
       elif (str(m) == 'description'):
         y = { 'notes' : str(data[m]) }
         dataset_dict.update(y)
-      elif (str(m) == 'path'):
+      elif (str(m) == 'homepage'):
         y = { 'url' : str(data[m]) }
         dataset_dict.update(y)
       elif (str(m) == 'package_id'):
@@ -460,19 +460,10 @@ def resources_metadata_create(url,datapackage,resource_id,resource,authorization
           dataset_dict.update(force)
           fields = []
           for field in resource_schema:
-            if 'type_override' in field.keys():
-                meta_info = {"label": field["title"], "notes" : field["description"] , "type_override" : field["type_override"] }
-            else:
-                meta_info = { "label": field["title"], "notes" : field["description"] }
-            if field["type"] == "string":
-                tipo = "text"
-            else:
-                tipo = field["type"]
-
-            field = { "type" : tipo, "id" : field["name"] , "info" : meta_info }
+            meta_info = {"label": field["title"], "notes" : field["description"] , "type_override" : 'text' }
+            field = { "type" : 'text', "id" : field["name"] , "info" : meta_info }
             fields.append(field)
           dataset_dict.update({ "fields" : fields})
-
   frictionless_package = json.dumps(converter.dataset(dataset_dict)).encode('utf-8')
 
   request = urllib.request.Request(f'{url}/api/action/datastore_create',
