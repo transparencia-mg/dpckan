@@ -246,6 +246,7 @@ def dataset_create(ckan_host, ckan_key):
 
     try:
       click.echo("Atualizando datapackage.json")
+      # Put datapackage.json title key to show only this description on Datapackage's page
       resource_create(ckan_host,ckan_key,id,datapackage_path,dataset["title"],"Datapackage")
     except Exception:
       delete_dataset(ckan_host, ckan_key, dataset_name)
@@ -259,6 +260,7 @@ def dataset_create(ckan_host, ckan_key):
                                         ckan_key,
                                         id,
                                         package.get_resource(resource_name).path,
+                                        # Put resource description key to show only this description resource's page
                                         package.get_resource(resource_name)["description"],
                                         package.get_resource(resource_name).title)
         resources_metadata_create(ckan_host,
