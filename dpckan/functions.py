@@ -112,7 +112,7 @@ def removePastaArquivos(diretorio,separador,comando,so,arquivo):
                 comandoCompleto = comando + arquivoDel
                 os.system(comandoCompleto)
 
-def resource_create(url,authorization,package_id,caminhoCompleto,resource_title,separador=os_slash):
+def resource_create(url,authorization,package_id,caminhoCompleto,description,resource_title,separador=os_slash):
   format = caminhoCompleto.split(separador)[-1]
   formato = format.split('.')[1]
   nome = format
@@ -127,7 +127,8 @@ def resource_create(url,authorization,package_id,caminhoCompleto,resource_title,
     files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
     saida = requests.post(f'{url}/api/action/resource_create',
                           data={"package_id":package_id,
-                          "name" : resource_title},
+                          "name": resource_title,
+                          "description": description},
                           headers={"Authorization": authorization},
                           files = files)
     result = saida.json()['result']
@@ -222,7 +223,9 @@ def dataset_create(ckan_host, ckan_key):
     datapackage_path = f'.{os_slash}datapackage.json'
     package = load_complete_datapackage(datapackage_path)
     dataset = f2c.package(package)
-    dataset.pop('resources') # removendo para empedir criação de recurso com dataset
+    dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
+    if os.path.isfile('CHANGELOG.md'): # Put dataset description and changelog together to show a better description on dataset's page
+      dataset["notes"] = f"{dataset['notes']}\n{open('CHANGELOG.md').read()}"
     dataset_name = package.name
     headers = {
       'Authorization': ckan_key
@@ -231,7 +234,6 @@ def dataset_create(ckan_host, ckan_key):
     request = urllib.request.Request(f'{ckan_host}/api/action/package_create',
                                      data=quote(json.dumps(dataset)).encode('utf-8'),
                                      headers=headers)
-
     response = urllib.request.urlopen(request)
     assert response.code == 200
 
@@ -244,7 +246,7 @@ def dataset_create(ckan_host, ckan_key):
 
     try:
       click.echo("Atualizando datapackage.json")
-      resource_create(ckan_host,ckan_key,id,datapackage_path,"datapackage.json")
+      resource_create(ckan_host,ckan_key,id,datapackage_path,dataset["title"],"Datapackage")
     except Exception:
       delete_dataset(ckan_host, ckan_key, dataset_name)
       print(f"Erro durante atualização do datapackage.json")
@@ -257,6 +259,7 @@ def dataset_create(ckan_host, ckan_key):
                                         ckan_key,
                                         id,
                                         package.get_resource(resource_name).path,
+                                        package.get_resource(resource_name)["description"],
                                         package.get_resource(resource_name).title)
         resources_metadata_create(ckan_host,
                                   package,
@@ -282,11 +285,6 @@ def comparaDataSet(dataset_dict,resources):
 
     for m in resources.keys():
         if(dataset_dict.has_key(m) and (str(resources[m]) != str(dataset_dict[m]))):
-            #pprint.pprint("Escopo1")
-            #pprint.pprint(str(m))
-            #pprint.pprint(str(resources[m]))
-            #pprint.pprint(str(dataset_dict[m]))
-            #pprint.pprint("Escopo2")
             y = { str(m) : str(dataset_dict[m]) }
             resources[m] = str(dataset_dict[m])
             dataset_dictNovo.update(y)
@@ -306,8 +304,6 @@ def atualizaMeta():
     'id': 'local-onde-havia-chave-acesso'
     }
 
-    #pprint.pprint(dataset_dict)
-    # Use the json module to dump the dictionary to a string for posting.
     data_string = quote(json.dumps(dataset_dict))
 
     headers = {
