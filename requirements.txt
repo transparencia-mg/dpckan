@@ -15,4 +15,5 @@ wheel==0.36.2
 twine==3.4.1
 ckanapi==4.0.0
 frictionless==4.12.4
+ipdb==0.13.9
 

@@ -58,7 +58,7 @@ publish("./", os.getenv('CKAN_PORTAL'), "portal")
 ```
 
 # Criar Recurso
-from dpkgckanmg import criarArquivo2
+from dpckan import criarArquivo2
 criarArquivo2(1, 2, 3)
 
 # Atualizar Data Set

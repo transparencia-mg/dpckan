@@ -224,6 +224,10 @@ def dataset_create(ckan_host, ckan_key):
     package = load_complete_datapackage(datapackage_path)
     dataset = f2c.package(package)
     dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
+    if "notes" not in dataset.keys():
+      dataset["notes"] = ""
+    if os.path.isfile('README.md'): # Put dataset description and readme together to show a better description on dataset's page
+      dataset["notes"] = f"{dataset['notes']}\n{open('README.md').read()}"
     if os.path.isfile('CHANGELOG.md'): # Put dataset description and changelog together to show a better description on dataset's page
       dataset["notes"] = f"{dataset['notes']}\n{open('CHANGELOG.md').read()}"
     dataset_name = package.name
@@ -426,3 +430,17 @@ def is_dataset_alread_published(host, dataset_name):
     return True
   else:
     return False
+
+def resource_update(ckan_host, ckan_key, resource_id, resource_path):
+  try:
+    resource_name = resource_path.split(separador)[-1]
+    click.echo(f"Atualizando recurso {resource_name}")
+    resource_format = resource_name.split('.')[1]
+    files = {'upload': (resource_name, open(resource_path, 'rb'), 'text/' + resource_format)}
+    result = requests.post(f'{ckan_host}/api/action/resource_update',
+              data={"id":resource_id},
+              headers={"Authorization": ckan_key},
+              files = files)
+  except urllib.error.HTTPError as e:
+    print(e.read().decode())
+    sys.exit(1)
