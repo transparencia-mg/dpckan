@@ -249,9 +249,7 @@ def dataset_create(ckan_host, ckan_key):
       id = str(created_package['id']).replace('u','')
 
     try:
-      click.echo("Atualizando datapackage.json")
-      # Put datapackage.json title key to show only this description on Datapackage's page
-      resource_create(ckan_host,ckan_key,id,datapackage_path,dataset["title"],"Datapackage")
+      create_datapackage_json_resource(ckan_host, ckan_key, id)
     except Exception:
       delete_dataset(ckan_host, ckan_key, dataset_name)
       print(f"Erro durante atualização do datapackage.json")
@@ -444,3 +442,31 @@ def resource_update(ckan_host, ckan_key, resource_id, resource_path):
   except urllib.error.HTTPError as e:
     print(e.read().decode())
     sys.exit(1)
+
+
+def create_datapackage_json_resource(ckan_host, ckan_key, package_id):
+
+  click.echo("Criando datapackage.json")
+      
+  requests.post(f'{ckan_host}/api/action/resource_create',
+                          data = {"package_id": package_id,
+                                  "name": "datapackage.json"},
+                          headers = {"Authorization": ckan_key},
+                          files = {'upload': ('datapackage.json', open('datapackage.json', 'rb') , 'application/json')})
+  
+
+def update_datapackage_json_resource(ckan_host, ckan_key, package_id):
+    
+    click.echo(f"Atualizando datapackage.json")
+
+    ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
+    ckan_dataset = ckan_instance.action.package_show(id = package_id)
+    
+    for resource in ckan_dataset['resources']:
+      if resource['name'] == "datapackage.json":
+        resource_id = resource['id']
+
+    requests.post(f'{ckan_host}/api/action/resource_update',
+                  data={"id": resource_id},
+                  headers={"Authorization": ckan_key},
+                  files = {'upload': ('datapackage.json', open('datapackage.json', 'rb') , 'application/json')})
