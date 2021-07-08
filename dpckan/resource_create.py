@@ -11,7 +11,7 @@ from ckanapi import RemoteCKAN
 from dpckan.functions import (os_slash, buscaListaDadosAbertos, buscaDataSet,
                               buscaPastaArquivos, removePastaArquivos,
                               buscaArquivos, atualizaMeta, load_complete_datapackage,
-                              resource_update, resource_update_datapackage, resource_create,
+                              resource_update, update_datapackage_json_resource, resource_create,
                               resources_metadata_create)
 import ipdb
 
@@ -48,7 +48,7 @@ def resource_upload(ckan_host, ckan_key, package_id, resource_name):
   package = load_complete_datapackage(datapackage_path)
   # Show package to find datapackage.json resource id
   # Update datapakcage.json resource
-  resource_update_datapackage(ckan_host, ckan_key, package_id)
+  update_datapackage_json_resource(ckan_host, ckan_key, package_id)
   # Create new resource
   print(f"Criando recurso: {resource_name}")
   resource_ckan = resource_create(ckan_host,
