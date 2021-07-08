@@ -13,6 +13,7 @@ from dpckan.functions import (os_slash, buscaListaDadosAbertos, buscaDataSet,
                               buscaArquivos, atualizaMeta, load_complete_datapackage,
                               resource_update, resource_create,
                               resources_metadata_create)
+import ipdb
 
 @click.command()
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
@@ -23,9 +24,7 @@ from dpckan.functions import (os_slash, buscaListaDadosAbertos, buscaDataSet,
               help="Nome do dataset para qual será incluido o recurso.")
 @click.option('--resource-name', '-rn', required=True,
               help="Nome do recurso a ser incluído. Chave 'name' do recurso dentro do arquivo datapackage.json")
-@click.option('--resource-id', '-ri', required=True,
-              help="Id do recurso a ser incluído.")
-def resource_update_cli(ckan_host, ckan_key, package_id, resource_name, resource_id):
+def resource_upload(ckan_host, ckan_key, package_id, resource_name):
   """
   Summary line.
 
@@ -44,6 +43,7 @@ def resource_update_cli(ckan_host, ckan_key, package_id, resource_name, resource
       Description of return value
 
   """
+  # try:
   datapackage_path = f'.{os_slash}datapackage.json'
   package = load_complete_datapackage(datapackage_path)
   # Show package to find datapackage.json resource id
@@ -51,17 +51,21 @@ def resource_update_cli(ckan_host, ckan_key, package_id, resource_name, resource
   package_resources = demo.action.package_show(id=package_id)
   for resource in package_resources['resources']:
     if resource['name'] == "Datapackage":
-      datapackage_resource_id = resource['id']
+      resource_id = resource['id']
   # Update datapakcage.json resource
-  resource_update(ckan_host, ckan_key, datapackage_resource_id, "./datapackage.json")
+  resource_update(ckan_host, ckan_key, resource_id, "./datapackage.json")
   # Create new resource
-  print(f"Atualizando recurso: {resource_name}")
-  resource_update(ckan_host,
-                  ckan_key,
-                  resource_id,
-                  package.get_resource(resource_name).path)
+  print(f"Criando recurso: {resource_name}")
+  resource_ckan = resource_create(ckan_host,
+                                  ckan_key,
+                                  package_id,
+                                  package.get_resource(resource_name).path,
+                                  # Put resource description key to show only this description resource's page
+                                  package.get_resource(resource_name)["description"],
+                                  package.get_resource(resource_name).title)
   resources_metadata_create(ckan_host,
                             package,
-                            resource_id,
+                            resource_ckan['id'],
                             package.get_resource(resource_name).path,
                             ckan_key)
+
