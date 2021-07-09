@@ -36,10 +36,7 @@ def resource_upload(ckan_host, ckan_key, package_id, resource_name):
   resource_ckan = resource_create(ckan_host,
                                   ckan_key,
                                   package_id,
-                                  package.get_resource(resource_name).path,
-                                  # Put resource description key to show only this description resource's page
-                                  package.get_resource(resource_name)["description"],
-                                  package.get_resource(resource_name).title)
+                                  package.get_resource(resource_name))
   resources_metadata_create(ckan_host,
                             ckan_key,
                             resource_ckan['id'],

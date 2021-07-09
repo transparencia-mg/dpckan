@@ -112,28 +112,30 @@ def removePastaArquivos(diretorio,separador,comando,so,arquivo):
                 comandoCompleto = comando + arquivoDel
                 os.system(comandoCompleto)
 
-def resource_create(url,authorization,package_id,caminhoCompleto,description,resource_title,separador=os_slash):
-  format = caminhoCompleto.split(separador)[-1]
-  formato = format.split('.')[1]
-  nome = format
-  if(caminhoCompleto.startswith('http')):
+def resource_create(ckan_host, ckan_key, package_id, resource):
+  if(resource.path.startswith('http')):
     
-    request = urllib.request.Request(f'{url}/api/action/resource_create',
-                                     data=quote(json.dumps({"package_id": package_id,
-                                "name" : resource_title,
-                                "url": caminhoCompleto})).encode('utf-8'),
-                                     headers={"Authorization": authorization})
-    saida = urllib.request.urlopen(request)
-    result = json.loads(saida.read().decode('utf-8'))['result']
+    payload = quote(json.dumps({"package_id": package_id,
+                               "name" : resource.title,
+                               "url": resource.path})).encode('utf-8')
+
+    request = urllib.request.Request(f'{ckan_host}/api/action/resource_create',
+                                     data = payload,
+                                     headers={"Authorization": ckan_key})
+    
+    response = urllib.request.urlopen(request)
+    
+    result = json.loads(response.read().decode('utf-8'))['result']
   else:
-    files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
-    saida = requests.post(f'{url}/api/action/resource_create',
-                          data={"package_id":package_id,
-                          "name": resource_title,
-                          "description": description},
-                          headers={"Authorization": authorization},
-                          files = files)
-    result = saida.json()['result']
+    payload = {"package_id":package_id,
+                                "name": resource.title,
+                                "description": resource.description}
+    upload_files = {'upload': (resource.path, open(resource.path, 'rb'), 'text/' + resource.format)}
+    response = requests.post(f'{ckan_host}/api/action/resource_create',
+                          data = payload,
+                          headers = {"Authorization": ckan_key},
+                          files = upload_files) # https://stackoverflow.com/questions/12385179/how-to-send-a-multipart-form-data-with-requests-in-python
+    result = response.json()['result']
   return result
 
 def load_complete_datapackage(source):
@@ -263,10 +265,7 @@ def dataset_create(ckan_host, ckan_key):
         resource_ckan = resource_create(ckan_host,
                                         ckan_key,
                                         id,
-                                        package.get_resource(resource_name).path,
-                                        # Put resource description key to show only this description resource's page
-                                        package.get_resource(resource_name)["description"],
-                                        package.get_resource(resource_name).title)
+                                        package.get_resource(resource_name))
         resources_metadata_create(ckan_host,
                                   ckan_key,
                                   resource_ckan['id'],
