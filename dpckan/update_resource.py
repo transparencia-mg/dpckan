@@ -19,13 +19,12 @@ from dpckan.functions import (os_slash, buscaListaDadosAbertos, buscaDataSet,
               help="Ckan host, exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br")  # -H para respeitar convenção de -h ser help
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
-@click.option('--package-id', '-pi', required=True,
-              help="Nome do dataset para qual será incluido o recurso.")
-@click.option('--resource-name', '-rn', required=True,
+@click.option('--datapackage', '-dp', required=True, default='datapackage.json')
+@click.option('--resource-name', '-n', required=True,
               help="Nome do recurso a ser incluído. Chave 'name' do recurso dentro do arquivo datapackage.json")
-@click.option('--resource-id', '-ri', required=True,
+@click.option('--resource-id', '-id', required=True,
               help="Id do recurso a ser incluído.")
-def resource_update_cli(ckan_host, ckan_key, package_id, resource_name, resource_id):
+def update_resource(ckan_host, ckan_key, datapackage, resource_name, resource_id):
   """
   Summary line.
 
@@ -44,11 +43,10 @@ def resource_update_cli(ckan_host, ckan_key, package_id, resource_name, resource
       Description of return value
 
   """
-  datapackage_path = f'.{os_slash}datapackage.json'
-  package = load_complete_datapackage(datapackage_path)
+  package = load_complete_datapackage(datapackage)
   # Show package to find datapackage.json resource id
   # Update datapakcage.json resource
-  update_datapackage_json_resource(ckan_host, ckan_key, package_id)
+  update_datapackage_json_resource(ckan_host, ckan_key, package.name)
   # Create new resource
   print(f"Atualizando recurso: {resource_name}")
   resource_update(ckan_host,

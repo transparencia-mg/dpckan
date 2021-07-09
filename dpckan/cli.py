@@ -1,7 +1,7 @@
 import click
-from dpckan.publish import publish
-from dpckan.resource_create import resource_upload
-from dpckan.updateResource import resource_update_cli
+from dpckan.create_dataset import create
+from dpckan.create_resource import create_resource
+from dpckan.update_resource import update_resource
 
 @click.group()
 def cli():
@@ -10,6 +10,6 @@ def cli():
   """
   pass
 
-cli.add_command(publish)
-cli.add_command(resource_upload)
-cli.add_command(resource_update_cli)
+cli.add_command(create)
+cli.add_command(create_resource)
+cli.add_command(update_resource)

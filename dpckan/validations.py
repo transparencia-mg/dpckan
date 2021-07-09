@@ -8,18 +8,14 @@ def run_validations(host, key):
   """
     Run validations before dataset publication
   """
-  click.echo("----Iniciando verificações----")
   is_datapackage_present()
   is_host_valid(host)
-  click.echo("----Verificações realizadas com sucesso----")
 
 def is_host_valid(host):
   demo = RemoteCKAN(host)
   try:
     ckan_exist = demo.action.site_read()
-    click.echo(f'----Host {host} válido----')
   except:
-    click.echo(f'----Host {host} inválido----')
     sys.exit(1)
 
 def is_datapackage_present():
@@ -49,12 +45,12 @@ def is_datapackage_present():
     with open('datapackage.json','r', encoding="utf-8") as json_file:
       datapackage_keys = json.load(json_file)
       if f"name" in datapackage_keys.keys():
-        click.echo(f"----Nome do dataset: {datapackage_keys['name']}----")
+        pass
       else:
         click.echo("----Arquivo datapackage.json sem a chave 'name' obrigatória----")
         sys.exit(1)
       if f"resources" in datapackage_keys.keys():
-        click.echo(f"----Resources encontrado no arquivo datapackage.json----")
+        pass
       else:
         click.echo("----Arquivo datapackage.json sem a chave 'resources' obrigatória----")
         sys.exit(1)
