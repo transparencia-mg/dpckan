@@ -117,6 +117,7 @@ def resource_create(ckan_host, ckan_key, package_id, resource):
     
     payload = quote(json.dumps({"package_id": package_id,
                                "name" : resource.title,
+                               "description": resource.description,
                                "url": resource.path})).encode('utf-8')
 
     request = urllib.request.Request(f'{ckan_host}/api/action/resource_create',
@@ -431,7 +432,9 @@ def resource_update(ckan_host, ckan_key, resource_id, resource):
   try:
     if(resource.path.startswith('http')):
       payload = quote(json.dumps({"id": resource_id,
-                               "url": resource.path})).encode('utf-8')
+                                  "name": resource.title,
+                                  "description": resource.description,
+                                  "url": resource.path})).encode('utf-8')
 
       request = urllib.request.Request(f'{ckan_host}/api/action/resource_update',
                                      data = payload,
@@ -442,7 +445,8 @@ def resource_update(ckan_host, ckan_key, resource_id, resource):
       click.echo(f"Atualizando recurso {resource.name}")
       files = {'upload': (resource.name, open(resource.path, 'rb'), 'text/' + resource.format)}
       requests.post(f'{ckan_host}/api/action/resource_update',
-              data={"id":resource_id},
+              data={"id":resource_id, "name": resource.title,
+                                  "description": resource.description,},
               headers={"Authorization": ckan_key},
               files = files)
   except urllib.error.HTTPError as e:
