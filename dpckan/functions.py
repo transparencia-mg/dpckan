@@ -112,31 +112,16 @@ def removePastaArquivos(diretorio,separador,comando,so,arquivo):
                 comandoCompleto = comando + arquivoDel
                 os.system(comandoCompleto)
 
-def resource_create(ckan_host, ckan_key, package_id, resource):
+def resource_create(ckan_instance, package_id, resource):
+  payload = {"package_id":package_id,
+               "name": resource.title,
+               "description": resource.description,
+               "url": resource.path}
   if(resource.path.startswith('http')):
-    
-    payload = quote(json.dumps({"package_id": package_id,
-                               "name" : resource.title,
-                               "description": resource.description,
-                               "url": resource.path})).encode('utf-8')
-
-    request = urllib.request.Request(f'{ckan_host}/api/action/resource_create',
-                                     data = payload,
-                                     headers={"Authorization": ckan_key})
-    
-    response = urllib.request.urlopen(request)
-    
-    result = json.loads(response.read().decode('utf-8'))['result']
+    result = ckan_instance.call_action('resource_create', payload)
   else:
-    payload = {"package_id":package_id,
-                                "name": resource.title,
-                                "description": resource.description}
-    upload_files = {'upload': (resource.path, open(resource.path, 'rb'), 'text/' + resource.format)}
-    response = requests.post(f'{ckan_host}/api/action/resource_create',
-                          data = payload,
-                          headers = {"Authorization": ckan_key},
-                          files = upload_files) # https://stackoverflow.com/questions/12385179/how-to-send-a-multipart-form-data-with-requests-in-python
-    result = response.json()['result']
+    upload_files = {'upload': open(resource.path, 'rb')}
+    result = ckan_instance.call_action('resource_create', payload, files=upload_files)
   return result
 
 def load_complete_datapackage(source):
@@ -263,8 +248,8 @@ def dataset_create(ckan_host, ckan_key):
     for resource_name in package.resource_names:
       try:
         click.echo(f"Criando recurso: {resource_name}")
-        resource_ckan = resource_create(ckan_host,
-                                        ckan_key,
+        ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
+        resource_ckan = resource_create(ckan_instance,
                                         id,
                                         package.get_resource(resource_name))
         resources_metadata_create(ckan_host,
