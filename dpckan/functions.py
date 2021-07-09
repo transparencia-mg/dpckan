@@ -116,13 +116,15 @@ def resource_create(url,authorization,package_id,caminhoCompleto,description,res
   format = caminhoCompleto.split(separador)[-1]
   formato = format.split('.')[1]
   nome = format
-  if(caminhoCompleto.find("http") > 0):
-    saida = requests.post(f'{url}/api/action/resource_create',
-                          data={"package_id":package_id,
-                          "name" : resource_title,
-                          "url":caminhoCompleto},
-                          headers={"Authorization": authorization})
-    result = saida.json()['result']
+  if(caminhoCompleto.startswith('http')):
+    
+    request = urllib.request.Request(f'{url}/api/action/resource_create',
+                                     data=quote(json.dumps({"package_id": package_id,
+                                "name" : resource_title,
+                                "url": caminhoCompleto})).encode('utf-8'),
+                                     headers={"Authorization": authorization})
+    saida = urllib.request.urlopen(request)
+    result = json.loads(saida.read().decode('utf-8'))['result']
   else:
     files = {'upload': (caminhoCompleto.split(separador)[-1], open(caminhoCompleto, 'rb'), 'text/' + formato)}
     saida = requests.post(f'{url}/api/action/resource_create',
@@ -257,7 +259,7 @@ def dataset_create(ckan_host, ckan_key):
 
     for resource_name in package.resource_names:
       try:
-        click.echo(f"Atualizando recurso: {resource_name}")
+        click.echo(f"Criando recurso: {resource_name}")
         resource_ckan = resource_create(ckan_host,
                                         ckan_key,
                                         id,
@@ -266,10 +268,10 @@ def dataset_create(ckan_host, ckan_key):
                                         package.get_resource(resource_name)["description"],
                                         package.get_resource(resource_name).title)
         resources_metadata_create(ckan_host,
-                                  package,
+                                  ckan_key,
                                   resource_ckan['id'],
-                                  package.get_resource(resource_name).path,
-                                  ckan_key)
+                                  package.get_resource(resource_name)
+                                  )
       except Exception:
         delete_dataset(ckan_host, ckan_key, dataset_name)
         print(f"Erro durante atualização do recurso: {resource_name}")
@@ -386,37 +388,34 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     update_package = response_dict['result']
     #pprint.pprint(response_dict['result'])
 
-def resources_metadata_create(url,datapackage,resource_id,resource,authorization):
-  data = datapackage.to_dict()
-  dataset_dict = {}
-  for data_key in data.keys():
-    if(str(data_key) == 'resources'):
-      for resource_key in data[data_key]:
-        name = str(resource_key['path']).split('/')[-1]
-        if(name == resource):
-          schema = resource_key['schema']
-          resource_schema = resource_key['schema']['fields']
-          resource_id = { "resource_id" : resource_id }
-          dataset_dict.update(resource_id)
-          force = { "force" : "True" }
-          dataset_dict.update(force)
-          fields = []
-          for field in resource_schema:
-            meta_info = {"label": field["title"], "notes" : field["description"] , "type_override" : 'text' }
-            field = { "type" : 'text', "id" : field["name"] , "info" : meta_info }
-            fields.append(field)
-          dataset_dict.update({ "fields" : fields})
-  frictionless_package = json.dumps(c2f.dataset(dataset_dict)).encode('utf-8')
+def resources_metadata_create(ckan_host, ckan_key, resource_id, resource):
+  
+  dataset_fields = {}
+  resource_id = { "resource_id" : resource_id }
+  dataset_fields.update(resource_id)
+  force = { "force" : "True" }
+  dataset_fields.update(force)
+  fields = []
+  for field in resource.schema.fields:
+    meta_info = {"label": field["title"], "notes" : field["description"] , "type_override" : 'text' }
+    field = { "type" : 'text', "id" : field["name"] , "info" : meta_info }
+    fields.append(field)
+  dataset_fields.update({ "fields" : fields})
+  frictionless_package = json.dumps(c2f.dataset(dataset_fields)).encode('utf-8')
 
-  request = urllib.request.Request(f'{url}/api/action/datastore_create',
-                                   data=frictionless_package,
-                                   headers={ 'Authorization': authorization })
+  try:
+    request = urllib.request.Request(f'{ckan_host}/api/action/datastore_create',
+                                    data=frictionless_package,
+                                    headers={ 'Authorization': ckan_key })
 
-  response = urllib.request.urlopen(request)
-  assert response.code == 200
-  time.sleep(10)
-  response_dict = json.loads(response.read())
-  assert response_dict['success'] is True
+    response = urllib.request.urlopen(request)
+    assert response.code == 200
+    response_dict = json.loads(response.read())
+    assert response_dict['success'] is True
+
+  except urllib.error.HTTPError as e:
+    print(e.read().decode())
+    sys.exit(1)
 
 def delete_dataset(host, key, dataset_name):
   demo = RemoteCKAN(host, apikey=key)
