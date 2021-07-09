@@ -56,7 +56,6 @@ def resource_update_cli(ckan_host, ckan_key, package_id, resource_name, resource
                   resource_id,
                   package.get_resource(resource_name).path)
   resources_metadata_create(ckan_host,
-                            package,
+                            ckan_key,
                             resource_id,
-                            package.get_resource(resource_name).path,
-                            ckan_key)
+                            package.get_resource(resource_name))

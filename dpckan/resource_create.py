@@ -25,24 +25,6 @@ import ipdb
 @click.option('--resource-name', '-rn', required=True,
               help="Nome do recurso a ser incluído. Chave 'name' do recurso dentro do arquivo datapackage.json")
 def resource_upload(ckan_host, ckan_key, package_id, resource_name):
-  """
-  Summary line.
-
-  Extended description of function.
-
-  Parameters
-  ----------
-  arg1 : int
-      Description of arg1
-  arg2 : str
-      Description of arg2
-
-  Returns
-  -------
-  int
-      Description of return value
-
-  """
   # try:
   datapackage_path = f'.{os_slash}datapackage.json'
   package = load_complete_datapackage(datapackage_path)
@@ -59,8 +41,7 @@ def resource_upload(ckan_host, ckan_key, package_id, resource_name):
                                   package.get_resource(resource_name)["description"],
                                   package.get_resource(resource_name).title)
   resources_metadata_create(ckan_host,
-                            package,
+                            ckan_key,
                             resource_ckan['id'],
-                            package.get_resource(resource_name).path,
-                            ckan_key)
+                            package.get_resource(resource_name))
 
