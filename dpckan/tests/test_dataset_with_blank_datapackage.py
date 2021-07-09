@@ -3,8 +3,7 @@ from click.testing import CliRunner
 import unittest
 from dpckan.tests import clone_online_repo
 from dpckan.tests import get_file_path
-from dpckan.publish import publish
-
+from dpckan.create_dataset import create
 
 class TestDatasetWithBlankDatapackage(unittest.TestCase):
   """
