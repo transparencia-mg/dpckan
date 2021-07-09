@@ -427,13 +427,21 @@ def is_dataset_alread_published(host, dataset_name):
   else:
     return False
 
-def resource_update(ckan_host, ckan_key, resource_id, resource_path):
+def resource_update(ckan_host, ckan_key, resource_id, resource):
   try:
-    resource_name = resource_path.split(separador)[-1]
-    click.echo(f"Atualizando recurso {resource_name}")
-    resource_format = resource_name.split('.')[1]
-    files = {'upload': (resource_name, open(resource_path, 'rb'), 'text/' + resource_format)}
-    result = requests.post(f'{ckan_host}/api/action/resource_update',
+    if(resource.path.startswith('http')):
+      payload = quote(json.dumps({"id": resource_id,
+                               "url": resource.path})).encode('utf-8')
+
+      request = urllib.request.Request(f'{ckan_host}/api/action/resource_update',
+                                     data = payload,
+                                     headers={"Authorization": ckan_key})
+    
+      urllib.request.urlopen(request)
+    else:
+      click.echo(f"Atualizando recurso {resource.name}")
+      files = {'upload': (resource.name, open(resource.path, 'rb'), 'text/' + resource.format)}
+      requests.post(f'{ckan_host}/api/action/resource_update',
               data={"id":resource_id},
               headers={"Authorization": ckan_key},
               files = files)

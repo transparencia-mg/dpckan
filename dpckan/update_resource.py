@@ -52,7 +52,7 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_name, resource_id
   resource_update(ckan_host,
                   ckan_key,
                   resource_id,
-                  package.get_resource(resource_name).path)
+                  package.get_resource(resource_name))
   resources_metadata_create(ckan_host,
                             ckan_key,
                             resource_id,
