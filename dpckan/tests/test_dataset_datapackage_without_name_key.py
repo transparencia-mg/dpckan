@@ -5,7 +5,7 @@ import unittest
 from dpckan.tests import clone_online_repo
 from dpckan.tests import get_file_path
 from dpckan.create_dataset import create
-from dpckan.functions import (delete_dataset, datapackage_path, lerDadosJsonMapeado)
+from dpckan.functions import (delete_dataset, datapackage_path)
 
 class TestDatasetDatapackageWithoutNameKey(unittest.TestCase):
   """

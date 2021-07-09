@@ -5,7 +5,8 @@ import unittest
 from dpckan.tests import clone_online_repo
 from dpckan.tests import get_file_path
 from dpckan.create_dataset import create
-from dpckan.functions import (delete_dataset, datapackage_path, lerDadosJsonMapeado)
+from dpckan.functions import (delete_dataset, datapackage_path,
+                              load_complete_datapackage)
 
 class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
   """
@@ -21,7 +22,7 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       result = runner.invoke(publish)
       # Deleting dataset after test
       path_datapackage = datapackage_path()
-      dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
+      dataset_dict = json.loads(load_complete_datapackage(path_datapackage))
       delete_dataset(os.environ.get('CKAN_HOST'), os.environ.get('CKAN_KEY'), dataset_dict['name'])
       self.assertEqual(result.exit_code, 0)
 
