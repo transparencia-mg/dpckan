@@ -17,9 +17,9 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       Testing dataset publication sucessfully homologacao environment
     """
     runner = CliRunner()
-    with runner.isolated_filesystem(temp_dir=get_file_path()):
+    with runner.isolated_filesystem():
       clone_online_repo(__file__)
-      result = runner.invoke(publish)
+      result = runner.invoke(create)
       # Deleting dataset after test
       path_datapackage = datapackage_path()
       dataset_dict = json.loads(load_complete_datapackage(path_datapackage))
@@ -31,9 +31,9 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       Testing dataset publication sucessfully producao environment
     """
     runner = CliRunner()
-    with runner.isolated_filesystem(temp_dir=get_file_path()):
+    with runner.isolated_filesystem():
       clone_online_repo(__file__)
-      result = runner.invoke(publish, ['--host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
+      result = runner.invoke(create, ['--host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
                              '--key', f"{os.environ.get('CKAN_KEY_PRODUCAO')}"])
       # Deleting dataset after test
       path_datapackage = datapackage_path()

@@ -14,9 +14,9 @@ class TestDatasetWithoutDatapackageFile(unittest.TestCase):
       Testing error for lack of datapackage file inside dataset home directory (--env homologacao)
     """
     runner = CliRunner()
-    with runner.isolated_filesystem(temp_dir=get_file_path()):
+    with runner.isolated_filesystem():
       clone_online_repo(__file__)
-      result = runner.invoke(publish,
+      result = runner.invoke(create,
                              ["--host", "$CKAN_HOST_HOMOLOGACAO",
                              "--key", "$CKAN_KEY_HOMOLOGACAO"])
       self.assertNotEqual(result.exit_code, 0)
@@ -26,9 +26,9 @@ class TestDatasetWithoutDatapackageFile(unittest.TestCase):
       Testing error for lack of datapackage file inside dataset home directory (--env homologacao)
     """
     runner = CliRunner()
-    with runner.isolated_filesystem(temp_dir=get_file_path()):
+    with runner.isolated_filesystem():
       clone_online_repo(__file__)
-      result = runner.invoke(publish,
+      result = runner.invoke(create,
                              ["--host", "$CKAN_HOST_PRODUCAO",
                              "--key", "$CKAN_KEY_PRODUCAO"])
       self.assertNotEqual(result.exit_code, 0)
