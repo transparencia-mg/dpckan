@@ -44,16 +44,15 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_name, resource_id
 
   """
   package = load_complete_datapackage(datapackage)
+  ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   # Show package to find datapackage.json resource id
   # Update datapakcage.json resource
-  update_datapackage_json_resource(ckan_host, ckan_key, package.name)
+  update_datapackage_json_resource(ckan_instance, package.name)
   # Create new resource
   print(f"Atualizando recurso: {resource_name}")
-  resource_update(ckan_host,
-                  ckan_key,
+  resource_update(ckan_instance,
                   resource_id,
                   package.get_resource(resource_name))
-  resources_metadata_create(ckan_host,
-                            ckan_key,
+  resources_metadata_create(ckan_instance,
                             resource_id,
                             package.get_resource(resource_name))

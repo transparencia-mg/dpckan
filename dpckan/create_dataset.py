@@ -1,8 +1,7 @@
-import urllib
 import os
-import requests
 import json
 import click
+from ckanapi import RemoteCKAN
 from dpckan.validations import run_validations
 from dpckan.functions import (os_slash, datapackage_path, frictionless_to_ckan_dictionary,
                               delete_dataset, lerCaminhoRelativo, dataset_create,
@@ -36,8 +35,12 @@ def create(ckan_host, ckan_key, datapackage):
   run_validations(ckan_host, ckan_key)
   dataset_dict = json.loads(frictionless_to_ckan_dictionary(datapackage))
   published_dataset = is_dataset_alread_published(ckan_host, dataset_dict['name'])
+  
+  ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
+
   if published_dataset:
     # Deleting dataset if it exists
-    delete_dataset(ckan_host, ckan_key, dataset_dict['name'])
-  dataset_create(ckan_host, ckan_key)
+    delete_dataset(ckan_instance, dataset_dict['name'])
+  
+  dataset_create(ckan_instance)
   
