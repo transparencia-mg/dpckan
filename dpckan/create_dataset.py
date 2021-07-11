@@ -1,10 +1,10 @@
-import os
 import json
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_validations
-from dpckan.functions import (os_slash, datapackage_path, frictionless_to_ckan_dictionary,
-                              delete_dataset, lerCaminhoRelativo, dataset_create,
+from dpckan.functions import (frictionless_to_ckan_dictionary,
+                              delete_dataset, 
+                              dataset_create,
                               is_dataset_alread_published)
 
 @click.command()

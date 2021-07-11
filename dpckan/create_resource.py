@@ -1,17 +1,8 @@
-import urllib
-import json
-import pprint
-import os
-import requests
-import json
-import collections
-import sys
 import click
 from ckanapi import RemoteCKAN
-from dpckan.functions import (os_slash, buscaListaDadosAbertos, buscaDataSet,
-                              buscaPastaArquivos, removePastaArquivos,
-                              buscaArquivos, atualizaMeta, load_complete_datapackage,
-                              resource_update, update_datapackage_json_resource, resource_create,
+from dpckan.functions import (load_complete_datapackage, 
+                              update_datapackage_json_resource, 
+                              resource_create,
                               resources_metadata_create)
 import ipdb
 
