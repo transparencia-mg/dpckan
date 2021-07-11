@@ -10,7 +10,6 @@ import importlib
 import time
 import click
 from urllib.parse import quote
-from frictionless_ckan_mapper import ckan_to_frictionless as c2f
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
@@ -351,7 +350,6 @@ def updateMetaData(caminhoCompleto,separador,url,authorization):
     #pprint.pprint(response_dict['result'])
 
 def resources_metadata_create(ckan_instance, resource_id, resource):
-  
   dataset_fields = {}
   resource_id = { "resource_id" : resource_id }
   dataset_fields.update(resource_id)
@@ -363,8 +361,7 @@ def resources_metadata_create(ckan_instance, resource_id, resource):
     field = { "type" : 'text', "id" : field["name"] , "info" : meta_info }
     fields.append(field)
   dataset_fields.update({ "fields" : fields})
-  frictionless_package = json.dumps(c2f.dataset(dataset_fields)).encode('utf-8')
-  ckan_instance.call_action('datastore_create', frictionless_package)
+  ckan_instance.call_action('datastore_create', dataset_fields)
 
 
 def delete_dataset(ckan_instance, dataset_name):
@@ -379,7 +376,7 @@ def is_dataset_alread_published(host, dataset_name):
 
 def resource_update(ckan_instance, resource_id, resource):
 
-  click.echo(f"Atualizando recurso {resource.name}")
+  click.echo(f"Atualizando recurso: {resource.name}")
 
   payload = {"id": resource_id,
              "name": resource.title,

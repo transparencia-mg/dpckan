@@ -48,8 +48,6 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_name, resource_id
   # Show package to find datapackage.json resource id
   # Update datapakcage.json resource
   update_datapackage_json_resource(ckan_instance, package.name)
-  # Create new resource
-  print(f"Atualizando recurso: {resource_name}")
   resource_update(ckan_instance,
                   resource_id,
                   package.get_resource(resource_name))
