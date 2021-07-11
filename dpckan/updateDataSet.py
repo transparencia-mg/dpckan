@@ -1,14 +1,10 @@
 import urllib
+from urllib.parse import quote
 import json
 import pprint
 import os
-import requests
 import json
-import collections
-import sys
-from dpckan.functions import (buscaListaDadosAbertos, buscaDataSet,
-                              buscaPastaArquivos, removePastaArquivos,
-                              frictionless_to_ckan_dictionary, buscaArquivos, atualizaMeta)
+from dpckan.functions import frictionless_to_ckan_dictionary
 
 def dataSet(authorizaton,caminhoCompleto,id):
   """
