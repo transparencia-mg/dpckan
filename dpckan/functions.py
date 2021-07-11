@@ -209,8 +209,8 @@ def frictionless_to_ckan_dictionary(diretorio):
 def dataset_create(ckan_instance):
   try:
     datapackage_path = f'.{os_slash}datapackage.json'
-    package = load_complete_datapackage(datapackage_path)
-    dataset = f2c.package(package)
+    datapackage = load_complete_datapackage(datapackage_path)
+    dataset = f2c.package(datapackage)
     dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
     if "notes" not in dataset.keys():
       dataset["notes"] = ""
@@ -218,35 +218,34 @@ def dataset_create(ckan_instance):
       dataset["notes"] = f"{dataset['notes']}\n{open('README.md').read()}"
     if os.path.isfile('CHANGELOG.md'): # Put dataset description and changelog together to show a better description on dataset's page
       dataset["notes"] = f"{dataset['notes']}\n{open('CHANGELOG.md').read()}"
-    dataset_name = package.name
     
     result = ckan_instance.call_action('package_create', dataset)
 
     try:
       create_datapackage_json_resource(ckan_instance, result['id'])
     except Exception:
-      delete_dataset(ckan_instance, dataset_name)
+      delete_dataset(ckan_instance, datapackage.name)
       print(f"Erro durante atualização do datapackage.json")
       sys.exit(1)
 
-    for resource_name in package.resource_names:
+    for resource_name in datapackage.resource_names:
       try:
         click.echo(f"Criando recurso: {resource_name}")
         resource_ckan = resource_create(ckan_instance,
-                                        id,
-                                        package.get_resource(resource_name))
+                                        datapackage.name,
+                                        datapackage.get_resource(resource_name))
         resources_metadata_create(ckan_instance,
                                   resource_ckan['id'],
-                                  package.get_resource(resource_name)
+                                  datapackage.get_resource(resource_name)
                                   )
       except Exception:
-        delete_dataset(ckan_instance, dataset_name)
+        delete_dataset(ckan_instance, datapackage.name)
         print(f"Erro durante atualização do recurso: {resource_name}")
         sys.exit(1)
 
   except Exception:
-    delete_dataset(ckan_instance, dataset_name)
-    print(f"Não foi possível criar o dataset {dataset_name}")
+    delete_dataset(ckan_instance, datapackage.name)
+    print(f"Não foi possível criar o dataset {datapackage.name}")
     sys.exit(1)
 
 def comparaDataSet(dataset_dict,resources):
