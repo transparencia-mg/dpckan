@@ -3,7 +3,7 @@ from ckanapi import RemoteCKAN
 from dpckan.functions import (load_complete_datapackage, 
                               update_datapackage_json_resource, 
                               resource_update,
-                              resources_metadata_create,
+                              resource_update_datastore_metadata,
                               dataset_update)
 
 @click.command()
@@ -44,6 +44,6 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_name, resource_id
   resource_update(ckan_instance,
                   resource_id,
                   package.get_resource(resource_name))
-  resources_metadata_create(ckan_instance,
+  resource_update_datastore_metadata(ckan_instance,
                             resource_id,
                             package.get_resource(resource_name))

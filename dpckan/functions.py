@@ -54,15 +54,13 @@ def dataset_create(ckan_instance, datapackage):
       resource_ckan = resource_create(ckan_instance,
                                       datapackage.name,
                                       datapackage.get_resource(resource_name))
-      resources_metadata_create(ckan_instance,
+      resource_update_datastore_metadata(ckan_instance,
                                 resource_ckan['id'],
                                 datapackage.get_resource(resource_name)
                                 )
     
 
-
-
-def resources_metadata_create(ckan_instance, resource_id, resource):
+def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
   dataset_fields = {}
   resource_id = { "resource_id" : resource_id }
   dataset_fields.update(resource_id)
