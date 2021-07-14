@@ -70,7 +70,7 @@ def resources_metadata_create(ckan_instance, resource_id, resource):
   dataset_fields.update(force)
   fields = []
   for field in resource.schema.fields:
-    meta_info = {"label": field["title"], "notes" : field["description"] , "type_override" : 'text' }
+    meta_info = {"label": field.get("title", ""), "notes" : field.get("description", "") , "type_override" : 'text' }
     field = { "type" : 'text', "id" : field["name"] , "info" : meta_info }
     fields.append(field)
   dataset_fields.update({ "fields" : fields})
