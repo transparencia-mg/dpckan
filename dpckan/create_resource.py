@@ -21,7 +21,7 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
   # Update datapakcage.json resource
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   
-  update_datapackage_json_resource(ckan_instance, package.name)
+  update_datapackage_json_resource(ckan_instance, package)
   # Create new resource
   print(f"Criando recurso: {resource_name}")
   resource_ckan = resource_create(ckan_instance,
