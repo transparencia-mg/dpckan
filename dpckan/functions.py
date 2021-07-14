@@ -61,18 +61,22 @@ def dataset_create(ckan_instance, datapackage):
     
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
-  dataset_fields = {}
-  resource_id = { "resource_id" : resource_id }
-  dataset_fields.update(resource_id)
-  force = { "force" : "True" }
-  dataset_fields.update(force)
-  fields = []
-  for field in resource.schema.fields:
-    meta_info = {"label": field.get("title", ""), "notes" : field.get("description", "") , "type_override" : 'text' }
-    field = { "type" : 'text', "id" : field["name"] , "info" : meta_info }
-    fields.append(field)
-  dataset_fields.update({ "fields" : fields})
-  ckan_instance.call_action('datastore_create', dataset_fields)
+  
+  if resource.schema.fields == []:
+    pass
+  else:
+    dataset_fields = {}
+    resource_id = { "resource_id" : resource_id }
+    dataset_fields.update(resource_id)
+    force = { "force" : "True" }
+    dataset_fields.update(force)
+    fields = []
+    for field in resource.schema.fields:
+      meta_info = {"label": field.get("title", ""), "notes" : field.get("description", "") , "type_override" : 'text' }
+      field = { "type" : 'text', "id" : field["name"] , "info" : meta_info }
+      fields.append(field)
+    dataset_fields.update({ "fields" : fields})
+    ckan_instance.call_action('datastore_create', dataset_fields)
 
 
 def delete_dataset(ckan_instance, dataset_name):
