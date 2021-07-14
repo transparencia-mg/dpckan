@@ -3,7 +3,8 @@ from ckanapi import RemoteCKAN
 from dpckan.functions import (load_complete_datapackage, 
                               update_datapackage_json_resource, 
                               resource_create,
-                              resources_metadata_create)
+                              resources_metadata_create,
+                              dataset_update)
 import ipdb
 
 @click.command()
@@ -22,6 +23,7 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   
   update_datapackage_json_resource(ckan_instance, package)
+  dataset_update(ckan_instance, package)
   # Create new resource
   print(f"Criando recurso: {resource_name}")
   resource_ckan = resource_create(ckan_instance,
