@@ -5,7 +5,6 @@ from dpckan.functions import (load_complete_datapackage,
                               resource_create,
                               resources_metadata_create,
                               dataset_update)
-import ipdb
 
 @click.command()
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,

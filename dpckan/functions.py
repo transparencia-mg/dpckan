@@ -1,5 +1,4 @@
 import os
-import sys
 import click
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
@@ -12,6 +11,8 @@ def datapackage_path():
   return 'datapackage.json'
 
 def resource_create(ckan_instance, package_id, resource):
+  
+  click.echo(f"Criando recurso: {resource.name}")
   payload = {"package_id":package_id,
                "name": resource.title,
                "description": resource.description,
@@ -31,11 +32,13 @@ def load_complete_datapackage(source):
   return datapackage
 
 def dataset_create(ckan_instance, datapackage):
-  try:
+    
     dataset = f2c.package(datapackage)
     dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
+    
     README_path = os.path.join(datapackage.basepath, 'README.md')
     CHANGELOG_path = os.path.join(datapackage.basepath, 'CHANGELOG.md')
+    
     if "notes" not in dataset.keys():
       dataset["notes"] = ""
     if os.path.isfile(README_path): # Put dataset description and readme together to show a better description on dataset's page
@@ -44,33 +47,19 @@ def dataset_create(ckan_instance, datapackage):
       dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
     
     ckan_instance.call_action('package_create', dataset)
-
-    try:
-      create_datapackage_json_resource(ckan_instance, datapackage)
-    except Exception:
-      delete_dataset(ckan_instance, datapackage.name)
-      print(f"Erro durante atualização do datapackage.json")
-      sys.exit(1)
-
+    
+    create_datapackage_json_resource(ckan_instance, datapackage)
+    
     for resource_name in datapackage.resource_names:
-      try:
-        click.echo(f"Criando recurso: {resource_name}")
-        resource_ckan = resource_create(ckan_instance,
-                                        datapackage.name,
-                                        datapackage.get_resource(resource_name))
-        resources_metadata_create(ckan_instance,
-                                  resource_ckan['id'],
-                                  datapackage.get_resource(resource_name)
-                                  )
-      except Exception:
-        delete_dataset(ckan_instance, datapackage.name)
-        print(f"Erro durante atualização do recurso: {resource_name}")
-        sys.exit(1)
+      resource_ckan = resource_create(ckan_instance,
+                                      datapackage.name,
+                                      datapackage.get_resource(resource_name))
+      resources_metadata_create(ckan_instance,
+                                resource_ckan['id'],
+                                datapackage.get_resource(resource_name)
+                                )
+    
 
-  except Exception:
-    delete_dataset(ckan_instance, datapackage.name)
-    print(f"Não foi possível criar o dataset {datapackage.name}")
-    sys.exit(1)
 
 
 def resources_metadata_create(ckan_instance, resource_id, resource):
@@ -91,12 +80,18 @@ def resources_metadata_create(ckan_instance, resource_id, resource):
 def delete_dataset(ckan_instance, dataset_name):
   ckan_instance.action.package_delete(id = dataset_name)
 
-def is_dataset_alread_published(host, dataset_name):
-  demo = RemoteCKAN(host)
-  if dataset_name in demo.action.package_list():
-    return True
-  else:
-    return False
+def is_dataset_published(ckan_instance, datapackage):
+  is_published = True
+
+  try: 
+    result = ckan_instance.action.package_show(id = datapackage.name)
+  except Exception:
+    is_published = False
+
+  if(result['state'] == 'deleted'):
+    is_published = False
+
+  return is_published
 
 def resource_update(ckan_instance, resource_id, resource):
 
