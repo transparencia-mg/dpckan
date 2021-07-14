@@ -1,4 +1,3 @@
-import json
 import os
 import json
 import sys
@@ -21,9 +20,11 @@ def resource_create(ckan_instance, package_id, resource):
   if(resource.path.startswith('http')):
     result = ckan_instance.call_action('resource_create', payload)
   else:
-    upload_files = {'upload': open(resource.path, 'rb')}
+    upload_files = {'upload': open(os.path.join(resource.basepath, resource.path), 'rb')}
     result = ckan_instance.call_action('resource_create', payload, files=upload_files)
   return result
+
+
 
 def load_complete_datapackage(source):
   datapackage = Package(source)
@@ -88,23 +89,23 @@ def frictionless_to_ckan_dictionary(diretorio):
     dataset_dict = json.dumps(dataset_dict)
     return dataset_dict
 
-def dataset_create(ckan_instance):
+def dataset_create(ckan_instance, datapackage):
   try:
-    datapackage_path = 'datapackage.json'
-    datapackage = load_complete_datapackage(datapackage_path)
     dataset = f2c.package(datapackage)
     dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
+    README_path = os.path.join(datapackage.basepath, 'README.md')
+    CHANGELOG_path = os.path.join(datapackage.basepath, 'CHANGELOG.md')
     if "notes" not in dataset.keys():
       dataset["notes"] = ""
-    if os.path.isfile('README.md'): # Put dataset description and readme together to show a better description on dataset's page
-      dataset["notes"] = f"{dataset['notes']}\n{open('README.md').read()}"
-    if os.path.isfile('CHANGELOG.md'): # Put dataset description and changelog together to show a better description on dataset's page
-      dataset["notes"] = f"{dataset['notes']}\n{open('CHANGELOG.md').read()}"
+    if os.path.isfile(README_path): # Put dataset description and readme together to show a better description on dataset's page
+      dataset["notes"] = f"{dataset['notes']}\n{open(README_path).read()}"
+    if os.path.isfile(CHANGELOG_path): # Put dataset description and changelog together to show a better description on dataset's page
+      dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
     
-    result = ckan_instance.call_action('package_create', dataset)
+    ckan_instance.call_action('package_create', dataset)
 
     try:
-      create_datapackage_json_resource(ckan_instance, result['id'])
+      create_datapackage_json_resource(ckan_instance, datapackage)
     except Exception:
       delete_dataset(ckan_instance, datapackage.name)
       print(f"Erro durante atualização do datapackage.json")
@@ -169,29 +170,30 @@ def resource_update(ckan_instance, resource_id, resource):
     result = ckan_instance.call_action('resource_update', payload)
   else:
     result = ckan_instance.call_action('resource_update', payload, 
-                                       files={'upload': open(resource.path, 'rb')})
+                                       files={'upload': open(os.path.join(resource.basepath, resource.path), 'rb')})
   return result
 
 
-def create_datapackage_json_resource(ckan_instance, package_id):
+
+def create_datapackage_json_resource(ckan_instance, datapackage):
 
   click.echo("Criando datapackage.json")
-
-  ckan_instance.action.resource_create(package_id = package_id,
+  
+  ckan_instance.action.resource_create(package_id = datapackage.name,
                                        name = "datapackage.json",
-                                       upload = open('datapackage.json', 'rb'))
+                                       upload = open(os.path.join(datapackage.basepath, 'datapackage.json'), 'rb'))
   
 
-def update_datapackage_json_resource(ckan_instance, package_id):
+def update_datapackage_json_resource(ckan_instance, datapackage):
     
     click.echo(f"Atualizando datapackage.json")
 
-    ckan_dataset = ckan_instance.action.package_show(id = package_id)
+    ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
     
     for resource in ckan_dataset['resources']:
       if resource['name'] == "datapackage.json":
         resource_id = resource['id']
 
     ckan_instance.action.resource_update(id = resource_id,
-                                         upload = open('datapackage.json', 'rb'))
+                                         upload = open(os.path.join(datapackage.basepath, 'datapackage.json'), 'rb'))
 

@@ -1,11 +1,11 @@
-import json
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_validations
-from dpckan.functions import (frictionless_to_ckan_dictionary,
-                              delete_dataset, 
+from dpckan.functions import (delete_dataset, 
                               dataset_create,
-                              is_dataset_alread_published)
+                              is_dataset_alread_published,
+                              load_complete_datapackage)
+                              
 
 @click.command()
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
@@ -32,15 +32,16 @@ def create(ckan_host, ckan_key, datapackage):
   -------
     Dataset publicado/atualizado no ambiente desejado
   """
-  run_validations(ckan_host, ckan_key)
-  dataset_dict = json.loads(frictionless_to_ckan_dictionary(datapackage))
-  published_dataset = is_dataset_alread_published(ckan_host, dataset_dict['name'])
+  
+  package = load_complete_datapackage(datapackage)
+  run_validations(ckan_host, ckan_key, package)
+  published_dataset = is_dataset_alread_published(ckan_host, package.name)
   
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
 
   if published_dataset:
     # Deleting dataset if it exists
-    delete_dataset(ckan_instance, dataset_dict['name'])
+    delete_dataset(ckan_instance, package.name)
   
-  dataset_create(ckan_instance)
+  dataset_create(ckan_instance, package)
   
