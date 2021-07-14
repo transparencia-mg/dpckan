@@ -37,13 +37,16 @@ def dataset_create(ckan_instance, datapackage):
     dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
     
     README_path = os.path.join(datapackage.basepath, 'README.md')
+    CONTRIBUTING_path = os.path.join(datapackage.basepath, 'CONTRIBUTING.md')
     CHANGELOG_path = os.path.join(datapackage.basepath, 'CHANGELOG.md')
     
     if "notes" not in dataset.keys():
       dataset["notes"] = ""
-    if os.path.isfile(README_path): # Put dataset description and readme together to show a better description on dataset's page
+    if os.path.isfile(README_path):
       dataset["notes"] = f"{dataset['notes']}\n{open(README_path).read()}"
-    if os.path.isfile(CHANGELOG_path): # Put dataset description and changelog together to show a better description on dataset's page
+    if os.path.isfile(CONTRIBUTING_path):
+      dataset["notes"] = f"{dataset['notes']}\n{open(CONTRIBUTING_path).read()}"
+    if os.path.isfile(CHANGELOG_path):
       dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
     
     ckan_instance.call_action('package_create', dataset)
@@ -144,13 +147,17 @@ def dataset_update(ckan_instance, datapackage):
   dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
   
   README_path = os.path.join(datapackage.basepath, 'README.md')
+  CONTRIBUTING_path = os.path.join(datapackage.basepath, 'CONTRIBUTING.md')
   CHANGELOG_path = os.path.join(datapackage.basepath, 'CHANGELOG.md')
+  
   if "notes" not in dataset.keys():
-      dataset["notes"] = ""
-  if os.path.isfile(README_path): # Put dataset description and readme together to show a better description on dataset's page
-      dataset["notes"] = f"{dataset['notes']}\n{open(README_path).read()}"
-  if os.path.isfile(CHANGELOG_path): # Put dataset description and changelog together to show a better description on dataset's page
-      dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
+    dataset["notes"] = ""
+  if os.path.isfile(README_path):
+    dataset["notes"] = f"{dataset['notes']}\n{open(README_path).read()}"
+  if os.path.isfile(CONTRIBUTING_path):
+    dataset["notes"] = f"{dataset['notes']}\n{open(CONTRIBUTING_path).read()}"
+  if os.path.isfile(CHANGELOG_path):
+    dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
 
   dataset.update({ "id" : datapackage.name})
 
