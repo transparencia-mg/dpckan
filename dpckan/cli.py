@@ -11,7 +11,16 @@ def cli():
   """
   pass
 
-cli.add_command(create)
-cli.add_command(update)
-cli.add_command(create_resource)
-cli.add_command(update_resource)
+@cli.group()
+def dataset():
+  pass
+
+dataset.add_command(create)
+dataset.add_command(update)
+
+@cli.group()
+def resource():
+  pass
+
+resource.add_command(create_resource, 'create')
+resource.add_command(update_resource, 'update')
