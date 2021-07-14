@@ -1,5 +1,4 @@
 import os
-import json
 import sys
 import click
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
@@ -24,70 +23,12 @@ def resource_create(ckan_instance, package_id, resource):
     result = ckan_instance.call_action('resource_create', payload, files=upload_files)
   return result
 
-
-
 def load_complete_datapackage(source):
   datapackage = Package(source)
   for resource_name in datapackage.resource_names:
     datapackage.get_resource(resource_name).dialect.expand()
     datapackage.get_resource(resource_name).schema.expand()
   return datapackage
-
-def frictionless_to_ckan_dictionary(diretorio):
-  listaParametros = ["license_title", "maintainer", "relationships_as_object",
-                     "private", "maintainer_email", "num_tags", "id", "metadata_created",
-                     "metadata_modified", "author_email", "state", "version", "creator_user_id",
-                     "type", "num_resources", "groups", "license_id", "relationships_as_subject", "isopen",
-                     "url", "owner_org", "extras", "title", "revision_id", "update"]
-  with open(diretorio,'r', encoding="utf-8") as json_file:
-    data = json.load(json_file)
-    tagsJson = {}
-    tagsJson['tags'] = []
-    tagsDicionario = {}
-    tagsDicionario['fields'] = []
-    dataset_dict = {}
-    for m in data.keys():
-      if(str(m) == 'keywords'):
-        for t in data[m]:
-          tagsJson['tags'].append({'name': t})
-        y = { 'tags' : tagsJson['tags'] }
-        dataset_dict.update(y)
-      elif(str(m) == 'fields'):
-        for t in data[m]:
-            tagsDicionario['fields'].append({'id': t})
-        y = { 'fields' : tagsDicionario['fields'] }
-        dataset_dict.update(y)
-      elif ((str(m) == 'resources')):
-        y = { str(m) : str(data[m]) }
-      elif (str(m) == 'name'):
-        y = { str(m) : str(data[m]) }
-        dataset_dict.update(y)
-      elif (str(m) == 'description'):
-        y = { 'notes' : str(data[m]) }
-        dataset_dict.update(y)
-      elif (str(m) == 'homepage'):
-        y = { 'url' : str(data[m]) }
-        dataset_dict.update(y)
-      elif (str(m) == 'package_id'):
-        id = str(data[m])
-        y = { 'id' : id }
-        dataset_dict.update(y)
-      elif (str(m) == 'update'):
-        isUpdate = 'true'
-      elif (str(m) == 'contributors'):
-        for c in data[m]:
-          if(c['title']):
-              y = { "author" : c["title"] }
-              dataset_dict.update(y)
-          if(c['role'] == "publisher"):
-            y = { "owner_org" : c["organization"] }
-            dataset_dict.update(y)
-      else:
-        if(str(m) in listaParametros):
-          y = { str(m) : str(data[m]) }
-          dataset_dict.update(y)
-    dataset_dict = json.dumps(dataset_dict)
-    return dataset_dict
 
 def dataset_create(ckan_instance, datapackage):
   try:
@@ -185,7 +126,6 @@ def create_datapackage_json_resource(ckan_instance, datapackage):
   
 
 def update_datapackage_json_resource(ckan_instance, datapackage):
-    
     click.echo(f"Atualizando datapackage.json")
 
     ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
@@ -197,3 +137,24 @@ def update_datapackage_json_resource(ckan_instance, datapackage):
     ckan_instance.action.resource_update(id = resource_id,
                                          upload = open(os.path.join(datapackage.basepath, 'datapackage.json'), 'rb'))
 
+
+
+def dataset_update(ckan_instance, datapackage):
+  
+  click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
+  dataset = f2c.package(datapackage)
+  
+  dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
+  
+  README_path = os.path.join(datapackage.basepath, 'README.md')
+  CHANGELOG_path = os.path.join(datapackage.basepath, 'CHANGELOG.md')
+  if "notes" not in dataset.keys():
+      dataset["notes"] = ""
+  if os.path.isfile(README_path): # Put dataset description and readme together to show a better description on dataset's page
+      dataset["notes"] = f"{dataset['notes']}\n{open(README_path).read()}"
+  if os.path.isfile(CHANGELOG_path): # Put dataset description and changelog together to show a better description on dataset's page
+      dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
+
+  dataset.update({ "id" : datapackage.name})
+
+  ckan_instance.call_action('package_patch', dataset)
