@@ -127,11 +127,10 @@ def create_datapackage_json_resource(ckan_instance, datapackage):
 
 def update_datapackage_json_resource(ckan_instance, datapackage):
     click.echo(f"Atualizando datapackage.json")
-
     ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
     
     for resource in ckan_dataset['resources']:
-      if resource['name'] == "datapackage.json":
+      if os.path.basename(resource['url']) == "datapackage.json":
         resource_id = resource['id']
 
     ckan_instance.action.resource_update(id = resource_id,
