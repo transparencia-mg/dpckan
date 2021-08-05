@@ -1,18 +1,18 @@
-# DPKG CKAN MG
+# Data package manager for CKAN (dpckan)
 
-## Descrição
+O `dpckan` é um pacote python, acessível via interface CLI, utilizado para catalogação inicial e atualização de conjuntos de dados documentados de acordo com o padrão de metadados [Frictionless Data](https://frictionlessdata.io/) (ie. pacotes de dados) em uma instância do [CKAN](https://ckan.org/).
 
-Pacote Python criado pela [Diretoria de Transparência Ativa - DTA](https://www.cge.mg.gov.br/a-cge/quem-e-quem/subcontroladoria-de-transparencia-e-integridade) da [Controladoria Geral do Estado de Minas Gerais - CGE/MG](https://www.cge.mg.gov.br/) com intuito de automatizar a publicação/manutenção de conjunto de dados abertos no [Portal de Dados Abertos do Estado de Minas Gerais](https://dados.mg.gov.br/). Trabalho realizado seguindo padrões internacionais de documentação e utilização de conjuntos de dados abertos, tais como [Frictionless Data](https://frictionlessdata.io/) e ferramentas open source como [CKAN](https://ckan.org/).
+## Instalação e configuração
 
-Obs.: "#" Utlizados nas caixas de código abaixo são comentários e deverão ser observados atentamente antes da execução de qualquer comando
+O `dpckan` está disponível no Python Package Index (PyPI) e pode ser instalado com
 
-## Utilização
-
-- Instalação
-
+```bash
+pip install dpckan
 ```
-$ pip install dpkgckanmg
-```
+
+Todos os comandos exigem a indicação de uma instância CKAN (eg. https://demo.ckan.org/) e de uma chave válida para autenticação na referida instância. Essas configurações podem ser informadas como argumento na invocação de cada comando ou com as variáveis de ambientes `CKAN_HOST = ` e `CKAN_KEY = `
+
+## Uso
 
 - Trabalhando com variáveis de ambiente
 
