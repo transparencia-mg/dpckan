@@ -86,17 +86,15 @@ def delete_dataset(ckan_instance, dataset_name):
   ckan_instance.action.package_delete(id = dataset_name)
 
 def is_dataset_published(ckan_instance, datapackage):
-  is_published = True
-
   try: 
     result = ckan_instance.action.package_show(id = datapackage.name)
   except Exception:
-    is_published = False
+    return False
 
   if(result['state'] == 'deleted'):
-    is_published = False
+    return False
 
-  return is_published
+  return True
 
 def resource_update(ckan_instance, resource_id, resource):
 
