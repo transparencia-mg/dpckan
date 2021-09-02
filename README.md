@@ -1,130 +1,100 @@
-# Data package manager for CKAN (dpckan)
+# Data package manager para CKAN (dpckan)
 
 O `dpckan` é um pacote python, acessível via interface CLI, utilizado para catalogação inicial e atualização de conjuntos de dados documentados de acordo com o padrão de metadados [Frictionless Data](https://frictionlessdata.io/) (ie. pacotes de dados) em uma instância do [CKAN](https://ckan.org/).
 
 ## Instalação e configuração
 
-O `dpckan` está disponível no Python Package Index (PyPI) e pode ser instalado com
+O `dpckan` está disponível no Python Package Index - [PyPI](https://pypi.org/project/dpckan/) e pode ser instalado utilizando-se o comando abaixo:
 
 ```bash
-pip install dpckan
+# Antes de executar o comando abaixo lembre-se que ambiente python deverá estar ativo
+$ pip install dpckan
 ```
 
-Todos os comandos exigem a indicação de uma instância CKAN (eg. https://demo.ckan.org/) e de uma chave válida para autenticação na referida instância. Essas configurações podem ser informadas como argumento na invocação de cada comando ou com as variáveis de ambientes `CKAN_HOST = ` e `CKAN_KEY = `
+Todos os comandos exigem a indicação de uma instância CKAN (ex: https://demo.ckan.org/) e de uma chave válida para autenticação na referida instância. Essas configurações podem ser informadas como argumento na invocação de cada comando ou com as variáveis de ambientes `CKAN_HOST` e `CKAN_KEY` para instância e chave respectivamente.
+
+O cadastro das variáveis de ambiente `CKAN_HOST` e `CKAN_KEY`, necessárias para invocação de cada comando, deverá ser realizada conforme sistema operacional do usuário, podendo ser utilizado como referência links como [este para windows](https://professor-falken.com/pt/windows/como-configurar-la-ruta-y-las-variables-de-entorno-en-windows-10/), [este para linux](https://ricardo-reis.medium.com/vari%C3%A1veis-de-ambiente-no-linux-debian-f677d6ca94c) ou [este para mac](https://support.apple.com/pt-br/guide/terminal/apd382cc5fa-4f58-4449-b20a-41c53c006f8f/mac).
+
+
+**CUIDADO: SOMENTE UTILIZE A OPÇÃO SUGERIDA ABAIXO SE POSSUIR CONHECIMENTO TÉCNICO E FAMILIARIDADE COM O ASSUNTO, EVITANDO ASSIM PROBLEMAS COM ACESSO DE TERCEIROS NÃO AUTORIZADOS EM SUA INSTÂNCIA CKAN**
+
+Alternativamente, o cadastro destas variáveis poderá ser realizado em arquivo .env, na raiz do conjunto de dados, sendo necessário a inclusão do novo arquivo .env em arquivo .gitignore, evitando assim a sincronização e consequente publicização destas chaves em repositórios online como [github](https://github.com/), conforme demostrado abaixo:
+
+
+```bash
+# CUIDADO: SOMENTE EXECUTE OS COMANDOS ABAIXO SE OS ARQUIVO .env e .gitignore NÃO EXISTIREM NA RAIZ DO CONJUNTO DE DADOS
+# CUIDADO: CASO COMANDOS ABAIXO SEJAM EXECUTADOS COM .env e .gitignore EXISTENTES TODO CONTEÚDO DOS MESMOS SERÁ APAGADO
+# CUIDADO: SOMENTE EXECUTE OS COMANDOS ABAIXO SE TIVER CERTEZA E CONHECIMENTO DO QUE SERÁ FEITO
+
+# Crie arquivo .env com estrutura para receber chaves CKAN_HOST e CKAN_KEY
+# Após a criação, abra o arquivo e inclua os valores para cada variável
+$ echo "CKAN_HOST=''\nCKAN_KEY=''" > .env
+
+# Crie arquivo .gitignore com configuração para excluir arquivo .env do controle de versão git
+$ echo ".env" > .gitignore
+
+# Confira se configuração foi realizada com sucesso
+# Comando abaixo deverá mostrar apenas criação/modificação de arquivo .gitignore, não sendo apresentado nada para arquivo .env
+$ git status
+```
+
+Recomendamos fortemente a utilização da primeira opção sugerida acima, via cadastro de variáveis de ambiente, por considerarmos a facilidade de erro da segunda e consequente publicização das chaves CKAN em repositórios online.
 
 ## Uso
 
-- Trabalhando com variáveis de ambiente
+### Acessando documentação dpckan via terminal
 
-A utilizaçao deste pacote exige a utilizaçao de chaves CKAN, tanto do ambiente de [homologação](https://homologa.cge.mg.gov.br/) quanto de [produção](https://dados.mg.gov.br/). Para solicitar login de acesso mande um e-mail para dadosabertos@cge.mg.gov.br.
+```bash
+# Informações gerais sobre o pacote e seus comandos
+# Utilização da flag --help retornará o mesmo resultado
+$ dpckan
 
+# Informações sobre comandos dataset e resource
+# Utilização da flag --help retornará o mesmo resultado
+$ dpckan dataset
+$ dpckan resource
 
-Sugerimos a criação de um arquivo .env na raiz do pacote (bem como o cadastro .gitignore do mesmo) para utilização destas chaves sem a sincronização das mesmas com o repositório online. O pacote "python-dotenv" necessário para carregamento das chaves cadastradas no arquivo .env, será instalado juntamente com o pacote. Sendo assim, sugerimos os seguintes passos para criaçao do arquivo .env:
+# Informações sobre subcomandos dataset
+$ dpckan dataset create --help
+$ dpckan dataset update --help
 
-```
-# Criação arquivo .env com estrutura para receber chaves CKAN homologação e produção
-# Após a criação, abra o arquivo e inclua as chaves em seus respectivos ambientes
-$ echo "CKAN_HOMOLOGA=''\nCKAN_PORTAL=''" > .env
-
-# Inclua ".env" na última linha do arquivo .gitignore existente na raiz do conjunto. Caso .gitignore não exista execute o comando abaixo:
-# CUIDADO: Caso comando abaixo seja executado em um conjunto cujo .gitignore exista toda configuração preexistente no mesmo será apagada
-$ echo ".env" > .gitignore
-```
-
-
-- Publicação de conjuntos (Arquivo Python ou terminal)
-  - publish(package_path, ckan_key, environment):
-    - package_path: caminho do arquivo datapackage.json
-    - ckan_key: chave ckan do usuário no ambiente desejado
-    - environment: escolher entre "homologa" e"portal" (homologa default)
-
-```
-# Publicação em ambiente de homologação - Executar na raiz do conjunto (local onde datapackage.json está armazenado)
-
-import os
-from dotenv import load_dotenv
-load_dotenv()
-from dpkgckanmg import publish
-publish("./", os.getenv('CKAN_HOMOLOGA'), "homologa")
-
-
-# Publicação em ambiente de produção - Executar na raiz do conjunto (local onde datapackage.json está armazenado)
-
-import os
-from dotenv import load_dotenv
-load_dotenv()
-from dpkgckanmg import publish
-publish("./", os.getenv('CKAN_PORTAL'), "portal")
+# Informações sobre subcomandos resource
+$ dpckan resource create --help
+$ dpckan resource update --help
 ```
 
-# Criar Recurso
-from dpckan import criarArquivo2
-criarArquivo2(1, 2, 3)
+### Criação de conjunto de dados via terminal
 
-# Atualizar Data Set
-from dpkgckanmg import dataSet
-dataSet(1, 2, 3)
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra:
 
-# Atualizar Recurso
-from dpkgckanmg import resource
-resource(1, 2, 3)
-
-
-### 1,2 3 deveráo ser retirados do arquivo .doc (gabriel atualizará)
+```bash
+$ dpckan dataset create
 ```
+
+- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra. Não copie e cole o comando abaixo cegamente, modifique o último argumento com o caminho local para arquivo datapackage.json
+
+```bash
+# Utilização flag --datapackage
+$ dpckan dataset create --datapackage local/path/para/datapackage.json
+
+# Utilização alias -dp para flag --datapackage
+$ dpckan dataset create -dp local/path/para/datapackage.json
+```
+
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra utilizando variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY`. Não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente para a sua realidade.
+
+```bash
+# Utilização flag --ckan-host e --ckan-key
+$ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
+
+# Utilização alias -H e -K para flags --ckan-host e --ckan-key respectivamente
+$ dpckan dataset create -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
+```
+
+### Atualização de conjunto de dados via terminal
+
+### Criação de recursos via terminal
+
+### Atualização de recursos via terminal
 
 ## Desenvolvimento
-
-# Instalação
-
-- Prerequisitos:
-  - Python 3.9 ou superior
-
-- [Documentação de referência mostrando procedimentos necessários para contribuiação em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
-- Passos básicos:
-  - Fork o repositório do projeto
-  - Clone o repositório criado em sua conta após o fork
-  - Navegue até o repositório clonado em sua máquina
-  - Crie e ative ambiente python para utilizar o projeto. Os passos abaixo são sugestões, podendo outro método ser utilizado de acordo com a preferência do usuário:
-```
-$ python3.9 -m venv venv
-$ source venv/bin/activate
-(venv) ➜ pip install -r requirements.txt
-# Desativar o ambiente
-(venv) ➜ deactivate
-```
-  - Crie um branch e realize as modificações necessárias
-  - Realize o push de suas modificações no branch criado
-  - Abra um PR explicando os motivos que o levaram a realizar a modificar parte do código e em como esta modificação auxiliará no desenvolvimento do projeto
-
-# Atualização de versão
-
-Conforme relatado no [issue 6](https://github.com/dados-mg/dpkgckanmg/issues/6), atualização de versões no [Pypi](https://pypi.org/) deve seguir os passos:
-
-- Visualização da última versão publicada no Pypi
-- Atualização arquivo setup.py com uma versão superior à identificada no Pypi
-- Commit diretamente na main da modificação
-```
-$ git add .
-$ git commit -m "v<numero-versao>"
-# Exemplo - $ git commit -m "v0.0.1.9013"
-```
-- Criação da tag e vinculação da mesma com o último commit
-```
-$ git tag v<numero-versao> HEAD
-# Exemplo - $ git tag v0.0.1.9013 HEAD
-```
-- Push commit (diretamente main) e tag para repo online
-```
-$ git push origin main                # branch
-$ git push origin v<numero-versao>    # tag
-```
-- Publicar nova versão
-```
-# Leitura do arquivo Makefile para relembrar
-# Ativar ambiente python e publicação
-$ source venv/bin/activate
-(venv) ➜  dpkgckanmg git:(main) make update-package
-```
-
-- Consulta nova versão publicada
