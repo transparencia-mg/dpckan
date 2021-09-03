@@ -49,7 +49,7 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json')
-@click.option('--resource_name', '-rn', required=True)
+@click.option('--resource-name', '-rn', required=True)
 def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name):
   """
   Função CLI responsável pela publicação de um recurso em conjunto de dados já existente na instância CKAN desejada.
