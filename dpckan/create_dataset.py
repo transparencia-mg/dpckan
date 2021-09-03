@@ -8,6 +8,25 @@ from dpckan.functions import (delete_dataset,
                               load_complete_datapackage)
 
 def create(ckan_host, ckan_key, datapackage):
+  """
+  Função responsável pela publicação de um conjunto de dados na instância CKAN desejada.
+
+  Parameters
+  ----------
+  ckan_host: string
+    host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
+    Exemplo: https://demo.ckan.org/
+
+  ckan_key: string
+    Chave CKAN do usuário e ambiente para a qual se deseja publicar conjunto de dados.
+
+  datapackage: string
+    caminho local para arquivo datapackage.json
+
+  Returns
+  -------
+    Conjunto de dados publicado no ambiente desejado
+  """
   package = load_complete_datapackage(datapackage)
   run_validations(ckan_host, ckan_key, package)
 
@@ -30,22 +49,25 @@ def create(ckan_host, ckan_key, datapackage):
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json')
 def create_cli(ckan_host, ckan_key, datapackage):
   """
-  Função responsável pela publicação/atualização de um conjunto de dados no ambiente (host) desejado.
+  Função CLI responsável pela publicação de um conjunto de dados na instância CKAN desejada.
 
-  Por padrão, função buscará host e key da instância CKAN para qual e deseja publicar/atualizar dataset
-  nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou em arquivo .env na raiz do dataset.
+  Por padrão, função buscará host e key da instância CKAN nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou
+  em arquivo .env na raiz do dataset.
 
   Parameters
   ----------
-  host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
-    host ou ambiente da instância CKAN para a qual se deseja publicar/atualizar dataset.
-    Exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br
-  key: string (não obrigatório caso variável CKAN_KEY esteja cadastrada na máquina ou em arquivo .env)
-    Chave CKAN do usuário e ambiente para a qual se deseja publicar/atualizar dataset
+  ckan_host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
+    host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
+    Exemplo: https://demo.ckan.org/
 
+  ckan_key: string (não obrigatório caso variável CKAN_KEY esteja cadastrada na máquina ou em arquivo .env)
+    Chave CKAN do usuário e ambiente para a qual se deseja publicar conjunto de dados.
+
+  datapackage: string (não obrigatório caso comando seja executado no mesmo diretório do arquivo datapackage.json)
+    caminho local para arquivo datapackage.json
   Returns
   -------
-    Dataset publicado/atualizado no ambiente desejado
+    Conjunto de dados publicado no ambiente desejado
   """
   create(ckan_host, ckan_key, datapackage)
 
