@@ -4,7 +4,7 @@ from dpckan.update_dataset import update
 from dpckan.create_resource import create_resource
 from dpckan.update_resource import update_resource
 
-@click.group()
+@click.group(context_settings=dict(help_option_names=["-h", "--help"]))
 def cli():
   """
     Conjunto de comandos criados para publicações/atualizações de datasets em instâncias CKAN
