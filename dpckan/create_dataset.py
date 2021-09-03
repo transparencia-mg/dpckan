@@ -43,7 +43,7 @@ def create(ckan_host, ckan_key, datapackage):
 
 @click.command(name='create')
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
-              help="Ckan host, exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br")  # -H para respeitar convenção de -h ser help
+              help="Ckan host, exemplo: https://demo.ckan.org/")  # -H para respeitar convenção de -h ser help
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json')
