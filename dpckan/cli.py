@@ -1,5 +1,5 @@
 import click
-from dpckan.create_dataset import create
+from dpckan.create_dataset import create_cli
 from dpckan.update_dataset import update
 from dpckan.create_resource import create_resource
 from dpckan.update_resource import update_resource
@@ -15,7 +15,7 @@ def cli():
 def dataset():
   pass
 
-dataset.add_command(create)
+dataset.add_command(create_cli)
 dataset.add_command(update)
 
 @cli.group()

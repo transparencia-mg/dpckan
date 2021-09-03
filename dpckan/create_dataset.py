@@ -6,15 +6,29 @@ from dpckan.functions import (delete_dataset,
                               dataset_create,
                               is_dataset_published,
                               load_complete_datapackage)
-                              
 
-@click.command()
+def create(ckan_host, ckan_key, datapackage):
+  package = load_complete_datapackage(datapackage)
+  run_validations(ckan_host, ckan_key, package)
+
+  ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
+  if is_dataset_published(ckan_instance, package):
+    raise Exception('Conjunto de dados já existente.')
+  else:
+    try:
+      dataset_create(ckan_instance, package)
+    except Exception:
+      delete_dataset(ckan_instance, package.name)
+      print(f"Erro durante criação do conjunto de dados {package.name}")
+      sys.exit(1)
+
+@click.command(name='create')
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
               help="Ckan host, exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br")  # -H para respeitar convenção de -h ser help
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json')
-def create(ckan_host, ckan_key, datapackage):
+def create_cli(ckan_host, ckan_key, datapackage):
   """
   Função responsável pela publicação/atualização de um conjunto de dados no ambiente (host) desejado.
 
@@ -33,17 +47,6 @@ def create(ckan_host, ckan_key, datapackage):
   -------
     Dataset publicado/atualizado no ambiente desejado
   """
-  package = load_complete_datapackage(datapackage)
-  run_validations(ckan_host, ckan_key, package)
-  
-  ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  if is_dataset_published(ckan_instance, package):
-    raise Exception('Conjunto de dados já existente.')
-  else:
-    try:
-      dataset_create(ckan_instance, package)
-    except Exception:
-      delete_dataset(ckan_instance, package.name)
-      print(f"Erro durante criação do conjunto de dados {package.name}")
-      sys.exit(1)
-  
+  create(ckan_host, ckan_key, datapackage)
+
+
