@@ -7,7 +7,7 @@ def update(ckan_host, ckan_key, datapackage):
   """
   Função responsável pela atualização de um conjunto de dados na instância CKAN desejada.
 
-  Parameters
+  Parâmetros
   ----------
   ckan_host: string
     host ou ambiente da instância CKAN para a qual se deseja atualizar conjunto de dados.
@@ -17,11 +17,11 @@ def update(ckan_host, ckan_key, datapackage):
     Chave CKAN do usuário e ambiente para a qual se deseja atualizar conjunto de dados.
 
   datapackage: string
-    caminho local para arquivo datapackage.json
+    Caminho local para arquivo datapackage.json.
 
-  Returns
+  Retorna
   -------
-    Conjunto de dados atualizado no ambiente desejado
+    Conjunto de dados atualizado no ambiente desejado.
   """
   package = load_complete_datapackage(datapackage)
   run_validations(ckan_host, ckan_key, package)
@@ -45,7 +45,7 @@ def update_cli(ckan_host, ckan_key, datapackage):
   Por padrão, função buscará host e key da instância CKAN nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou
   em arquivo .env na raiz do dataset.
 
-  Parameters
+  Parâmetros
   ----------
   ckan_host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
     host ou ambiente da instância CKAN para a qual se deseja atualizar conjunto de dados.
@@ -54,11 +54,12 @@ def update_cli(ckan_host, ckan_key, datapackage):
   ckan_key: string (não obrigatório caso variável CKAN_KEY esteja cadastrada na máquina ou em arquivo .env)
     Chave CKAN do usuário e ambiente para a qual se deseja atualizar conjunto de dados.
 
-  datapackage: string (não obrigatório caso comando seja executado no mesmo diretório do arquivo datapackage.json)
-    caminho local para arquivo datapackage.json
-  Returns
+  atapackage: string (não obrigatório caso comando seja executado no mesmo diretório do arquivo datapackage.json)
+    Caminho local para arquivo datapackage.json.
+
+  Retorna
   -------
-    Conjunto de dados atualizado no ambiente desejado
+    Conjunto de dados atualizado no ambiente desejado.
   """
   update(ckan_host, ckan_key, datapackage)
 

@@ -163,7 +163,7 @@ $ dpckan dataset update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
 
 ```python
 import os
-from dpckan import create_dataset
+from dpckan import update_dataset
 
 CKAN_HOST = os.environ.get('CKAN_HOST')
 CKAN_KEY = os.environ.get('CKAN_KEY')
@@ -175,7 +175,56 @@ create_dataset.update(ckan_host=CKAN_HOST,
                       datapackage=datapackage_path)
 ```
 
-### Criação de recursos via terminal
+### Criação de recurso via terminal
+
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o último argumento com o nome do recurso presente no arquivo datapackage.json que será criado):
+
+```bash
+$ dpckan resource create --resource-name nome-recurso
+
+# Utilização alias -rn para flag --resource-name
+$ dpckan resource create -rn nome-recurso
+```
+
+- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o caminho local para arquivo datapackage.json e o nome do recurso para a sua realidade):
+
+```bash
+# Utilização flag --datapackage
+$ dpckan dataset create --datapackage local/path/para/datapackage.json --resource-name nome-recurso
+
+# Utilização alias -dp e -rn para flags --datapackage e --resource-name respectivamente
+$ dpckan dataset create -dp local/path/para/datapackage.json -rn nome-recurso
+```
+
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente para a sua realidade):
+
+```bash
+# Utilização flags --resource-name, --ckan-host e --ckan-key
+$ dpckan resource create --resource-name nome-recurso --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
+
+# Utilização alias -rn, -H e -k para flags --resource-name, --ckan-host e --ckan-key respectivamente
+$ dpckan resource create -rn nome-recurso -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
+```
+
+### Criação de conjunto de dados via código Python
+
+- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente e o caminho para o arquivo datapackage.json e o nome do recurso a ser criado de acordo com a sua realidade):
+
+```python
+import os
+from dpckan import create_resource
+
+CKAN_HOST = os.environ.get('CKAN_HOST')
+CKAN_KEY = os.environ.get('CKAN_KEY')
+datapackage_path = 'local/path/para/datapackage.json'
+resource_name = 'nome-recurso'
+
+# A chamada de funções via código Python exige passagem de todos os argumentos
+create_dataset.create_resource(ckan_host=CKAN_HOST,
+                      ckan_key=CKAN_KEY,
+                      datapackage=datapackage_path,
+                      resource_name=resource_name)
+```
 
 ### Atualização de recursos via terminal
 
