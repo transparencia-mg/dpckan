@@ -2,7 +2,7 @@ import click
 from dpckan.create_dataset import create_cli
 from dpckan.update_dataset import update_cli
 from dpckan.create_resource import create_resource_cli
-from dpckan.update_resource import update_resource
+from dpckan.update_resource import update_resource_cli
 
 @click.group(context_settings=dict(help_option_names=["-h", "--help"]))
 def cli():
@@ -23,4 +23,4 @@ def resource():
   pass
 
 resource.add_command(create_resource_cli, 'create')
-resource.add_command(update_resource, 'update')
+resource.add_command(update_resource_cli, 'update')
