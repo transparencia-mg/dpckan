@@ -21,8 +21,9 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
 
   datapackage: string
     Caminho local para arquivo datapackage.json.
+
   resource_name: string
-    Nome do recurso presente no arquivo datapackage.json que será criado.
+    Nome do recurso, presente no arquivo datapackage.json, que será criado.
 
   Retorna
   -------
@@ -70,7 +71,7 @@ def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name):
     Caminho local para arquivo datapackage.json.
 
   resource_name: string
-    Nome do recurso presente no arquivo datapackage.json que será criado.
+    Nome do recurso, presente no arquivo datapackage.json, que será criado.
 
   Retorna
   -------
