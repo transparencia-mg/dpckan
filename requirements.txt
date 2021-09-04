@@ -1,3 +1,4 @@
+ipdb==0.13.9
 certifi==2020.12.5
 chardet==4.0.0
 frictionless-ckan-mapper==1.0.6
