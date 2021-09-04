@@ -1,6 +1,7 @@
 import os
 from click.testing import CliRunner
 import unittest
+from ckanapi import RemoteCKAN
 
 def clone_online_repo(file):
   """
@@ -18,6 +19,12 @@ def get_file_name(file):
     As explained in clone_online_repo method test_dataset_* file name must be branch's name
   """
   return file.split("/")[-1].split(".")[0]
+
+def get_ckan_instance(ckan_host, ckan_key):
+  ckan_host = os.environ.get(ckan_host)
+  ckan_key = os.environ.get(ckan_key)
+  ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
+  return ckan_instance
 
 def get_file_path():
   """
