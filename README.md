@@ -280,3 +280,40 @@ create_dataset.create_resource(ckan_host=CKAN_HOST,
 ```
 
 ## Desenvolvimento
+
+### Contribuir para o projeto
+
+- Prerequisitos:
+    - Python 3.9 ou superior
+
+- [Documentação de referência mostrando procedimentos necessários para contribuiação em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
+
+- Passos básicos:
+    - Fork o repositório do projeto;
+    - Clone o repositório criado em sua conta após o fork;
+    - Navegue até o repositório clonado em sua máquina;
+    - Crie e ative ambiente python para utilizar o projeto, conforme sugerido abaixo (procedimentos poderão ser diferentes conforme sistema operacional):
+
+```
+# Linux
+$ python3.9 -m venv venv
+$ source venv/bin/activate
+(venv) ➜ pip install -r requirements.txt
+# Desativar o ambiente
+(venv) ➜ deactivate
+
+# Windows
+$ python -m venv venv
+$ source venv/Script/activate
+(venv) ➜ pip install -r requirements.txt
+# Desativar o ambiente
+(venv) ➜ deactivate
+```
+
+  - Crie um branch para realizar as modificações necessárias;
+  - Realize o push da branch criada; e
+  - Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto.
+
+### Atualizar versão
+
+Conforme relatado no [issue 6](https://github.com/dados-mg/dpkgckanmg/issues/6), atualização de versões no [Pypi](https://pypi.org/) deve seguir [estes os passos](https://github.com/dados-mg/dpckan/issues/6#issuecomment-851678297):
