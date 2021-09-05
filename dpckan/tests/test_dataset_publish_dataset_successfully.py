@@ -17,7 +17,7 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       Testing dataset publication sucessfully homologacao environment
     """
     runner = CliRunner()
-    with runner.isolated_filesystem():
+    with runner.isolated_filesystem(temp_dir=get_file_path()):
       clone_online_repo(__file__)
       ckan_instance = get_ckan_instance('CKAN_HOST', 'CKAN_KEY')
       path_datapackage = datapackage_path()
@@ -37,7 +37,7 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       Testing dataset publication sucessfully production environment
     """
     runner = CliRunner()
-    with runner.isolated_filesystem():
+    with runner.isolated_filesystem(temp_dir=get_file_path()):
       clone_online_repo(__file__)
       ckan_instance = get_ckan_instance('CKAN_HOST_PRODUCAO', 'CKAN_KEY_PRODUCAO')
       path_datapackage = datapackage_path()
