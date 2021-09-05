@@ -7,6 +7,9 @@ from dpckan.functions import (delete_dataset,
                               is_dataset_published,
                               load_complete_datapackage)
 
+def hello():
+  print('heloo')
+
 def create(ckan_host, ckan_key, datapackage):
   """
   Função responsável pela publicação de um conjunto de dados na instância CKAN desejada.
@@ -79,5 +82,3 @@ def create_cli(ckan_host, ckan_key, datapackage):
   Conjunto de dados publicado no ambiente desejado.
   """
   create(ckan_host, ckan_key, datapackage)
-
-
