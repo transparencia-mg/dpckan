@@ -1,9 +1,9 @@
-.. dpkgckanmg documentation master file, created by
+.. dpckan documentation master file, created by
    sphinx-quickstart on Sat May 15 09:39:55 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to dpkgckanmg's documentation!
+Welcome to dpckan's documentation!
 ======================================
 
 .. toctree::
@@ -11,21 +11,29 @@ Welcome to dpkgckanmg's documentation!
    :caption: Contents:
 
 
-Indices and tables
-==================
+.. Indices and tables
+.. ==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
 
-.. automodule:: dpkgckanmg.publish
+Criar conjunto de dados
+=====================================
+.. automodule:: dpckan.create_dataset
   :members:
 
-.. automodule:: dpkgckanmg.createResource
+Atualizar conjunto de dados
+=====================================
+.. automodule:: dpckan.update_dataset
   :members:
 
-.. automodule:: dpkgckanmg.updateDataSet
+Criar recurso
+======================================
+.. automodule:: dpckan.create_resource
   :members:
 
-.. automodule:: dpkgckanmg.updateResource
+Atualizar recurso
+======================================
+.. automodule:: dpckan.update_resource
   :members:
