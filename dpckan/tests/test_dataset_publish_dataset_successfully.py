@@ -1,12 +1,12 @@
+import ipdb
 import os
 import json
 from click.testing import CliRunner
 import unittest
-from dpckan.tests import clone_online_repo
-from dpckan.tests import get_file_path
-from dpckan.create_dataset import create
+from dpckan.create_dataset import create_cli
+from dpckan.tests import (clone_online_repo, get_file_path, get_ckan_instance)
 from dpckan.functions import (delete_dataset, datapackage_path,
-                              load_complete_datapackage)
+                              load_complete_datapackage, is_dataset_published)
 
 class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
   """
@@ -19,28 +19,33 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
     runner = CliRunner()
     with runner.isolated_filesystem():
       clone_online_repo(__file__)
-      result = runner.invoke(create)
-      # Deleting dataset after test
+      ckan_instance = get_ckan_instance('CKAN_HOST', 'CKAN_KEY')
       path_datapackage = datapackage_path()
-      dataset_dict = json.loads(load_complete_datapackage(path_datapackage))
-      delete_dataset(os.environ.get('CKAN_HOST'), os.environ.get('CKAN_KEY'), dataset_dict['name'])
+      dataset_dict = dict(load_complete_datapackage(path_datapackage))
+      dataset_name = dataset_dict['name']
+      # Deleting dataset before test
+      if is_dataset_published(ckan_instance, dataset_name):
+        delete_dataset(ckan_instance, dataset_name)
+      # Publish dataset
+      result = runner.invoke(create_cli)
+      # Deleting dataset after test
+      delete_dataset(ckan_instance, dataset_name)
       self.assertEqual(result.exit_code, 0)
 
-  def test_prod_env(self):
-    """
-      Testing dataset publication sucessfully producao environment
-    """
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-      clone_online_repo(__file__)
-      result = runner.invoke(create, ['--host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
-                             '--key', f"{os.environ.get('CKAN_KEY_PRODUCAO')}"])
-      # Deleting dataset after test
-      path_datapackage = datapackage_path()
-      dataset_dict = json.loads(load_complete_datapackage(path_datapackage))
-      delete_dataset(os.environ.get('CKAN_HOST_PRODUCAO'), os.environ.get('CKAN_KEY_PRODUCAO'), dataset_dict['name'])
-      self.assertEqual(result.exit_code, 0)
+  # def test_prod_env(self):
+  #   """
+  #     Testing dataset publication sucessfully producao environment
+  #   """
+  #   runner = CliRunner()
+  #   with runner.isolated_filesystem():
+  #     clone_online_repo(__file__)
+  #     result = runner.invoke(create_cli, ['--ckan-host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
+  #                            '--ckan-key', f"{os.environ.get('CKAN_KEY_PRODUCAO')}"])
+  #     # Deleting dataset after test
+  #     path_datapackage = datapackage_path()
+  #     dataset_dict = json.loads(lerDadosJsonMapeado(path_datapackage))
+  #     delete_dataset(os.environ.get('CKAN_HOST_PRODUCAO'), os.environ.get('CKAN_KEY_PRODUCAO'), dataset_dict['name'])
+  #     self.assertEqual(result.exit_code, 0)
 
 if __name__ == '__main__':
   unittest.main()
-
