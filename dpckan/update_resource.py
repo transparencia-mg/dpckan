@@ -10,8 +10,10 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   """
   Função responsável pela atualização de um recurso em conjunto de dados já existente na instância CKAN desejada.
 
-  Parâmetros
+  Parâmetros:
+
   ----------
+
   ckan_host: string
     host ou ambiente da instância CKAN para a qual se deseja atualizar conjunto de dados.
     Exemplo: https://demo.ckan.org/
@@ -25,9 +27,11 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   resource_name: string
     Nome do recurso, presente no arquivo datapackage.json, que será atualizado.
 
-  Retorna
+  Retorna:
+
   -------
-    Recurso atualizado em um conjunto de dados previamente publicado no ambiente desejado.
+
+  Recurso atualizado em um conjunto de dados previamente publicado no ambiente desejado.
   """
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
@@ -59,8 +63,10 @@ def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_
   Por padrão, função buscará host e key da instância CKAN nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou
   em arquivo .env na raiz do dataset.
 
-  Parâmetros
+  Parâmetros:
+
   ----------
+
   ckan_host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
     host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
     Exemplo: https://demo.ckan.org/
@@ -77,8 +83,10 @@ def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_
   resource_name: string
     Nome do recurso, presente no arquivo datapackage.json, que será atualizado.
 
-  Retorna
+  Retorna:
+
   -------
-    Recurso atualizado em um conjunto de dados previamente publicado no ambiente desejado.
+
+  Recurso atualizado em um conjunto de dados previamente publicado no ambiente desejado.
   """
   update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name)
