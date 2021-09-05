@@ -7,8 +7,10 @@ def update(ckan_host, ckan_key, datapackage):
   """
   Função responsável pela atualização de um conjunto de dados na instância CKAN desejada.
 
-  Parâmetros
+  Parâmetros:
+
   ----------
+
   ckan_host: string
     host ou ambiente da instância CKAN para a qual se deseja atualizar conjunto de dados.
     Exemplo: https://demo.ckan.org/
@@ -19,9 +21,11 @@ def update(ckan_host, ckan_key, datapackage):
   datapackage: string
     Caminho local para arquivo datapackage.json.
 
-  Retorna
+  Retorna:
+
   -------
-    Conjunto de dados atualizado no ambiente desejado.
+
+  Conjunto de dados atualizado no ambiente desejado.
   """
   package = load_complete_datapackage(datapackage)
   run_validations(ckan_host, ckan_key, package)
@@ -45,8 +49,10 @@ def update_cli(ckan_host, ckan_key, datapackage):
   Por padrão, função buscará host e key da instância CKAN nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou
   em arquivo .env na raiz do dataset.
 
-  Parâmetros
+  Parâmetros:
+
   ----------
+
   ckan_host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
     host ou ambiente da instância CKAN para a qual se deseja atualizar conjunto de dados.
     Exemplo: https://demo.ckan.org/
@@ -57,9 +63,11 @@ def update_cli(ckan_host, ckan_key, datapackage):
   atapackage: string (não obrigatório caso comando seja executado no mesmo diretório do arquivo datapackage.json)
     Caminho local para arquivo datapackage.json.
 
-  Retorna
+  Retorna:
+
   -------
-    Conjunto de dados atualizado no ambiente desejado.
+
+  Conjunto de dados atualizado no ambiente desejado.
   """
   update(ckan_host, ckan_key, datapackage)
 
