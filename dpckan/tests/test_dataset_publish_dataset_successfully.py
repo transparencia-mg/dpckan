@@ -47,7 +47,8 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       if is_dataset_published(ckan_instance, dataset_name):
         delete_dataset(ckan_instance, dataset_name)
       # Publish dataset
-      result = runner.invoke(create_cli)
+      result = runner.invoke(create_cli, ['--ckan-host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
+                             '--ckan-key', f"{os.environ.get('CKAN_KEY_PRODUCAO')}"])
       # Deleting dataset after test
       delete_dataset(ckan_instance, dataset_name)
       self.assertEqual(result.exit_code, 0)
