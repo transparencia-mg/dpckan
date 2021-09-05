@@ -8,29 +8,25 @@ Bem Vindo à documentação dpckan
 
 Criar conjunto de dados
 --------------------------------------
-.. automodule:: dpckan.create_dataset
-   :members:
+.. automethod:: dpckan.create_dataset.create(ckan_host, ckan_key, datapackage)
 
 .. automethod:: dpckan.create_dataset.create_cli(ckan_host, ckan_key, datapackage)
 
 Atualizar conjunto de dados
 -------------------------------------
-.. automodule:: dpckan.update_dataset
-   :members:
+.. automethod:: dpckan.update_dataset.update(ckan_host, ckan_key, datapackage)
 
 .. automethod:: dpckan.update_dataset.update_cli(ckan_host, ckan_key, datapackage)
 
 Criar recurso
 --------------------------------------
-.. automodule:: dpckan.create_resource
-   :members:
+.. automethod:: dpckan.create_resource.create_resource(ckan_host, ckan_key, datapackage, resource_name)
 
 .. automethod:: dpckan.create_resource.create_resource_cli(ckan_host, ckan_key, datapackage, resource_name)
 
 Atualizar recurso
 --------------------------------------
-.. automodule:: dpckan.update_resource
-   :members:
+.. automethod:: dpckan.update_resource.update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name)
 
 .. automethod:: dpckan.update_resource.update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_name)
 
