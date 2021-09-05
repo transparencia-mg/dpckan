@@ -92,10 +92,10 @@
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Bem Vindo à documentação dpckan</a><ul>
-<li><a class="reference internal" href="#module-dpckan.create_dataset">Criar conjunto de dados</a></li>
-<li><a class="reference internal" href="#module-dpckan.update_dataset">Atualizar conjunto de dados</a></li>
-<li><a class="reference internal" href="#module-dpckan.create_resource">Criar recurso</a></li>
-<li><a class="reference internal" href="#module-dpckan.update_resource">Atualizar recurso</a></li>
+<li><a class="reference internal" href="#criar-conjunto-de-dados">Criar conjunto de dados</a></li>
+<li><a class="reference internal" href="#atualizar-conjunto-de-dados">Atualizar conjunto de dados</a></li>
+<li><a class="reference internal" href="#criar-recurso">Criar recurso</a></li>
+<li><a class="reference internal" href="#atualizar-recurso">Atualizar recurso</a></li>
 </ul>
 </li>
 </ul>
@@ -167,11 +167,11 @@
             
   <div class="section" id="bem-vindo-a-documentacao-dpckan">
 <h1>Bem Vindo à documentação dpckan<a class="headerlink" href="#bem-vindo-a-documentacao-dpckan" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-dpckan.create_dataset">
-<span id="criar-conjunto-de-dados"></span><h2>Criar conjunto de dados<a class="headerlink" href="#module-dpckan.create_dataset" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="criar-conjunto-de-dados">
+<h2>Criar conjunto de dados<a class="headerlink" href="#criar-conjunto-de-dados" title="Permalink to this headline">¶</a></h2>
+<dl class="py method">
 <dt class="sig sig-object py" id="dpckan.create_dataset.create">
-<span class="sig-prename descclassname"><span class="pre">dpckan.create_dataset.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.create_dataset.create" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">create_dataset.</span></span><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.create_dataset.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Função responsável pela publicação de um conjunto de dados na instância CKAN desejada.</p>
 <p>Parâmetros:</p>
 <dl class="simple">
@@ -208,11 +208,11 @@ Exemplo: <a class="reference external" href="https://demo.ckan.org/">https://dem
 </dd></dl>
 
 </div>
-<div class="section" id="module-dpckan.update_dataset">
-<span id="atualizar-conjunto-de-dados"></span><h2>Atualizar conjunto de dados<a class="headerlink" href="#module-dpckan.update_dataset" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="atualizar-conjunto-de-dados">
+<h2>Atualizar conjunto de dados<a class="headerlink" href="#atualizar-conjunto-de-dados" title="Permalink to this headline">¶</a></h2>
+<dl class="py method">
 <dt class="sig sig-object py" id="dpckan.update_dataset.update">
-<span class="sig-prename descclassname"><span class="pre">dpckan.update_dataset.</span></span><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.update_dataset.update" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">update_dataset.</span></span><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.update_dataset.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Função responsável pela atualização de um conjunto de dados na instância CKAN desejada.</p>
 <p>Parâmetros:</p>
 <dl class="simple">
@@ -249,11 +249,11 @@ Exemplo: <a class="reference external" href="https://demo.ckan.org/">https://dem
 </dd></dl>
 
 </div>
-<div class="section" id="module-dpckan.create_resource">
-<span id="criar-recurso"></span><h2>Criar recurso<a class="headerlink" href="#module-dpckan.create_resource" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="criar-recurso">
+<h2>Criar recurso<a class="headerlink" href="#criar-recurso" title="Permalink to this headline">¶</a></h2>
+<dl class="py method">
 <dt class="sig sig-object py" id="dpckan.create_resource.create_resource">
-<span class="sig-prename descclassname"><span class="pre">dpckan.create_resource.</span></span><span class="sig-name descname"><span class="pre">create_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.create_resource.create_resource" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">create_resource.</span></span><span class="sig-name descname"><span class="pre">create_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.create_resource.create_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Função responsável pela publicação de um recurso em conjunto de dados já existente na instância CKAN desejada.</p>
 <p>Parâmetros:</p>
 <dl class="simple">
@@ -294,11 +294,11 @@ Exemplo: <a class="reference external" href="https://demo.ckan.org/">https://dem
 </dd></dl>
 
 </div>
-<div class="section" id="module-dpckan.update_resource">
-<span id="atualizar-recurso"></span><h2>Atualizar recurso<a class="headerlink" href="#module-dpckan.update_resource" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
+<div class="section" id="atualizar-recurso">
+<h2>Atualizar recurso<a class="headerlink" href="#atualizar-recurso" title="Permalink to this headline">¶</a></h2>
+<dl class="py method">
 <dt class="sig sig-object py" id="dpckan.update_resource.update_resource">
-<span class="sig-prename descclassname"><span class="pre">dpckan.update_resource.</span></span><span class="sig-name descname"><span class="pre">update_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.update_resource.update_resource" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">update_resource.</span></span><span class="sig-name descname"><span class="pre">update_resource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckan_host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ckan_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datapackage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dpckan.update_resource.update_resource" title="Permalink to this definition">¶</a></dt>
 <dd><p>Função responsável pela atualização de um recurso em conjunto de dados já existente na instância CKAN desejada.</p>
 <p>Parâmetros:</p>
 <dl class="simple">
