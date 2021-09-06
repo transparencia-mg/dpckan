@@ -1,6 +1,6 @@
 # Data package manager para CKAN (dpckan)
 
-O `dpckan` é um pacote Python, acessível via interface [CLI](https://pt.wikipedia.org/wiki/Interface_de_linha_de_comandos), utilizado para criação e atualização de conjuntos de dados e recursos, documentados de acordo com o padrão de metadados [Frictionless Data](https://frictionlessdata.io/), em uma instância do [CKAN](https://ckan.org/).
+O `dpckan` é um pacote Python, acessível via interface [CLI](https://pt.wikipedia.org/wiki/Interface_de_linha_de_comandos), utilizado para criação e atualização de conjuntos de dados e recursos (documentados de acordo com o padrão de metadados [Frictionless Data](https://frictionlessdata.io/)) em uma instância do [CKAN](https://ckan.org/).
 
 [Documentação complementar](https://dpckan.readthedocs.io/en/latest/)
 
