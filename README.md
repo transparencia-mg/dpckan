@@ -56,7 +56,7 @@ $ echo "CKAN_HOST=''\nCKAN_KEY=''" > .env
 $ echo ".env" > .gitignore
 
 # Confira se configuração foi realizada com sucesso
-# Comando abaixo deverá mostrar apenas criação/modificação de arquivo .gitignore, não sendo apresentado nada para arquivo ".env"
+# Comando abaixo deverá mostrar apenas criação/modificação de arquivo ".gitignore", não sendo apresentado nada para arquivo ".env"
 $ git status
 ```
 
