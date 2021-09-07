@@ -172,7 +172,7 @@ CKAN_KEY = os.environ.get('CKAN_KEY')
 datapackage_path = 'local/path/para/datapackage.json'
 
 # A chamada de funções via código Python exige passagem de todos os argumentos
-create_dataset.update(ckan_host=CKAN_HOST,
+update_dataset.update(ckan_host=CKAN_HOST,
                       ckan_key=CKAN_KEY,
                       datapackage=datapackage_path)
 ```
