@@ -13,6 +13,9 @@ def cli():
 
 @cli.group()
 def dataset():
+  """
+    Funções responsáveis pela criação e atualização de conjuntos de dados em uma instância CKAN.
+  """
   pass
 
 dataset.add_command(create_cli)
@@ -20,6 +23,9 @@ dataset.add_command(update_cli)
 
 @cli.group()
 def resource():
+  """
+    Funções responsáveis pela criação e atualização de recursos em conjuntos de dados publicados em uma instância CKAN.
+  """
   pass
 
 resource.add_command(create_resource_cli, 'create')

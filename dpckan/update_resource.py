@@ -15,16 +15,24 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   ----------
 
   ckan_host: string
+
     host ou ambiente da instância CKAN para a qual se deseja atualizar conjunto de dados.
     Exemplo: https://demo.ckan.org/
 
   ckan_key: string
+
     Chave CKAN do usuário e ambiente para a qual se deseja atualizar conjunto de dados.
 
   datapackage: string
+
     Caminho local para arquivo datapackage.json.
 
+  resource_id: string
+
+    Id do recurso a ser atualizado na instância CKAN desejada.
+
   resource_name: string
+
     Nome do recurso, presente no arquivo datapackage.json, que será atualizado.
 
   Retorna:
@@ -68,19 +76,24 @@ def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_
   ----------
 
   ckan_host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
+
     host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
     Exemplo: https://demo.ckan.org/
 
   ckan_key: string (não obrigatório caso variável CKAN_KEY esteja cadastrada na máquina ou em arquivo .env)
+
     Chave CKAN do usuário e ambiente para a qual se deseja publicar conjunto de dados.
 
   datapackage: string (não obrigatório caso comando seja executado no mesmo diretório do arquivo datapackage.json)
+
     Caminho local para arquivo datapackage.json.
 
   resource_id: string
-    Id do recurso, presente no arquivo datapackage.json, que ser atualizado.
+
+    Id do recurso a ser atualizado na instância CKAN desejada.
 
   resource_name: string
+
     Nome do recurso, presente no arquivo datapackage.json, que será atualizado.
 
   Retorna:
