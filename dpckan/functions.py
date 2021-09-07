@@ -1,3 +1,4 @@
+import ipdb
 import os
 import click
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
@@ -32,36 +33,17 @@ def load_complete_datapackage(source):
   return datapackage
 
 def dataset_create(ckan_instance, datapackage):
-    
-    dataset = f2c.package(datapackage)
-    dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
-    
-    README_path = os.path.join(datapackage.basepath, 'README.md')
-    CONTRIBUTING_path = os.path.join(datapackage.basepath, 'CONTRIBUTING.md')
-    CHANGELOG_path = os.path.join(datapackage.basepath, 'CHANGELOG.md')
-    
-    if "notes" not in dataset.keys():
-      dataset["notes"] = ""
-    if os.path.isfile(README_path):
-      dataset["notes"] = f"{dataset['notes']}\n{open(README_path).read()}"
-    if os.path.isfile(CONTRIBUTING_path):
-      dataset["notes"] = f"{dataset['notes']}\n{open(CONTRIBUTING_path).read()}"
-    if os.path.isfile(CHANGELOG_path):
-      dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
-    
-    ckan_instance.call_action('package_create', dataset)
-    
-    create_datapackage_json_resource(ckan_instance, datapackage)
-    
-    for resource_name in datapackage.resource_names:
-      resource_ckan = resource_create(ckan_instance,
-                                      datapackage.name,
-                                      datapackage.get_resource(resource_name))
-      resource_update_datastore_metadata(ckan_instance,
-                                resource_ckan['id'],
-                                datapackage.get_resource(resource_name)
-                                )
-    
+  dataset = frictionless_to_ckan(datapackage)
+  ckan_instance.call_action('package_create', dataset)
+  create_datapackage_json_resource(ckan_instance, datapackage)
+  for resource_name in datapackage.resource_names:
+    resource_ckan = resource_create(ckan_instance,
+                                    datapackage.name,
+                                    datapackage.get_resource(resource_name))
+    resource_update_datastore_metadata(ckan_instance,
+                              resource_ckan['id'],
+                              datapackage.get_resource(resource_name)
+                              )
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
   
@@ -134,19 +116,17 @@ def update_datapackage_json_resource(ckan_instance, datapackage):
     ckan_instance.action.resource_update(id = resource_id,
                                          upload = open(os.path.join(datapackage.basepath, 'datapackage.json'), 'rb'))
 
-
-
 def dataset_update(ckan_instance, datapackage):
-  
   click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
+  dataset = frictionless_to_ckan(datapackage)
+  ckan_instance.call_action('package_patch', dataset)
+
+def frictionless_to_ckan(datapackage):
   dataset = f2c.package(datapackage)
-  
   dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
-  
   README_path = os.path.join(datapackage.basepath, 'README.md')
   CONTRIBUTING_path = os.path.join(datapackage.basepath, 'CONTRIBUTING.md')
   CHANGELOG_path = os.path.join(datapackage.basepath, 'CHANGELOG.md')
-  
   if "notes" not in dataset.keys():
     dataset["notes"] = ""
   if os.path.isfile(README_path):
@@ -155,7 +135,6 @@ def dataset_update(ckan_instance, datapackage):
     dataset["notes"] = f"{dataset['notes']}\n{open(CONTRIBUTING_path).read()}"
   if os.path.isfile(CHANGELOG_path):
     dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
-
-  dataset.update({ "id" : datapackage.name})
-
-  ckan_instance.call_action('package_patch', dataset)
+  if 'id' in dataset.keys():
+    dataset.update({ "id" : datapackage.name})
+  return dataset
