@@ -119,6 +119,7 @@ def update_datapackage_json_resource(ckan_instance, datapackage):
 def dataset_update(ckan_instance, datapackage):
   click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
   dataset = frictionless_to_ckan(datapackage)
+  dataset['id'] = datapackage.name
   ckan_instance.call_action('package_patch', dataset)
 
 def frictionless_to_ckan(datapackage):

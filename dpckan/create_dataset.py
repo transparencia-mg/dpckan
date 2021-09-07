@@ -19,13 +19,16 @@ def create(ckan_host, ckan_key, datapackage):
   -------
 
   ckan_host: string
+
     host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
     Exemplo: https://demo.ckan.org/
 
   ckan_key: string
+
     Chave CKAN do usuário e ambiente para a qual se deseja publicar conjunto de dados.
 
   datapackage: string
+
     Caminho local para arquivo datapackage.json.
 
   Retorna:
@@ -66,13 +69,16 @@ def create_cli(ckan_host, ckan_key, datapackage):
   ----------
 
   ckan_host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
+
     host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
     Exemplo: https://demo.ckan.org/
 
   ckan_key: string (não obrigatório caso variável CKAN_KEY esteja cadastrada na máquina ou em arquivo .env)
+
     Chave CKAN do usuário e ambiente para a qual se deseja publicar conjunto de dados.
 
   datapackage: string (não obrigatório caso comando seja executado no mesmo diretório do arquivo datapackage.json)
+
     Caminho local para arquivo datapackage.json.
 
   Retorna:
