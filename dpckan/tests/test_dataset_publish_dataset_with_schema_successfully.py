@@ -13,24 +13,25 @@ class TestDatasetPublishDatasetWithSchemaSuccessfully(unittest.TestCase):
     Testing dataset publication sucessfully
   """
   def test_homologa_env(self):
-      """
-        Testing dataset publication sucessfully homologacao environment
-      """
-      runner = CliRunner()
-      with runner.isolated_filesystem(temp_dir=get_file_path()):
-        clone_online_repo(__file__)
-        ckan_instance = get_ckan_instance('CKAN_HOST', 'CKAN_KEY')
-        path_datapackage = datapackage_path()
-        dataset_dict = dict(load_complete_datapackage(path_datapackage))
-        dataset_name = dataset_dict['name']
-        # Deleting dataset before test
-        if is_dataset_published(ckan_instance, dataset_name):
-          delete_dataset(ckan_instance, dataset_name)
-        # Publish dataset
-        result = runner.invoke(create_cli)
-        # Deleting dataset after test
+    """
+      Testing dataset publication sucessfully homologacao environment
+    """
+    runner = CliRunner()
+    with runner.isolated_filesystem(temp_dir=get_file_path()):
+      clone_online_repo(__file__)
+      ckan_instance = get_ckan_instance('CKAN_HOST', 'CKAN_KEY')
+      path_datapackage = datapackage_path()
+      datapackage = load_complete_datapackage(path_datapackage)
+      datapackage_dict = dict(datapackage)
+      dataset_name = datapackage_dict['name']
+      # Deleting dataset before test
+      if is_dataset_published(ckan_instance, datapackage):
         delete_dataset(ckan_instance, dataset_name)
-        self.assertEqual(result.exit_code, 0)
+      # Publish dataset
+      result = runner.invoke(create_cli)
+      # # Deleting dataset after test
+      delete_dataset(ckan_instance, dataset_name)
+      self.assertEqual(result.exit_code, 0)
 
   def test_production_env(self):
     """
@@ -41,10 +42,11 @@ class TestDatasetPublishDatasetWithSchemaSuccessfully(unittest.TestCase):
       clone_online_repo(__file__)
       ckan_instance = get_ckan_instance('CKAN_HOST_PRODUCAO', 'CKAN_KEY_PRODUCAO')
       path_datapackage = datapackage_path()
-      dataset_dict = dict(load_complete_datapackage(path_datapackage))
-      dataset_name = dataset_dict['name']
+      datapackage = load_complete_datapackage(path_datapackage)
+      datapackage_dict = dict(datapackage)
+      dataset_name = datapackage_dict['name']
       # Deleting dataset before test
-      if is_dataset_published(ckan_instance, dataset_name):
+      if is_dataset_published(ckan_instance, datapackage):
         delete_dataset(ckan_instance, dataset_name)
       # Publish dataset
       result = runner.invoke(create_cli, ['--ckan-host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
