@@ -29,9 +29,9 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
         delete_dataset(ckan_instance, dataset_name)
       # Publish dataset
       result = runner.invoke(create_cli)
-      # # Deleting dataset after test
-      delete_dataset(ckan_instance, dataset_name)
-      self.assertEqual(result.exit_code, 0)
+    # Deleting dataset after test
+    self.assertEqual(result.exit_code, 0)
+    delete_dataset(ckan_instance, dataset_name)
 
   def test_production_env(self):
     """
@@ -51,9 +51,9 @@ class TestDatasetPublishDatasetSuccessfully(unittest.TestCase):
       # Publish dataset
       result = runner.invoke(create_cli, ['--ckan-host', f"{os.environ.get('CKAN_HOST_PRODUCAO')}",
                              '--ckan-key', f"{os.environ.get('CKAN_KEY_PRODUCAO')}"])
-      # Deleting dataset after test
-      delete_dataset(ckan_instance, dataset_name)
-      self.assertEqual(result.exit_code, 0)
+    # Deleting dataset after test
+    delete_dataset(ckan_instance, dataset_name)
+    self.assertEqual(result.exit_code, 0)
 
 if __name__ == '__main__':
   unittest.main()
