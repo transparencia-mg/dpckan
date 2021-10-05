@@ -19,7 +19,7 @@ from package_information import name, copyright, author, version
 
 # Busca informações do arquivo ../setup.py (importação somente foi possível devido a linha 15)
 project = name
-copyright = copyright
+copyright = copyright.replace('Copyright ', '', 1)
 author = author
 
 # The full version, including alpha/beta/rc tags

@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+0.1.1 (08/09/2021)
+------------------
+- Revisão documentação README.md
+- Revisão documentação docstrings
+- Revisão estrutura testes
+
 0.1.0 (23/08/2021)
 ------------------
 - Criação dos comandos cli para criação e atualização de datasets
