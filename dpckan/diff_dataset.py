@@ -82,7 +82,7 @@ def diff_dataset_cli(ckan_host, ckan_key, datapackage):
   A list of (non-expected) differences between the datapackage and the CKAN dataset
   """
 
-  diffs = diff_dataset(ckan_host, ckan_key, datapackage)
+  diffs, oks = diff_dataset(ckan_host, ckan_key, datapackage)
   if len(diffs) == 0:
     click.echo("There are no differences")
   else:
@@ -91,3 +91,8 @@ def diff_dataset_cli(ckan_host, ckan_key, datapackage):
       click.echo(f" - On field {diff['field_name']}")
       click.echo(f"   - CKAN value {diff['ckan_value']}")
       click.echo(f"   - DataPackage value {diff['datapackage_value']}")
+
+  if len(oks) == 0:
+    click.echo("No equal field found")
+  else:
+    click.echo("Equal fields: {}".format(', '.join(oks)))

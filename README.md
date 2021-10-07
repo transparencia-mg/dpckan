@@ -322,18 +322,23 @@ from dpckan.diff_dataset import diff_dataset
 
 CKAN_HOST = os.environ.get('CKAN_HOST')
 CKAN_KEY = os.environ.get('CKAN_KEY')
-datapackage_path = 'local/path/para/datapackage.json'
+datapackage_path = 'dpckan/tests/test-datapackage/datapackage.json'
 resource_name = 'nome-recurso'
 resource_id = 'id-resource'
 
 # A chamada de funções via código Python exige passagem de todos os argumentos
-diff_dataset(
+diffs, oks = diff_dataset(
   ckan_host=CKAN_HOST,
   ckan_key=CKAN_KEY,
   datapackage=datapackage_path
 )
 
+diffs
 [{'field_name': 'title', 'ckan_value': 'A vowel letters dataset for tests CHANGED', 'datapackage_value': 'A vowel letters dataset for tests'}]
+
+oks
+['version', 'url', 'license_id', 'owner_org', 'tags', 'notes']
+
 ```
 
 ## Desenvolvimento
