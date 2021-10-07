@@ -146,10 +146,12 @@ def diff_dataset(ckan_instance, datapackage):
 
   diffs = []
   # TODO, add more
-  fields = ["title", "notes", "owner_org"]
+  fields = ["title"]
 
   for field in fields:
-    if dp_dataset.get(field) != ckan_dataset.get(field):
+    if dp_dataset.get(field) == ckan_dataset.get(field):
+      print(f' - field {field} OK. {dp_dataset.get(field)} == {ckan_dataset.get(field)}')
+    else:
       diffs.append(
         {
           'field_name': field,
@@ -158,4 +160,29 @@ def diff_dataset(ckan_instance, datapackage):
         }
       )
 
+  # check org (dataset use ID, datapackage uses name)
+  if dp_dataset['owner_org'] == ckan_dataset['organization']['name']:
+    print(f' - field owner_org OK')
+  else:
+    diffs.append(
+        {
+          'field_name': 'owner_org',
+          'ckan_value': ckan_dataset['organization']['name'],
+          'datapackage_value': dp_dataset['owner_org']
+        }
+      )
+
+  # Analyze tags
+  dp_tags = sorted([t['name'] for t in dp_dataset['tags']])
+  ckan_tags = sorted([t['name'] for t in ckan_dataset['tags']])
+  if dp_tags == ckan_tags:
+    print(f' - field tags OK')
+  else:
+    diffs.append(
+        {
+          'field_name': 'tags',
+          'ckan_value': ckan_tags,
+          'datapackage_value': dp_tags
+        }
+      )
   return diffs

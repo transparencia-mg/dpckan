@@ -40,12 +40,12 @@ def diff_dataset_internal_cli(ckan_host, ckan_key, datapackage):
   package = load_complete_datapackage(datapackage)
   run_validations(ckan_host, ckan_key, package)
 
-  ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
+  ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
   if not is_dataset_published(ckan_instance, package):
     raise Exception('Conjunto de dados nao existente.')
 
-  ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  diff_dataset(ckan_instance, datapackage)
+  ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
+  return diff_dataset(ckan_instance, package)
 
 
 @click.command(name='diff')
