@@ -86,73 +86,26 @@ $ dpckan resource create --help
 $ dpckan resource update --help
 ```
 
-### Criação de conjunto de dados via terminal
+### Criando e atualizando com um conjunto de dados via terminal
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra:
+
+- Para criar um conjunto de dados, execute o comando no diretório aonde o arquivo datapackage.json se encontra:
 
 ```bash
 $ dpckan dataset create
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o último argumento com o caminho local para arquivo datapackage.json
-
-```bash
-# Utilização flag --datapackage
-$ dpckan dataset create --datapackage local/path/para/datapackage.json
-
-# Utilização alias -dp para flag --datapackage
-$ dpckan dataset create -dp local/path/para/datapackage.json
-```
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o nome das variáveis de ambiente para a sua realidade
-
-```bash
-# Utilização flag --ckan-host e --ckan-key
-$ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
-
-# Utilização alias -H e -k para flags --ckan-host e --ckan-key respectivamente
-$ dpckan dataset create -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
-```
-
-
-
-### Atualização de conjunto de dados via terminal
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra:
+- E para atualizar o conjunto de dados, execute o comando no diretório aonde o arquivo datapackage.json se encontra:
 
 ```bash
 $ dpckan dataset update
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o último argumento com o caminho local para arquivo datapackage.json
-
-```bash
-# Utilização flag --datapackage
-$ dpckan dataset update --datapackage local/path/para/datapackage.json
-
-# Utilização alias -dp para flag --datapackage
-$ dpckan dataset update -dp local/path/para/datapackage.json
-```
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o nome das variáveis de ambiente para a sua realidade):
-
-```bash
-# Utilização flag --ckan-host e --ckan-key
-$ dpckan dataset update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
-
-# Utilização alias -H e -k para flags --ckan-host e --ckan-key respectivamente
-$ dpckan dataset update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
-```
 
 
-### Criação de recurso via terminal
+### Criando e atualizando recursos via terminal
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o último argumento com o nome do recurso presente no arquivo datapackage.json que será criado
+- Para criar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra. Não se esqueça de modificar o último argumento com o nome do recurso presente no arquivo datapackage.json que será criado
 
 ```bash
 $ dpckan resource create --resource-name nome-recurso
@@ -161,33 +114,8 @@ $ dpckan resource create --resource-name nome-recurso
 $ dpckan resource create -rn nome-recurso
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o caminho local para arquivo datapackage.json e o nome do recurso para a sua realidade
 
-```bash
-# Utilização flags --datapackage e --resource-name
-$ dpckan resource create --datapackage local/path/para/datapackage.json --resource-name nome-recurso
-
-# Utilização alias -dp e -rn para flags --datapackage e --resource-name respectivamente
-$ dpckan resource create -dp local/path/para/datapackage.json -rn nome-recurso
-```
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o nome do recurso e o nome das variáveis de ambiente para a sua realidade
-
-```bash
-# Utilização flags --resource-name, --ckan-host e --ckan-key
-$ dpckan resource create --resource-name nome-recurso --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
-
-# Utilização alias -rn, -H e -k para flags --resource-name, --ckan-host e --ckan-key respectivamente
-$ dpckan resource create -rn nome-recurso -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
-```
-
-
-### Atualização de recurso via terminal
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
-  - Modifique os últimos argumentos com o nome e id do recurso presente no arquivo datapackage.json que será atualizado
+- Para atualizar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra. Não se esqueça de modificar os últimos argumentos com o nome e id do recurso presente no arquivo datapackage.json que será atualizado
 
 ```bash
 # Utilização flags --resource-name e --resource-id
@@ -197,8 +125,9 @@ $ dpckan resource update --resource-name nome-recurso --resource-id id-recurso
 $ dpckan resource update -rn nome-recurso -id id-recurso
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
-  - modifique o caminho local para arquivo datapackage.json, o nome e id do recurso para a sua realidade
+### Usando as flags
+
+- É possível atualizar um conjunto de dados ou recurso fora do diretório onde o arquivo datapackage.json se encontra utilizando a flag `--datapackage` ou `-dp` como abaixo:
 
 ```bash
 # Utilização flag --datapackage
@@ -208,8 +137,7 @@ $ dpckan resource update --datapackage local/path/para/datapackage.json --resour
 $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -id id-recurso
 ```
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
-  - Modifique o nome das variáveis de ambiente, o nome e id do recurso para a sua realidade
+- Também é possível usar uma `CKAN_KEY` e `CKAN_HOST` com o nome e id de um recurso para atualizá-lo:
 
 ```bash
 # Utilização flags --ckan-host, --ckan-key, --resource-name e --resource-id
@@ -219,6 +147,8 @@ $ dpckan resource update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PR
 $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-recurso -id id-rescurso
 ```
 
+Para mais exemplos, consulte a [documentação](https://dpckan.readthedocs.io/en/latest/)
+
 
 ## Desenvolvimento
 
@@ -227,7 +157,7 @@ $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-r
 - Prerequisitos:
     - Python 3.9 ou superior
 
-- [Documentação de referência mostrando procedimentos necessários para contribuiação em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
+- [Documentação de referência mostrando procedimentos necessários para contribuição em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
 
 - Passos básicos:
     - Crie um fork do repositório do projeto
