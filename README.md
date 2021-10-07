@@ -33,9 +33,9 @@ $ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRO
 
 O cadastro das variáveis de ambiente `CKAN_HOST` e `CKAN_KEY`, necessárias para invocação de cada comando, deverá ser realizada conforme sistema operacional do usuário. Abaixo links de referência para tal:
 
-  * [Windows](https://professor-falken.com/pt/windows/como-configurar-la-ruta-y-las-variables-de-entorno-en-windows-10/);
-  * [Linux](https://ricardo-reis.medium.com/vari%C3%A1veis-de-ambiente-no-linux-debian-f677d6ca94c); e
-  * [Mac](https://support.apple.com/pt-br/guide/terminal/apd382cc5fa-4f58-4449-b20a-41c53c006f8f/mac).
+  * [Windows](https://professor-falken.com/pt/windows/como-configurar-la-ruta-y-las-variables-de-entorno-en-windows-10/)
+  * [Linux](https://ricardo-reis.medium.com/vari%C3%A1veis-de-ambiente-no-linux-debian-f677d6ca94c)
+  * [Mac](https://support.apple.com/pt-br/guide/terminal/apd382cc5fa-4f58-4449-b20a-41c53c006f8f/mac)
 
 
 Alternativamente, o cadastro destas variáveis de ambiente poderá ser realizado em arquivo ".env", na raiz do conjunto de dados, sendo necessário a inclusão deste ".env" em arquivo ".gitignore", evitando assim a sincronização e consequente publicização destas chaves em repositórios online como [github](https://github.com/), conforme demostrado abaixo:
@@ -61,7 +61,9 @@ $ git status
 
 ## Uso
 
-### Acessando documentação dpckan via terminal
+**AVISO: VERIFIQUE AS VARIÁVEIS DE AMBIENTE E O CAMINHO DOS ARQUIVOS ANTES DE EXECUTAR CADA COMANDO. NÃO COPIE E COLE O CÓDIGO SEM VERIFICAR.**
+
+### Acessando documentação do dpckan via terminal
 
 ```bash
 # Informações gerais sobre o pacote e seus comandos
@@ -92,7 +94,8 @@ $ dpckan resource update --help
 $ dpckan dataset create
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o último argumento com o caminho local para arquivo datapackage.json):
+- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o último argumento com o caminho local para arquivo datapackage.json
 
 ```bash
 # Utilização flag --datapackage
@@ -102,7 +105,8 @@ $ dpckan dataset create --datapackage local/path/para/datapackage.json
 $ dpckan dataset create -dp local/path/para/datapackage.json
 ```
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente para a sua realidade):
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o nome das variáveis de ambiente para a sua realidade
 
 ```bash
 # Utilização flag --ckan-host e --ckan-key
@@ -122,7 +126,8 @@ $ dpckan dataset create -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
 $ dpckan dataset update
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o último argumento com o caminho local para arquivo datapackage.json):
+- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o último argumento com o caminho local para arquivo datapackage.json
 
 ```bash
 # Utilização flag --datapackage
@@ -132,7 +137,8 @@ $ dpckan dataset update --datapackage local/path/para/datapackage.json
 $ dpckan dataset update -dp local/path/para/datapackage.json
 ```
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente para a sua realidade):
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o nome das variáveis de ambiente para a sua realidade):
 
 ```bash
 # Utilização flag --ckan-host e --ckan-key
@@ -145,7 +151,8 @@ $ dpckan dataset update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
 
 ### Criação de recurso via terminal
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o último argumento com o nome do recurso presente no arquivo datapackage.json que será criado):
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o último argumento com o nome do recurso presente no arquivo datapackage.json que será criado
 
 ```bash
 $ dpckan resource create --resource-name nome-recurso
@@ -154,7 +161,8 @@ $ dpckan resource create --resource-name nome-recurso
 $ dpckan resource create -rn nome-recurso
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o caminho local para arquivo datapackage.json e o nome do recurso para a sua realidade):
+- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o caminho local para arquivo datapackage.json e o nome do recurso para a sua realidade
 
 ```bash
 # Utilização flags --datapackage e --resource-name
@@ -164,7 +172,8 @@ $ dpckan resource create --datapackage local/path/para/datapackage.json --resour
 $ dpckan resource create -dp local/path/para/datapackage.json -rn nome-recurso
 ```
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome do recurso e o nome das variáveis de ambiente para a sua realidade):
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o nome do recurso e o nome das variáveis de ambiente para a sua realidade
 
 ```bash
 # Utilização flags --resource-name, --ckan-host e --ckan-key
@@ -177,7 +186,8 @@ $ dpckan resource create -rn nome-recurso -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PR
 
 ### Atualização de recurso via terminal
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique os últimos argumentos com o nome e id do recurso presente no arquivo datapackage.json que será atualizado):
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
+  - Modifique os últimos argumentos com o nome e id do recurso presente no arquivo datapackage.json que será atualizado
 
 ```bash
 # Utilização flags --resource-name e --resource-id
@@ -187,7 +197,8 @@ $ dpckan resource update --resource-name nome-recurso --resource-id id-recurso
 $ dpckan resource update -rn nome-recurso -id id-recurso
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o caminho local para arquivo datapackage.json, o nome e id do recurso para a sua realidade):
+- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra
+  - modifique o caminho local para arquivo datapackage.json, o nome e id do recurso para a sua realidade
 
 ```bash
 # Utilização flag --datapackage
@@ -197,7 +208,8 @@ $ dpckan resource update --datapackage local/path/para/datapackage.json --resour
 $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -id id-recurso
 ```
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente, o nome e id do recurso para a sua realidade):
+- Executar o comando no diretório aonde o arquivo datapackage.json se encontra
+  - Modifique o nome das variáveis de ambiente, o nome e id do recurso para a sua realidade
 
 ```bash
 # Utilização flags --ckan-host, --ckan-key, --resource-name e --resource-id
@@ -218,13 +230,14 @@ $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-r
 - [Documentação de referência mostrando procedimentos necessários para contribuiação em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
 
 - Passos básicos:
-    - Crie um fork do repositório do projeto;
-    - Clone o repositório criado em sua conta após o fork;
-    - Navegue até o repositório clonado em sua máquina;
-    - Crie e ative um ambiente virtual Python para utilizar o projeto;
-  - Crie um branch para realizar as modificações necessárias;
-  - Realize o push da branch criada; e
-  - Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto.
+    - Crie um fork do repositório do projeto
+    - Clone o repositório criado em sua conta após o fork
+    - Navegue até o repositório clonado em sua máquina
+    - Crie e ative um ambiente virtual Python para utilizar o projeto
+
+  - Crie um branch para realizar as modificações necessárias
+  - Realize o push da branch criada
+  - Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto
 
 ### Atualizar versão
 
