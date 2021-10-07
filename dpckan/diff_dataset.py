@@ -5,11 +5,11 @@ from dpckan.validations import run_validations
 from dpckan.functions import (
   load_complete_datapackage,
   is_dataset_published,
-  diff_dataset
+  dataset_diff
 )
 
 
-def diff_dataset_internal_cli(ckan_host, ckan_key, datapackage):
+def diff_dataset(ckan_host, ckan_key, datapackage):
   """
   Detect changes between datapackage an the created dataset. 
 
@@ -45,7 +45,7 @@ def diff_dataset_internal_cli(ckan_host, ckan_key, datapackage):
     raise Exception('Conjunto de dados nao existente.')
 
   ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
-  return diff_dataset(ckan_instance, package)
+  return dataset_diff(ckan_instance, package)
 
 
 @click.command(name='diff')
@@ -82,7 +82,7 @@ def diff_dataset_cli(ckan_host, ckan_key, datapackage):
   A list of (non-expected) differences between the datapackage and the CKAN dataset
   """
 
-  diffs = diff_dataset_internal_cli(ckan_host, ckan_key, datapackage)
+  diffs = diff_dataset(ckan_host, ckan_key, datapackage)
   if len(diffs) == 0:
     click.echo("There are no differences")
   else:

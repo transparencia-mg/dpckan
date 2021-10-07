@@ -282,6 +282,60 @@ update_resource.update_resource(ckan_host=CKAN_HOST,
                       resource_id=resource_id)
 ```
 
+### Check diff before updating a dataset
+
+#### CLI
+
+```bash
+dpckan dataset diff --datapackage some-path/datapackage.json 
+ - field title OK. A vowel letters dataset for tests == A vowel letters dataset for tests
+ - field version OK. 0.1.0 == 0.1.0
+ - field url OK. https://github.com/fjuniorr == https://github.com/fjuniorr
+ - field license_id OK. CC0-1.0 == CC0-1.0
+ - field owner_org OK
+ - field tags OK
+ - field notes OK
+There are no differences
+```
+
+or with some differences
+
+```bash
+dpckan dataset diff --datapackage some-path/datapackage.json 
+ - field version OK. 0.1.0 == 0.1.0
+ - field url OK. https://github.com/fjuniorr == https://github.com/fjuniorr
+ - field license_id OK. CC0-1.0 == CC0-1.0
+ - field owner_org OK
+ - field tags OK
+ - field notes OK
+Differences detected:
+ - On field title
+   - CKAN value A vowel letters dataset for tests CHANGED
+   - DataPackage value A vowel letters dataset for tests
+```
+
+#### Via Python code
+
+```python
+import os
+from dpckan.diff_dataset import diff_dataset
+
+CKAN_HOST = os.environ.get('CKAN_HOST')
+CKAN_KEY = os.environ.get('CKAN_KEY')
+datapackage_path = 'local/path/para/datapackage.json'
+resource_name = 'nome-recurso'
+resource_id = 'id-resource'
+
+# A chamada de funções via código Python exige passagem de todos os argumentos
+diff_dataset(
+  ckan_host=CKAN_HOST,
+  ckan_key=CKAN_KEY,
+  datapackage=datapackage_path
+)
+
+[{'field_name': 'title', 'ckan_value': 'A vowel letters dataset for tests CHANGED', 'datapackage_value': 'A vowel letters dataset for tests'}]
+```
+
 ## Desenvolvimento
 
 ### Contribuir para o projeto

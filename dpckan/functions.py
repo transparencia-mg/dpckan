@@ -140,7 +140,8 @@ def frictionless_to_ckan(datapackage):
     dataset.update({ "id" : datapackage.name})
   return dataset
 
-def diff_dataset(ckan_instance, datapackage):
+
+def dataset_diff(ckan_instance, datapackage):
   dp_dataset = frictionless_to_ckan(datapackage)
   ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
 
