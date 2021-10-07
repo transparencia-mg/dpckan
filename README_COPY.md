@@ -113,7 +113,23 @@ $ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRO
 $ dpckan dataset create -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
 ```
 
+### Criação de conjunto de dados via código Python
 
+- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente e  o caminho para o arquivo datapackage.json de acordo com a sua realidade):
+
+```python
+import os
+from dpckan import create_dataset
+
+CKAN_HOST = os.environ.get('CKAN_HOST')
+CKAN_KEY = os.environ.get('CKAN_KEY')
+datapackage_path = 'local/path/para/datapackage.json'
+
+# A chamada de funções via código Python exige passagem de todos os argumentos
+create_dataset.create(ckan_host=CKAN_HOST,
+                      ckan_key=CKAN_KEY,
+                      datapackage=datapackage_path)
+```
 
 ### Atualização de conjunto de dados via terminal
 
@@ -143,6 +159,23 @@ $ dpckan dataset update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRO
 $ dpckan dataset update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
 ```
 
+### Atualização de conjunto de dados via código Python
+
+- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente e  o caminho para o arquivo datapackage.json de acordo com a sua realidade):
+
+```python
+import os
+from dpckan import update_dataset
+
+CKAN_HOST = os.environ.get('CKAN_HOST')
+CKAN_KEY = os.environ.get('CKAN_KEY')
+datapackage_path = 'local/path/para/datapackage.json'
+
+# A chamada de funções via código Python exige passagem de todos os argumentos
+update_dataset.update(ckan_host=CKAN_HOST,
+                      ckan_key=CKAN_KEY,
+                      datapackage=datapackage_path)
+```
 
 ### Criação de recurso via terminal
 
@@ -175,7 +208,25 @@ $ dpckan resource create --resource-name nome-recurso --ckan-host $CKAN_HOST_PRO
 $ dpckan resource create -rn nome-recurso -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
 ```
 
+### Criação de recurso via código Python
 
+- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente, o caminho para o arquivo datapackage.json e o nome do recurso a ser criado de acordo com a sua realidade):
+
+```python
+import os
+from dpckan import create_resource
+
+CKAN_HOST = os.environ.get('CKAN_HOST')
+CKAN_KEY = os.environ.get('CKAN_KEY')
+datapackage_path = 'local/path/para/datapackage.json'
+resource_name = 'nome-recurso'
+
+# A chamada de funções via código Python exige passagem de todos os argumentos
+create_resource.create_resource(ckan_host=CKAN_HOST,
+                      ckan_key=CKAN_KEY,
+                      datapackage=datapackage_path,
+                      resource_name=resource_name)
+```
 
 ### Atualização de recurso via terminal
 
@@ -209,6 +260,27 @@ $ dpckan resource update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PR
 $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-recurso -id id-rescurso
 ```
 
+### Criação de recurso via código Python
+
+- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente, o caminho para o arquivo datapackage.json, o nome e id do recurso a ser atualizado de acordo com a sua realidade):
+
+```python
+import os
+from dpckan import update_resource
+
+CKAN_HOST = os.environ.get('CKAN_HOST')
+CKAN_KEY = os.environ.get('CKAN_KEY')
+datapackage_path = 'local/path/para/datapackage.json'
+resource_name = 'nome-recurso'
+resource_id = 'id-resource'
+
+# A chamada de funções via código Python exige passagem de todos os argumentos
+update_resource.update_resource(ckan_host=CKAN_HOST,
+                      ckan_key=CKAN_KEY,
+                      datapackage=datapackage_path,
+                      resource_name=resource_name,
+                      resource_id=resource_id)
+```
 
 ## Desenvolvimento
 
@@ -220,14 +292,31 @@ $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-r
 - [Documentação de referência mostrando procedimentos necessários para contribuiação em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
 
 - Passos básicos:
-    - Crie um fork do repositório do projeto;
+    - Fork o repositório do projeto;
     - Clone o repositório criado em sua conta após o fork;
     - Navegue até o repositório clonado em sua máquina;
-    - Crie e ative um ambiente virtual Python para utilizar o projeto;
+    - Crie e ative ambiente python para utilizar o projeto, conforme sugerido abaixo (procedimentos poderão ser diferentes conforme sistema operacional):
+
+```
+# Linux
+$ python3.9 -m venv venv
+$ source venv/bin/activate
+(venv) ➜ pip install -r requirements.txt
+# Desativar o ambiente
+(venv) ➜ deactivate
+
+# Windows
+$ python -m venv venv
+$ source venv/Script/activate
+(venv) ➜ pip install -r requirements.txt
+# Desativar o ambiente
+(venv) ➜ deactivate
+```
+
   - Crie um branch para realizar as modificações necessárias;
   - Realize o push da branch criada; e
   - Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto.
 
 ### Atualizar versão
 
-Conforme relatado no [issue 6](https://github.com/dados-mg/dpkgckanmg/issues/6), atualização de versões no [Pypi](https://pypi.org/) deve seguir [estes os passos](https://github.com/dados-mg/dpckan/issues/6#issuecomment-851678297)
+Conforme relatado no [issue 6](https://github.com/dados-mg/dpkgckanmg/issues/6), atualização de versões no [Pypi](https://pypi.org/) deve seguir [estes os passos](https://github.com/dados-mg/dpckan/issues/6#issuecomment-851678297):
