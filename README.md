@@ -286,35 +286,21 @@ update_resource.update_resource(ckan_host=CKAN_HOST,
 
 #### CLI
 
-```bash
-dpckan dataset diff --datapackage some-path/datapackage.json 
- - field title OK. A vowel letters dataset for tests == A vowel letters dataset for tests
- - field version OK. 0.1.0 == 0.1.0
- - field url OK. https://github.com/fjuniorr == https://github.com/fjuniorr
- - field license_id OK. CC0-1.0 == CC0-1.0
- - field owner_org OK
- - field tags OK
- - field notes OK
-There are no differences
-```
-
-or with some differences
+Running the `diff` command
 
 ```bash
 dpckan dataset diff --datapackage some-path/datapackage.json 
- - field version OK. 0.1.0 == 0.1.0
- - field url OK. https://github.com/fjuniorr == https://github.com/fjuniorr
- - field license_id OK. CC0-1.0 == CC0-1.0
- - field owner_org OK
- - field tags OK
- - field notes OK
 Differences detected:
  - On field title
    - CKAN value A vowel letters dataset for tests CHANGED
    - DataPackage value A vowel letters dataset for tests
+Equal fields: version, url, license_id, owner_org, tags, notes
+
 ```
 
 #### Via Python code
+
+Using the python `diff_dataset` function
 
 ```python
 import os
@@ -322,7 +308,7 @@ from dpckan.diff_dataset import diff_dataset
 
 CKAN_HOST = os.environ.get('CKAN_HOST')
 CKAN_KEY = os.environ.get('CKAN_KEY')
-datapackage_path = 'dpckan/tests/test-datapackage/datapackage.json'
+datapackage_path = 'local/path/para/datapackage.json'
 resource_name = 'nome-recurso'
 resource_id = 'id-resource'
 
