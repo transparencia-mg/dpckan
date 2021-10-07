@@ -139,3 +139,23 @@ def frictionless_to_ckan(datapackage):
   if 'id' in dataset.keys():
     dataset.update({ "id" : datapackage.name})
   return dataset
+
+def diff_dataset(ckan_instance, datapackage):
+  dp_dataset = frictionless_to_ckan(datapackage)
+  ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
+
+  diffs = []
+  # TODO, add more
+  fields = ["title", "notes", "owner_org"]
+
+  for field in fields:
+    if dp_dataset.get(field) != ckan_dataset.get(field):
+      diffs.append(
+        {
+          'field_name': field,
+          'ckan_value': ckan_dataset.get(field),
+          'datapackage_value': dp_dataset.get(field)
+        }
+      )
+
+  return diffs
