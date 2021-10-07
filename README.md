@@ -235,9 +235,9 @@ $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-r
     - Navegue até o repositório clonado em sua máquina
     - Crie e ative um ambiente virtual Python para utilizar o projeto
 
-  - Crie um branch para realizar as modificações necessárias
-  - Realize o push da branch criada
-  - Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto
+- Crie um branch para realizar as modificações necessárias
+- Realize o push da branch criada
+- Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto
 
 ### Atualizar versão
 
