@@ -136,8 +136,9 @@ $ dpckan resource update --datapackage local/path/para/datapackage.json --resour
 # Utilização alias -dp, -rn e -id para flags --datapackage,--resource-name e --resource-id respectivamente
 $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -id id-recurso
 ```
+- Podemos usar as flags `-H` para o `CKAN_HOST`, `-k` para o `CKAN_KEY`, `-rn` para o `--resource_name` e `-id` para o `--resource_id`
 
-- Também é possível usar uma `CKAN_KEY` e `CKAN_HOST` com o nome e id de um recurso para atualizá-lo:
+- Também é possível usar a `CKAN_KEY` e `CKAN_HOST` com o nome e id de um recurso para atualizá-lo, por exemplo:
 
 ```bash
 # Utilização flags --ckan-host, --ckan-key, --resource-name e --resource-id

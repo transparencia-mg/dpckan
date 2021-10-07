@@ -1,6 +1,6 @@
 # Data package manager for CKAN (dpckan)
 
-`dpckan` is a Python package, accessible via the [CLI](https://pt.wikipedia.org/wiki/Interface_de_linha_de_comandos), used for creating and updating datasets and resources (according to the [Frictionless Data](https://frictionlessdata.io/)) standard of metadata in an instance of [CKAN](https://ckan.org/).
+`dpckan` is a Python package, accessible via the [CLI](https://en.wikipedia.org/wiki/Command-line_interface) interface, used for creating and updating datasets and resources (documented according to the [Frictionless Data](https://frictionlessdata.io/)) metadata standard in an instance of [CKAN](https://ckan.org/).
 
 [Additional documentation](https://dpckan.readthedocs.io/en/latest/)
 
@@ -9,13 +9,13 @@
 `dpckan` is available in the Python Package Index - [PyPI](https://pypi.org/project/dpckan/) and can be installed using the command below:
 
 ```bash
-# Before executing the command below remember to activate the Python environment
+# Before executing the command below remember that Python environment must be active
 $ pip install dpckan
 ```
 
 ## Setting Environment Variables
 
-All commands require the indication of a CKAN instance (eg https://demo.ckan.org/) and a valid key for authentication in that instance. This indication must be done through the registration of environment variables. For CLI invocation of any command without the need to explicitly indicate these variables, it is recommended to use the names `CKAN_HOST` and `CKAN_KEY` to register instance and key respectively. If other names are used, it is necessary to explicitly indicate them during the call to the desired function, using the flags "--ckan-host" and "--ckan-key", as shown below and/or in more detail in the section [Usage ](#use).
+All commands require the indication of a CKAN instance (eg https://demo.ckan.org/) and a valid key for authentication in that instance. This indication must be done through the registration of environment variables. For CLI invocation of any command without the need to explicitly indicate these variables, it is recommended to use the names `CKAN_HOST` and `CKAN_KEY` to register instance and key respectively. If other names are used, it is necessary to explicitly indicate during the call of the desired function, using the flags "--ckan-host" and "--ckan-key", as shown below and/or in more detail in the section [Usage ](#use).
 
 
 ```bash
@@ -31,7 +31,7 @@ $ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCTION --ckan-key $CKAN_KEY_P
 
 ```
 
-The registration of environment variables `CKAN_HOST` and `CKAN_KEY`, needed for invoking each command, must be performed according to the user's operating system. Below are reference links for this:
+The registration of environment variables `CKAN_HOST` and `CKAN_KEY`, necessary for invoking each command, must be performed according to the user's operating system. Below are reference links for this:
 
   * [Windows](https://professor-falken.com/pt/windows/como-configurar-la-ruta-y-las-variables-de-entorno-en-windows-10/)
   * [Linux](https://ricardo-reis.medium.com/vari%C3%A1veis-de-ambiente-no-linux-debian-f677d6ca94c)
@@ -86,73 +86,26 @@ $ dpckan resource create --help
 $ dpckan resource update --help
 ```
 
-### Dataset creation via terminal
+### Creating and Updating a Dataset via Terminal
 
-- Run the command in the directory where the datapackage.json file is located:
+
+- To create a dataset, run the command in the directory where the datapackage.json file is located:
 
 ```bash
 $dpckan dataset create
 ```
 
-- Run the command outside the directory where the datapackage.json file is located
-  - Modify the last argument with the local path to datapackage.json file
-
-```bash
-# Use flag --datapackage
-$ dpckan dataset create --datapackage local/path/to/datapackage.json
-
-# Use alias -dp for flag --datapackage
-$ dpckan dataset create -dp local/path/to/datapackage.json
-```
-
-- Run the command in the directory where the datapackage.json file is located
-  - Change the name of the environment variables to your reality
-
-```bash
-# Usage flag --ckan-host and --ckan-key
-$ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCTION --ckan-key $CKAN_KEY_PRODUCTION
-
-# Use -H and -k aliases for --ckan-host and --ckan-key flags respectively
-$ dpckan dataset create -H $CKAN_HOST_PRODUCTION -k $CKAN_KEY_PRODUCTION
-```
-
-
-
-### Dataset update via terminal
-
-- Run the command in the directory where the datapackage.json file is located:
+- And to update the dataset, execute the command in the directory where the datapackage.json file is located:
 
 ```bash
 $ dpckan dataset update
 ```
 
-- Run the command outside the directory where the datapackage.json file is located
-  - Modify the last argument with the local path to datapackage.json file
-
-```bash
-# Use flag --datapackage
-$ dpckan dataset update --datapackage local/path/to/datapackage.json
-
-# Use alias -dp for flag --datapackage
-$ dpckan dataset update -dp local/path/to/datapackage.json
-```
-
-- Run the command in the directory where the datapackage.json file is located
-  - Change the name of the environment variables to your reality):
-
-```bash
-# Usage flag --ckan-host and --ckan-key
-$ dpckan dataset update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
-
-# Use -H and -k aliases for --ckan-host and --ckan-key flags respectively
-$ dpckan dataset update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
-```
 
 
-### Resource creation via terminal
+### Creating and Updating Resources via Terminal
 
-- Run the command in the directory where the datapackage.json file is located
-  - Modify the last argument with the name of the resource present in the datapackage.json file that will be created
+- To create a resource, run the following command in the directory where the datapackage.json file is located. Don't forget to modify the last argument with the name of the resource present in the datapackage.json file that will be created
 
 ```bash
 $ dpckan resource create --resource-name resource-name
@@ -161,33 +114,8 @@ $ dpckan resource create --resource-name resource-name
 $ dpckan resource create -rn resource-name
 ```
 
-- Run the command outside the directory where the datapackage.json file is located
-  - Modify the local path to datapackage.json file and the resource name to your reality
 
-```bash
-# Usage --datapackage and --resource-name flags
-$ dpckan resource create --datapackage local/path/to/datapackage.json --resource-name resource-name
-
-# Use -dp and -rn aliases for --datapackage and --resource-name flags respectively
-$ dpckan resource create -dp local/path/to/datapackage.json -rn resource-name
-```
-
-- Run the command in the directory where the datapackage.json file is located
-  - Modify the resource name and the name of the environment variables to your reality
-
-```bash
-# Usage flags --resource-name, --ckan-host and --ckan-key
-$ dpckan resource create --resource-name resource-name --ckan-host $CKAN_HOST_PRODUCTION --ckan-key $CKAN_KEY_PRODUCTION
-
-# Use -rn, -H and -k aliases for --resource-name, --ckan-host and --ckan-key flags respectively
-$ dpckan resource create -rn resource-name -H $CKAN_HOST_PRODUCTION -k $CKAN_KEY_PRODUCTION
-```
-
-
-### Resource update via terminal
-
-- Run the command in the directory where the datapackage.json file is located
-  - Modify the last arguments with the name and id of the resource present in the datapackage.json file that will be updated
+- To update a resource, run the following command in the directory where the datapackage.json file is located. Don't forget to modify the last arguments with the name and id of the resource present in the datapackage.json file that will be updated
 
 ```bash
 # Usage flags --resource-name and --resource-id
@@ -197,8 +125,9 @@ $ dpckan resource update --resource-name resource-name --resource-id resource-id
 $ dpckan resource update -rn resource-name -id resource-id
 ```
 
-- Run the command outside the directory where the datapackage.json file is located
-  - modify the local path to datapackage.json file, the resource name and id to your reality
+### Using flags
+
+- It is possible to update a dataset or resource outside the directory where the datapackage.json file is located using the `--datapackage` or `-dp` flag as below:
 
 ```bash
 # Use flag --datapackage
@@ -207,9 +136,9 @@ $ dpckan resource update --datapackage local/path/to/datapackage.json --resource
 # Use -dp, -rn and -id aliases for --datapackage,--resource-name and --resource-id flags respectively
 $ dpckan resource update -dp local/path/to/datapackage.json -rn resource-name -id resource-id
 ```
+- We can use the flags `-H` for `CKAN_HOST`, `-k` for `CKAN_KEY`, `-rn` for `--resource_name` and `-id` for `--resource_id`
 
-- Run the command in the directory where the datapackage.json file is located
-  - Modify the name of the environment variables, the name and id of the resource to your reality
+- You can also use `CKAN_KEY` and `CKAN_HOST` with the name and id of a resource to update it, for example:
 
 ```bash
 # Usage flags --ckan-host, --ckan-key, --resource-name and --resource-id
@@ -218,6 +147,8 @@ $ dpckan resource update --ckan-host $CKAN_HOST_PRODUCTION --ckan-key $CKAN_KEY_
 # Use -H, -k, -rn and -id aliases for --ckan-host, --ckan-key, --resource-name and --resource-id flags respectively
 $ dpckan resource update -H $CKAN_HOST_PRODUCTION -k $CKAN_KEY_PRODUCTION -rn resource-name -id resource-id
 ```
+
+For more examples, see the [documentation](https://dpckan.readthedocs.io/en/latest/)
 
 
 ## Development
