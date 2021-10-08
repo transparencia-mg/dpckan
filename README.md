@@ -2,6 +2,8 @@
 
 O `dpckan` é um pacote Python, acessível via interface [CLI](https://pt.wikipedia.org/wiki/Interface_de_linha_de_comandos), utilizado para criação e atualização de conjuntos de dados e recursos (documentados de acordo com o padrão de metadados [Frictionless Data](https://frictionlessdata.io/)) em uma instância do [CKAN](https://ckan.org/).
 
+Curiosidades: Consulte a comparação do dpckan com alguns [projetos relacionados](RELATED_PROJECTS.md).
+
 [Documentação complementar](https://dpckan.readthedocs.io/en/latest/)
 
 ## Instalação
@@ -33,17 +35,16 @@ $ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRO
 
 O cadastro das variáveis de ambiente `CKAN_HOST` e `CKAN_KEY`, necessárias para invocação de cada comando, deverá ser realizada conforme sistema operacional do usuário. Abaixo links de referência para tal:
 
-  * [Windows](https://professor-falken.com/pt/windows/como-configurar-la-ruta-y-las-variables-de-entorno-en-windows-10/);
-  * [Linux](https://ricardo-reis.medium.com/vari%C3%A1veis-de-ambiente-no-linux-debian-f677d6ca94c); e
-  * [Mac](https://support.apple.com/pt-br/guide/terminal/apd382cc5fa-4f58-4449-b20a-41c53c006f8f/mac).
+  * [Windows](https://professor-falken.com/pt/windows/como-configurar-la-ruta-y-las-variables-de-entorno-en-windows-10/)
+  * [Linux](https://ricardo-reis.medium.com/vari%C3%A1veis-de-ambiente-no-linux-debian-f677d6ca94c)
+  * [Mac](https://support.apple.com/pt-br/guide/terminal/apd382cc5fa-4f58-4449-b20a-41c53c006f8f/mac)
 
-
-**CUIDADO: SOMENTE UTILIZE A OPÇÃO SUGERIDA ABAIXO SE POSSUIR CONHECIMENTO TÉCNICO E FAMILIARIDADE COM O ASSUNTO, EVITANDO ASSIM PROBLEMAS COM ACESSO DE TERCEIROS NÃO AUTORIZADOS EM SUA INSTÂNCIA CKAN**
 
 Alternativamente, o cadastro destas variáveis de ambiente poderá ser realizado em arquivo ".env", na raiz do conjunto de dados, sendo necessário a inclusão deste ".env" em arquivo ".gitignore", evitando assim a sincronização e consequente publicização destas chaves em repositórios online como [github](https://github.com/), conforme demostrado abaixo:
 
 
 ```bash
+# SOMENTE UTILIZE A OPÇÃO SUGERIDA ABAIXO SE POSSUIR FAMILIARIDADE COM O ASSUNTO, EVITANDO ASSIM PROBLEMAS COM ACESSO DE TERCEIROS NÃO AUTORIZADOS EM SUA INSTÂNCIA CKAN
 # CUIDADO: SOMENTE EXECUTE OS COMANDOS ABAIXO SE OS ARQUIVO ".env" e ".gitignore" NÃO EXISTIREM NA RAIZ DO CONJUNTO DE DADOS
 # CUIDADO: CASO COMANDOS ABAIXO SEJAM EXECUTADOS COM ".env" e ".gitignore" EXISTENTES TODO CONTEÚDO DOS MESMOS SERÁ APAGADO
 # CUIDADO: SOMENTE EXECUTE OS COMANDOS ABAIXO SE TIVER CERTEZA E CONHECIMENTO DO QUE SERÁ FEITO
@@ -62,7 +63,9 @@ $ git status
 
 ## Uso
 
-### Acessando documentação dpckan via terminal
+**AVISO: VERIFIQUE AS VARIÁVEIS DE AMBIENTE E O CAMINHO DOS ARQUIVOS ANTES DE EXECUTAR CADA COMANDO. NÃO COPIE E COLE O CÓDIGO CEGAMENTE!**
+
+### Acessando documentação do dpckan via terminal
 
 ```bash
 # Informações gerais sobre o pacote e seus comandos
@@ -85,101 +88,26 @@ $ dpckan resource create --help
 $ dpckan resource update --help
 ```
 
-### Criação de conjunto de dados via terminal
+### Criando e atualizando com um conjunto de dados via terminal
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra:
+
+- Para criar um conjunto de dados, execute o comando no diretório aonde o arquivo datapackage.json se encontra:
 
 ```bash
 $ dpckan dataset create
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o último argumento com o caminho local para arquivo datapackage.json):
-
-```bash
-# Utilização flag --datapackage
-$ dpckan dataset create --datapackage local/path/para/datapackage.json
-
-# Utilização alias -dp para flag --datapackage
-$ dpckan dataset create -dp local/path/para/datapackage.json
-```
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente para a sua realidade):
-
-```bash
-# Utilização flag --ckan-host e --ckan-key
-$ dpckan dataset create --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
-
-# Utilização alias -H e -k para flags --ckan-host e --ckan-key respectivamente
-$ dpckan dataset create -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
-```
-
-### Criação de conjunto de dados via código Python
-
-- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente e  o caminho para o arquivo datapackage.json de acordo com a sua realidade):
-
-```python
-import os
-from dpckan import create_dataset
-
-CKAN_HOST = os.environ.get('CKAN_HOST')
-CKAN_KEY = os.environ.get('CKAN_KEY')
-datapackage_path = 'local/path/para/datapackage.json'
-
-# A chamada de funções via código Python exige passagem de todos os argumentos
-create_dataset.create(ckan_host=CKAN_HOST,
-                      ckan_key=CKAN_KEY,
-                      datapackage=datapackage_path)
-```
-
-### Atualização de conjunto de dados via terminal
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra:
+- E para atualizar o conjunto de dados, execute o comando no diretório aonde o arquivo datapackage.json se encontra:
 
 ```bash
 $ dpckan dataset update
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o último argumento com o caminho local para arquivo datapackage.json):
 
-```bash
-# Utilização flag --datapackage
-$ dpckan dataset update --datapackage local/path/para/datapackage.json
 
-# Utilização alias -dp para flag --datapackage
-$ dpckan dataset update -dp local/path/para/datapackage.json
-```
+### Criando e atualizando recursos via terminal
 
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente para a sua realidade):
-
-```bash
-# Utilização flag --ckan-host e --ckan-key
-$ dpckan dataset update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
-
-# Utilização alias -H e -k para flags --ckan-host e --ckan-key respectivamente
-$ dpckan dataset update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
-```
-
-### Atualização de conjunto de dados via código Python
-
-- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente e  o caminho para o arquivo datapackage.json de acordo com a sua realidade):
-
-```python
-import os
-from dpckan import update_dataset
-
-CKAN_HOST = os.environ.get('CKAN_HOST')
-CKAN_KEY = os.environ.get('CKAN_KEY')
-datapackage_path = 'local/path/para/datapackage.json'
-
-# A chamada de funções via código Python exige passagem de todos os argumentos
-update_dataset.update(ckan_host=CKAN_HOST,
-                      ckan_key=CKAN_KEY,
-                      datapackage=datapackage_path)
-```
-
-### Criação de recurso via terminal
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o último argumento com o nome do recurso presente no arquivo datapackage.json que será criado):
+- Para criar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra. Não se esqueça de modificar o último argumento com o nome do recurso presente no arquivo datapackage.json que será criado
 
 ```bash
 $ dpckan resource create --resource-name nome-recurso
@@ -188,49 +116,8 @@ $ dpckan resource create --resource-name nome-recurso
 $ dpckan resource create -rn nome-recurso
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o caminho local para arquivo datapackage.json e o nome do recurso para a sua realidade):
 
-```bash
-# Utilização flags --datapackage e --resource-name
-$ dpckan resource create --datapackage local/path/para/datapackage.json --resource-name nome-recurso
-
-# Utilização alias -dp e -rn para flags --datapackage e --resource-name respectivamente
-$ dpckan resource create -dp local/path/para/datapackage.json -rn nome-recurso
-```
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome do recurso e o nome das variáveis de ambiente para a sua realidade):
-
-```bash
-# Utilização flags --resource-name, --ckan-host e --ckan-key
-$ dpckan resource create --resource-name nome-recurso --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO
-
-# Utilização alias -rn, -H e -k para flags --resource-name, --ckan-host e --ckan-key respectivamente
-$ dpckan resource create -rn nome-recurso -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO
-```
-
-### Criação de recurso via código Python
-
-- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente, o caminho para o arquivo datapackage.json e o nome do recurso a ser criado de acordo com a sua realidade):
-
-```python
-import os
-from dpckan import create_resource
-
-CKAN_HOST = os.environ.get('CKAN_HOST')
-CKAN_KEY = os.environ.get('CKAN_KEY')
-datapackage_path = 'local/path/para/datapackage.json'
-resource_name = 'nome-recurso'
-
-# A chamada de funções via código Python exige passagem de todos os argumentos
-create_resource.create_resource(ckan_host=CKAN_HOST,
-                      ckan_key=CKAN_KEY,
-                      datapackage=datapackage_path,
-                      resource_name=resource_name)
-```
-
-### Atualização de recurso via terminal
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique os últimos argumentos com o nome e id do recurso presente no arquivo datapackage.json que será atualizado):
+- Para atualizar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra. Não se esqueça de modificar os últimos argumentos com o nome e id do recurso presente no arquivo datapackage.json que será atualizado
 
 ```bash
 # Utilização flags --resource-name e --resource-id
@@ -240,7 +127,9 @@ $ dpckan resource update --resource-name nome-recurso --resource-id id-recurso
 $ dpckan resource update -rn nome-recurso -id id-recurso
 ```
 
-- Executar o comando fora do diretório aonde o arquivo datapackage.json se encontra (não copie e cole o comando abaixo cegamente, modifique o caminho local para arquivo datapackage.json, o nome e id do recurso para a sua realidade):
+### Usando as flags
+
+- É possível atualizar um conjunto de dados ou recurso fora do diretório onde o arquivo datapackage.json se encontra utilizando a flag `--datapackage` ou `-dp` como abaixo:
 
 ```bash
 # Utilização flag --datapackage
@@ -249,8 +138,7 @@ $ dpckan resource update --datapackage local/path/para/datapackage.json --resour
 # Utilização alias -dp, -rn e -id para flags --datapackage,--resource-name e --resource-id respectivamente
 $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -id id-recurso
 ```
-
-- Executar o comando no diretório aonde o arquivo datapackage.json se encontra e variáveis de ambiente com nomenclatura diferente de `CKAN_HOST` e `CKAN_KEY` (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente, o nome e id do recurso para a sua realidade):
+- Podemos usar as flags `-H` para o `CKAN_HOST`, `-k` para o `CKAN_KEY`, `-rn` para o `--resource_name` e `-id` para o `--resource_id`, por exemplo:
 
 ```bash
 # Utilização flags --ckan-host, --ckan-key, --resource-name e --resource-id
@@ -260,27 +148,8 @@ $ dpckan resource update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PR
 $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-recurso -id id-rescurso
 ```
 
-### Criação de recurso via código Python
+Para mais exemplos, consulte a [documentação](https://dpckan.readthedocs.io/en/latest/)
 
-- Criar um arquivo .py com a seguinte estrutura (não copie e cole o comando abaixo cegamente, modifique o nome das variáveis de ambiente, o caminho para o arquivo datapackage.json, o nome e id do recurso a ser atualizado de acordo com a sua realidade):
-
-```python
-import os
-from dpckan import update_resource
-
-CKAN_HOST = os.environ.get('CKAN_HOST')
-CKAN_KEY = os.environ.get('CKAN_KEY')
-datapackage_path = 'local/path/para/datapackage.json'
-resource_name = 'nome-recurso'
-resource_id = 'id-resource'
-
-# A chamada de funções via código Python exige passagem de todos os argumentos
-update_resource.update_resource(ckan_host=CKAN_HOST,
-                      ckan_key=CKAN_KEY,
-                      datapackage=datapackage_path,
-                      resource_name=resource_name,
-                      resource_id=resource_id)
-```
 
 ## Desenvolvimento
 
@@ -289,34 +158,23 @@ update_resource.update_resource(ckan_host=CKAN_HOST,
 - Prerequisitos:
     - Python 3.9 ou superior
 
-- [Documentação de referência mostrando procedimentos necessários para contribuiação em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
+- [Documentação de referência mostrando procedimentos necessários para contribuição em um projeto open source](https://www.dataschool.io/how-to-contribute-on-github/)
 
 - Passos básicos:
-    - Fork o repositório do projeto;
-    - Clone o repositório criado em sua conta após o fork;
-    - Navegue até o repositório clonado em sua máquina;
-    - Crie e ative ambiente python para utilizar o projeto, conforme sugerido abaixo (procedimentos poderão ser diferentes conforme sistema operacional):
+    - Crie um fork do repositório do projeto
+    - Clone o repositório criado em sua conta após o fork
+    - Navegue até o repositório clonado em sua máquina
+    - Crie e ative um ambiente virtual Python para utilizar o projeto
 
-```
-# Linux
-$ python3.9 -m venv venv
-$ source venv/bin/activate
-(venv) ➜ pip install -r requirements.txt
-# Desativar o ambiente
-(venv) ➜ deactivate
-
-# Windows
-$ python -m venv venv
-$ source venv/Script/activate
-(venv) ➜ pip install -r requirements.txt
-# Desativar o ambiente
-(venv) ➜ deactivate
-```
-
-  - Crie um branch para realizar as modificações necessárias;
-  - Realize o push da branch criada; e
-  - Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto.
+- Crie um branch para realizar as modificações necessárias
+- Realize o push da branch criada
+- Abra um PR explicando os motivos da mudança e como esta auxiliará no desenvolvimento do projeto
 
 ### Atualizar versão
 
-Conforme relatado no [issue 6](https://github.com/dados-mg/dpkgckanmg/issues/6), atualização de versões no [Pypi](https://pypi.org/) deve seguir [estes os passos](https://github.com/dados-mg/dpckan/issues/6#issuecomment-851678297):
+Conforme relatado no [issue 6](https://github.com/dados-mg/dpkgckanmg/issues/6), atualização de versões no [Pypi](https://pypi.org/) deve seguir [estes os passos](https://github.com/dados-mg/dpckan/issues/6#issuecomment-851678297)
+
+## Licença
+
+O **dpckan** é licenciado sob a licença MIT.
+Veja o arquivo [`LICENSE.md`](LICENSE.md) para mais detalhes.
