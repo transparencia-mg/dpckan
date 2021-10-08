@@ -141,6 +141,54 @@ def frictionless_to_ckan(datapackage):
   return dataset
 
 
+def resource_diff(ckan_instance, datapackage, resource_name):
+  dp_dataset = f2c.package(datapackage)
+  ckan_dataset = ckan_instance.action.package_show(id=datapackage.name)
+
+  # to return results
+  diffs = []
+  oks = []
+
+  for res in dp_dataset.get('resources', []):
+    if res['title'] == resource_name:
+      dp_resource = res
+      break
+  else:
+    dp_resource = None
+
+  # it's not easy to detect which is the right resource, because we use the title as name
+  for res in ckan_dataset.get('resources', []):
+    if res['name'] == resource_name:
+      ckan_resource = res
+      break
+  else:
+    ckan_resource = None
+
+  if ckan_resource is None or dp_resource is None:
+    if ckan_resource is None:
+      diffs.append({'field_name': 'ALL', 'error': 'Resource not found in CKAN'})
+    if dp_resource is None:
+      diffs.append({'field_name': 'ALL', 'error': 'Resource not found in DataPackage'})
+    return diffs, []
+
+  fields = ["format", "description"]
+  # TODO use hash functions for the resource file
+
+  for field in fields:
+    if dp_resource.get(field) == ckan_resource.get(field):
+      oks.append(field)
+    else:
+      diffs.append(
+        {
+          'field_name': field,
+          'ckan_value': ckan_resource.get(field),
+          'datapackage_value': dp_resource.get(field)
+        }
+      )
+
+  return diffs, oks
+
+
 def dataset_diff(ckan_instance, datapackage):
   dp_dataset = frictionless_to_ckan(datapackage)
   ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
