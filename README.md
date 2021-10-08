@@ -309,8 +309,6 @@ from dpckan.diff_dataset import diff_dataset
 CKAN_HOST = os.environ.get('CKAN_HOST')
 CKAN_KEY = os.environ.get('CKAN_KEY')
 datapackage_path = 'local/path/para/datapackage.json'
-resource_name = 'nome-recurso'
-resource_id = 'id-resource'
 
 # A chamada de funções via código Python exige passagem de todos os argumentos
 diffs, oks = diff_dataset(
@@ -325,6 +323,51 @@ diffs
 oks
 ['version', 'url', 'license_id', 'owner_org', 'tags', 'notes']
 
+```
+
+
+### Check diff for resources
+
+#### CLI
+
+Running the `diff` command for a resource
+
+```bash
+dpckan resource diff --datapackage some-path/datapackage.json --resource-name="This is the actual data"
+Differences detected:
+ - On field format
+   - CKAN value: CSV
+   - DataPackage value: csv
+Equal fields: description
+```
+
+#### Via Python code
+
+Using the python `diff_dataset` function
+
+```python
+import os
+from dpckan.diff_resource import diff_resource
+
+CKAN_HOST = os.environ.get('CKAN_HOST')
+CKAN_KEY = os.environ.get('CKAN_KEY')
+datapackage_path = 'local/path/para/datapackage.json'
+datapackage_path = 'dpckan/tests/data-samples/datapackage-example/datapackage.json'
+resource_name = 'This is the actual data'
+
+# A chamada de funções via código Python exige passagem de todos os argumentos
+diffs, oks = diff_resource(
+  ckan_host=CKAN_HOST,
+  ckan_key=CKAN_KEY,
+  datapackage=datapackage_path,
+  resource_name=resource_name
+)
+
+diffs
+[{'field_name': 'format', 'ckan_value': 'CSV', 'datapackage_value': 'csv'}]
+
+oks
+['description']
 ```
 
 ## Desenvolvimento
