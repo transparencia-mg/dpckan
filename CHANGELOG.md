@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.2 (20/10/2021)
+------------------
+- Update python-dotenv
+
 0.1.1 (08/09/2021)
 ------------------
 - Revisão documentação README.md
