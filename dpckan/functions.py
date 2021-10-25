@@ -4,6 +4,7 @@ import click
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
+import json
 
 def datapackage_path():
   """
@@ -32,21 +33,40 @@ def load_complete_datapackage(source):
     datapackage.get_resource(resource_name).schema.expand()
   return datapackage
 
-def dataset_create(ckan_instance, datapackage):
-  dataset = frictionless_to_ckan(datapackage)
+def dataset_create(ckan_instance, package, datapackage):
+  dataset = frictionless_to_ckan(package)
   ckan_instance.call_action('package_create', dataset)
-  create_datapackage_json_resource(ckan_instance, datapackage)
-  for resource_name in datapackage.resource_names:
+  for resource_name in package.resource_names:
     resource_ckan = resource_create(ckan_instance,
-                                    datapackage.name,
-                                    datapackage.get_resource(resource_name))
+                                    package.name,
+                                    package.get_resource(resource_name))
     resource_update_datastore_metadata(ckan_instance,
                               resource_ckan['id'],
-                              datapackage.get_resource(resource_name)
+                              package.get_resource(resource_name)
                               )
+    update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_ckan['id'])
+  create_datapackage_json_resource(ckan_instance, package)
+
+def update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_id):
+  # https://stackoverflow.com/a/24579926/11755155
+  with open(datapackage, 'r+') as datapackage:
+    data = json.load(datapackage)
+    if 'ckan_hosts' not in data:
+      data['ckan_hosts'] = {}
+      data['ckan_hosts'][ckan_instance.address] = {}
+      data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+    else:
+      if ckan_instance.address not in data['ckan_hosts']:
+        data['ckan_hosts'][ckan_instance.address] = {}
+        data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+      else:
+        data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+    datapackage.seek(0)
+    # https://stackoverflow.com/a/37398392/11755155
+    datapackage.write(json.dumps(data, indent=2))
+    datapackage.truncate()
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
-  
   if resource.schema.fields == []:
     pass
   else:
@@ -62,7 +82,6 @@ def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
       fields.append(field)
     dataset_fields.update({ "fields" : fields})
     ckan_instance.call_action('datastore_create', dataset_fields)
-
 
 def delete_dataset(ckan_instance, dataset_name):
   ckan_instance.action.package_delete(id = dataset_name)
@@ -139,3 +158,115 @@ def frictionless_to_ckan(datapackage):
   if 'id' in dataset.keys():
     dataset.update({ "id" : datapackage.name})
   return dataset
+
+
+def resource_diff(ckan_instance, datapackage, resource_name):
+  dp_dataset = f2c.package(datapackage)
+  ckan_dataset = ckan_instance.action.package_show(id=datapackage.name)
+
+  # to return results
+  diffs = []
+  oks = []
+
+  for res in dp_dataset.get('resources', []):
+    if res['title'] == resource_name:
+      dp_resource = res
+      break
+  else:
+    dp_resource = None
+
+  # it's not easy to detect which is the right resource, because we use the title as name
+  for res in ckan_dataset.get('resources', []):
+    if res['name'] == resource_name:
+      ckan_resource = res
+      break
+  else:
+    ckan_resource = None
+
+  if ckan_resource is None or dp_resource is None:
+    if ckan_resource is None:
+      diffs.append({'field_name': 'ALL', 'error': 'Resource not found in CKAN'})
+    if dp_resource is None:
+      diffs.append({'field_name': 'ALL', 'error': 'Resource not found in DataPackage'})
+    return diffs, []
+
+  fields = ["format", "description"]
+  # TODO use hash functions for the resource file
+
+  for field in fields:
+    if dp_resource.get(field) == ckan_resource.get(field):
+      oks.append(field)
+    else:
+      diffs.append(
+        {
+          'field_name': field,
+          'ckan_value': ckan_resource.get(field),
+          'datapackage_value': dp_resource.get(field)
+        }
+      )
+
+  return diffs, oks
+
+
+def dataset_diff(ckan_instance, datapackage):
+  dp_dataset = frictionless_to_ckan(datapackage)
+  ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
+
+  diffs = []
+  oks = []
+  # TODO, add more
+  fields = ["title", "version", "url", "license_id"]
+
+  for field in fields:
+    if dp_dataset.get(field) == ckan_dataset.get(field):
+      oks.append(field)
+    else:
+      diffs.append(
+        {
+          'field_name': field,
+          'ckan_value': ckan_dataset.get(field),
+          'datapackage_value': dp_dataset.get(field)
+        }
+      )
+
+  # check org (dataset use ID, datapackage uses name)
+  if dp_dataset['owner_org'] == ckan_dataset['organization']['name']:
+    oks.append('owner_org')
+  else:
+    diffs.append(
+        {
+          'field_name': 'owner_org',
+          'ckan_value': ckan_dataset['organization']['name'],
+          'datapackage_value': dp_dataset['owner_org']
+        }
+      )
+
+  # Analyze tags
+  dp_tags = sorted([t['name'] for t in dp_dataset['tags']])
+  ckan_tags = sorted([t['name'] for t in ckan_dataset['tags']])
+  if dp_tags == ckan_tags:
+    oks.append('tags')
+  else:
+    diffs.append(
+        {
+          'field_name': 'tags',
+          'ckan_value': ckan_tags,
+          'datapackage_value': dp_tags
+        }
+      )
+
+  # Analyze notes
+  dp_notes = dp_dataset['notes'].replace('\n', '')
+  ckan_notes = ckan_dataset['notes'].replace('\n', '')
+  if dp_tags == ckan_tags:
+    oks.append('notes')
+  else:
+    diffs.append(
+        {
+          'field_name': 'notes',
+          'ckan_value': ckan_tags,
+          'datapackage_value': dp_tags
+        }
+      )
+
+  return diffs, oks
