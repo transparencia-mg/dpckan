@@ -4,6 +4,7 @@ import click
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
+import json
 
 def datapackage_path():
   """
@@ -32,21 +33,40 @@ def load_complete_datapackage(source):
     datapackage.get_resource(resource_name).schema.expand()
   return datapackage
 
-def dataset_create(ckan_instance, datapackage):
-  dataset = frictionless_to_ckan(datapackage)
+def dataset_create(ckan_instance, package, datapackage):
+  dataset = frictionless_to_ckan(package)
   ckan_instance.call_action('package_create', dataset)
-  create_datapackage_json_resource(ckan_instance, datapackage)
-  for resource_name in datapackage.resource_names:
+  for resource_name in package.resource_names:
     resource_ckan = resource_create(ckan_instance,
-                                    datapackage.name,
-                                    datapackage.get_resource(resource_name))
+                                    package.name,
+                                    package.get_resource(resource_name))
     resource_update_datastore_metadata(ckan_instance,
                               resource_ckan['id'],
-                              datapackage.get_resource(resource_name)
+                              package.get_resource(resource_name)
                               )
+    update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_ckan['id'])
+  create_datapackage_json_resource(ckan_instance, package)
+
+def update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_id):
+  # https://stackoverflow.com/a/24579926/11755155
+  with open(datapackage, 'r+') as datapackage:
+    data = json.load(datapackage)
+    if 'ckan_hosts' not in data:
+      data['ckan_hosts'] = {}
+      data['ckan_hosts'][ckan_instance.address] = {}
+      data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+    else:
+      if ckan_instance.address not in data['ckan_hosts']:
+        data['ckan_hosts'][ckan_instance.address] = {}
+        data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+      else:
+        data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+    datapackage.seek(0)
+    # https://stackoverflow.com/a/37398392/11755155
+    datapackage.write(json.dumps(data, indent=2))
+    datapackage.truncate()
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
-  
   if resource.schema.fields == []:
     pass
   else:
@@ -62,7 +82,6 @@ def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
       fields.append(field)
     dataset_fields.update({ "fields" : fields})
     ckan_instance.call_action('datastore_create', dataset_fields)
-
 
 def delete_dataset(ckan_instance, dataset_name):
   ckan_instance.action.package_delete(id = dataset_name)

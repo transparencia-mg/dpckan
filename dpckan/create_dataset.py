@@ -45,7 +45,8 @@ def create(ckan_host, ckan_key, datapackage):
     raise Exception('Conjunto de dados já existente.')
   else:
     try:
-      dataset_create(ckan_instance, package)
+      dataset_create(ckan_instance, package, datapackage)
+      print(f"Conjunto de dados {package.name} publicado. Datapackage.json Atualizado com id dos recursos publicados.")
     except Exception:
       delete_dataset(ckan_instance, package.name)
       print(f"Erro durante criação do conjunto de dados {package.name}")
