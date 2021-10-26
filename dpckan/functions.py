@@ -4,7 +4,6 @@ import click
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
-import json
 
 def datapackage_path():
   """
@@ -48,23 +47,19 @@ def dataset_create(ckan_instance, package, datapackage):
   create_datapackage_json_resource(ckan_instance, package)
 
 def update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_id):
-  # https://stackoverflow.com/a/24579926/11755155
-  with open(datapackage, 'r+') as datapackage:
-    data = json.load(datapackage)
-    if 'ckan_hosts' not in data:
-      data['ckan_hosts'] = {}
-      data['ckan_hosts'][ckan_instance.address] = {}
-      data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+  dp = Package(datapackage)
+  if 'ckan_hosts' not in dp:
+    dp['ckan_hosts'] = {}
+    dp['ckan_hosts'][ckan_instance.address] = {}
+    dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+  else:
+    if ckan_instance.address not in dp['ckan_hosts']:
+      dp['ckan_hosts'][ckan_instance.address] = {}
+      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
     else:
-      if ckan_instance.address not in data['ckan_hosts']:
-        data['ckan_hosts'][ckan_instance.address] = {}
-        data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-      else:
-        data['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-    datapackage.seek(0)
-    # https://stackoverflow.com/a/37398392/11755155
-    datapackage.write(json.dumps(data, indent=2))
-    datapackage.truncate()
+      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+  dp.to_json(datapackage)
+
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
   if resource.schema.fields == []:
