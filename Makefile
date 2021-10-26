@@ -22,5 +22,4 @@ publish-build: ## Publica pacote em Pypi
 
 tests:
 	@echo "Realizando Testes"
-	@python -m unittest discover -s dpckan/tests -p "test_*.py"
-	@rm -rf dpckan/tests/tmp*
+	@python dpckan/tests/dpckan_test.py

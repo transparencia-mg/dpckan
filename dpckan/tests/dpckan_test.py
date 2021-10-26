@@ -3,6 +3,13 @@ from click.testing import CliRunner
 import unittest
 from ckanapi import RemoteCKAN
 
+def run_tests():
+  try:
+    os.system("python -m unittest discover -s dpckan/tests -p 'test_*.py'")
+    os.system('rm -rf dpckan/tests/tmp*')
+  except Exception:
+    os.system('rm -rf dpckan/tests/tmp*')
+
 def clone_online_repo(file):
   """
     Cloning branch's online repo to proceed the test
@@ -32,3 +39,6 @@ def get_file_path():
     This folder must reproduce a dataset error that must be prevented
   """
   return os.path.dirname(os.path.realpath(__file__))
+
+if __name__ == "__main__":
+  run_tests()
