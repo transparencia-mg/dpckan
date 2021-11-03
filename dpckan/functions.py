@@ -36,6 +36,7 @@ def dataset_create(ckan_instance, package):
   dataset = frictionless_to_ckan(package)
   ckan_instance.call_action('package_create', dataset)
   for resource_name in package.resource_names:
+    resource_path = package.get_resource(resource_name)['path']
     resource_ckan = resource_create(ckan_instance,
                                     package.name,
                                     package.get_resource(resource_name))
@@ -43,21 +44,21 @@ def dataset_create(ckan_instance, package):
                               resource_ckan['id'],
                               package.get_resource(resource_name)
                               )
-    update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_ckan['id'])
+    update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, resource_ckan['id'])
   create_datapackage_json_resource(ckan_instance, package)
 
-def update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_id):
+def update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, resource_id):
   dp = Package(f"{package.basepath}/datapackage.json")
   if 'ckan_hosts' not in dp:
     dp['ckan_hosts'] = {}
     dp['ckan_hosts'][ckan_instance.address] = {}
-    dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+    dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
   else:
     if ckan_instance.address not in dp['ckan_hosts']:
       dp['ckan_hosts'][ckan_instance.address] = {}
-      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+      dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
     else:
-      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
+      dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
   dp.to_json(f"{package.basepath}/datapackage.json")
 
 
