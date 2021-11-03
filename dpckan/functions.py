@@ -130,9 +130,35 @@ def update_datapackage_json_resource(ckan_instance, datapackage):
 
 def dataset_update(ckan_instance, datapackage):
   click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
-  dataset = frictionless_to_ckan(datapackage)
-  dataset['id'] = datapackage.name
-  ckan_instance.call_action('package_patch', dataset)
+  # Find ckan host url
+  ckan_host = ckan_instance.url
+  # Find datapackage.json id for ckan instance in local datapackage.json file
+  datapackage_id = datapackage['ckan_hosts'][ckan_host]['datapackage.json']
+  # Search datapackage.json resource in ckan instance using datapackage_id
+  ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
+  # Remote datapackage.json paths: keys
+  datapackage_remote_resource_paths = ckan_datapackage_resource[ckan_host]
+  # Local datapackage.json paths: keys
+  datapackage_local_resource_paths = datapackage[ckan_host]
+  # Compare paths in datapackage.json remote with local
+  for path in datapackage_remote_resource_paths.keys():
+    if path in datapackage_local_resource_paths.keys():
+      # If path and id are the same use diff to compare them
+      if datapackage_remote_resource_paths[path] == datapackage_local_resource_paths[path]:
+        print('Caminho e chave iguais vamos comparar os dois arquivos')
+        print('comparando dois arquivos de dados')
+        print('comparando metadados')
+      else:
+        # path are the same but id is different something must be wrong, suggest confering process
+        print('ids dos dois arquivos diferentes, conferir')
+    else:
+      # Is path doesn't exist in local datapackage.json suggest delete resource from remote
+      print(f'{path} não existe no arquivo datapackage.json local, utilize \`dpckan resource delete\` para excluir recurso na instância {ckan_host}')
+  # Compare paths in datapackage.json local with remote
+  for path in datapackage_local_resource_paths.keys():
+    # If local path doesn't exist in remote instance sugest creation
+    if path not in datapackage_remote_resource_paths.keys():
+      print(f'{path} não existe na instância {ckan_host}. utilize \`dpckan resource create\` para cria-lo')
 
 def frictionless_to_ckan(datapackage):
   dataset = f2c.package(datapackage)
