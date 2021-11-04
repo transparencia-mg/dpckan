@@ -1,6 +1,9 @@
 import ipdb
 import os
 import click
+import hashlib
+import json
+from urllib.request import urlopen
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
@@ -131,13 +134,15 @@ def update_datapackage_json_resource(ckan_instance, datapackage):
 def dataset_update(ckan_instance, datapackage):
   click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
   # Find ckan host url
-  ckan_host = ckan_instance.url
+  ckan_host = ckan_instance.address
   # Find datapackage.json id for ckan instance in local datapackage.json file
   datapackage_id = datapackage['ckan_hosts'][ckan_host]['datapackage.json']
   # Search datapackage.json resource in ckan instance using datapackage_id
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
   # Remote datapackage.json paths: keys
-  datapackage_remote_resource_paths = ckan_datapackage_resource[ckan_host]
+  datapackage_remote_resource_paths = json.loads(urlopen(ckan_datapackage_resource['url']).read())['ckan_hosts']
+  ipdb.set_trace(context=5)
+  # ckan_datapackage_resource[ckan_host]
   # Local datapackage.json paths: keys
   datapackage_local_resource_paths = datapackage[ckan_host]
   # Compare paths in datapackage.json remote with local
@@ -147,6 +152,7 @@ def dataset_update(ckan_instance, datapackage):
       if datapackage_remote_resource_paths[path] == datapackage_local_resource_paths[path]:
         print('Caminho e chave iguais vamos comparar os dois arquivos')
         print('comparando dois arquivos de dados')
+        # resource_diff(path, ckan_datapackage_resource)
         print('comparando metadados')
       else:
         # path are the same but id is different something must be wrong, suggest confering process
@@ -178,6 +184,16 @@ def frictionless_to_ckan(datapackage):
     dataset.update({ "id" : datapackage.name})
   return dataset
 
+# def resource_diff(local_resource_path, remote_resource_path)
+#   datapackage = open(datapackage_path)
+#   dataset = urlopen(remote_resource_path)
+#   hash = hashlib.md5()
+
+
+
+
+#   if hash_algorithm.update(datapackage.read(4096)).hexdigest() != hash_algorithm.update(dataset).hexdigest():
+#     print('Necessário atualizar resource')
 
 def resource_diff(ckan_instance, datapackage, resource_name):
   dp_dataset = f2c.package(datapackage)
