@@ -139,12 +139,12 @@ def dataset_update(ckan_instance, datapackage):
   datapackage_id = datapackage['ckan_hosts'][ckan_host]['datapackage.json']
   # Search datapackage.json resource in ckan instance using datapackage_id
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
+  # Load ckan_datapackage_resource as json
+  dataset = json.loads(urlopen(ckan_datapackage_resource['url']).read())
   # Remote datapackage.json paths: keys
-  datapackage_remote_resource_paths = json.loads(urlopen(ckan_datapackage_resource['url']).read())['ckan_hosts']
-  ipdb.set_trace(context=5)
-  # ckan_datapackage_resource[ckan_host]
+  datapackage_remote_resource_paths = dataset['ckan_hosts']
   # Local datapackage.json paths: keys
-  datapackage_local_resource_paths = datapackage[ckan_host]
+  datapackage_local_resource_paths = datapackage['ckan_hosts']
   # Compare paths in datapackage.json remote with local
   for path in datapackage_remote_resource_paths.keys():
     if path in datapackage_local_resource_paths.keys():
