@@ -51,7 +51,12 @@ def dataset_create(ckan_instance, package):
   create_datapackage_json_resource(ckan_instance, package)
 
 def update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, resource_id):
-  dp = Package(f"{package.basepath}/datapackage.json")
+  # ipdb.set_trace(context=10)
+  dp = ''
+  if package.basepath == '':
+    dp = Package("datapackage.json")
+  else:
+    dp = Package(f"{package.basepath}/datapackage.json")
   if 'ckan_hosts' not in dp:
     dp['ckan_hosts'] = {}
     dp['ckan_hosts'][ckan_instance.address] = {}
@@ -62,7 +67,10 @@ def update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, reso
       dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
     else:
       dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
-  dp.to_json(f"{package.basepath}/datapackage.json")
+  if package.basepath == '':
+    dp.to_json("datapackage.json")
+  else:
+    dp.to_json(f"{package.basepath}/datapackage.json")
 
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
