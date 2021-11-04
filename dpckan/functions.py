@@ -151,8 +151,8 @@ def dataset_update(ckan_instance, datapackage):
     if path in datapackage_local_resource_paths[ckan_host].keys():
       # If path and id are the same use diff to compare them
       if datapackage_remote_resource_paths[ckan_host][path] == datapackage_local_resource_paths[ckan_host][path]:
-        print(resource_hash(path))
         print(f'Caminho e chave iguais para {path}. Comparar dados e metadados')
+        print(resource_hash(path) == resource_url_hash(ckan_instance, datapackage_local_resource_paths[ckan_host][path]))
       else:
         # path are the same but id is different something must be wrong, suggest confering process
         print(f'{path} com ids diferentes, conferir')
@@ -169,6 +169,15 @@ def resource_hash(resource_path):
   md5_hash = hashlib.md5()
   resource_content = open(resource_path, "rb").read()
   md5_hash.update(resource_content)
+  resource_hash = md5_hash.hexdigest()
+  return resource_hash
+
+def resource_url_hash(ckan_instance, resource_id):
+  md5_hash = hashlib.md5()
+  ckan_datapackage_resource = ckan_instance.action.resource_show(id = resource_id)
+  # ipdb.set_trace(context=10)
+  resouce_content = urlopen(ckan_datapackage_resource['url']).read()
+  md5_hash.update(resouce_content)
   resource_hash = md5_hash.hexdigest()
   return resource_hash
 
