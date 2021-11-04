@@ -35,7 +35,7 @@ def update(ckan_host, ckan_key, datapackage):
 
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
 
-  update_datapackage_json_resource(ckan_instance, package)
+  # update_datapackage_json_resource(ckan_instance, package)
   dataset_update(ckan_instance, package)
 
 

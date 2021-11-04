@@ -146,25 +146,31 @@ def dataset_update(ckan_instance, datapackage):
   # Local datapackage.json paths: keys
   datapackage_local_resource_paths = datapackage['ckan_hosts']
   # Compare paths in datapackage.json remote with local
-  for path in datapackage_remote_resource_paths.keys():
-    if path in datapackage_local_resource_paths.keys():
+  for path in datapackage_remote_resource_paths[ckan_host].keys():
+    # ipdb.set_trace(context=10)
+    if path in datapackage_local_resource_paths[ckan_host].keys():
       # If path and id are the same use diff to compare them
-      if datapackage_remote_resource_paths[path] == datapackage_local_resource_paths[path]:
-        print('Caminho e chave iguais vamos comparar os dois arquivos')
-        print('comparando dois arquivos de dados')
-        # resource_diff(path, ckan_datapackage_resource)
-        print('comparando metadados')
+      if datapackage_remote_resource_paths[ckan_host][path] == datapackage_local_resource_paths[ckan_host][path]:
+        print(resource_hash(path))
+        print(f'Caminho e chave iguais para {path}. Comparar dados e metadados')
       else:
         # path are the same but id is different something must be wrong, suggest confering process
-        print('ids dos dois arquivos diferentes, conferir')
+        print(f'{path} com ids diferentes, conferir')
     else:
       # Is path doesn't exist in local datapackage.json suggest delete resource from remote
-      print(f'{path} não existe no arquivo datapackage.json local, utilize \`dpckan resource delete\` para excluir recurso na instância {ckan_host}')
+      print(f'{path} não existe no arquivo datapackage.json local, utilize `dpckan resource delete` para excluir recurso na instância {ckan_host}')
   # Compare paths in datapackage.json local with remote
-  for path in datapackage_local_resource_paths.keys():
+  for path in datapackage_local_resource_paths[ckan_host].keys():
     # If local path doesn't exist in remote instance sugest creation
-    if path not in datapackage_remote_resource_paths.keys():
-      print(f'{path} não existe na instância {ckan_host}. utilize \`dpckan resource create\` para cria-lo')
+    if path not in datapackage_remote_resource_paths[ckan_host].keys():
+      print(f'{path} não existe na instância {ckan_host}. utilize `dpckan resource create` para cria-lo')
+
+def resource_hash(resource_path):
+  md5_hash = hashlib.md5()
+  resource_content = open(resource_path, "rb").read()
+  md5_hash.update(resource_content)
+  resource_hash = md5_hash.hexdigest()
+  return resource_hash
 
 def frictionless_to_ckan(datapackage):
   dataset = f2c.package(datapackage)
@@ -183,17 +189,6 @@ def frictionless_to_ckan(datapackage):
   if 'id' in dataset.keys():
     dataset.update({ "id" : datapackage.name})
   return dataset
-
-# def resource_diff(local_resource_path, remote_resource_path)
-#   datapackage = open(datapackage_path)
-#   dataset = urlopen(remote_resource_path)
-#   hash = hashlib.md5()
-
-
-
-
-#   if hash_algorithm.update(datapackage.read(4096)).hexdigest() != hash_algorithm.update(dataset).hexdigest():
-#     print('Necessário atualizar resource')
 
 def resource_diff(ckan_instance, datapackage, resource_name):
   dp_dataset = f2c.package(datapackage)
