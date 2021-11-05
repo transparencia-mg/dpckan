@@ -167,9 +167,9 @@ def dataset_update(ckan_instance, datapackage):
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
   # Load ckan_datapackage_resource as json
   dataset = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
-  dataset_diff(ckan_host, datapackage, dataset)
+  dataset_diff(ckan_instance, ckan_host, datapackage, dataset)
 
-def dataset_diff(ckan_host, datapackage, dataset):
+def dataset_diff(ckan_instance, ckan_host, datapackage, dataset):
   # Remote datapackage.json paths: keys
   datapackage_remote_resource_paths = dataset['ckan_hosts']
   # Local datapackage.json paths: keys
@@ -182,6 +182,10 @@ def dataset_diff(ckan_host, datapackage, dataset):
       if datapackage_remote_resource_paths[ckan_host][path] == datapackage_local_resource_paths[ckan_host][path]:
         if resouce_index_name_path(path, datapackage):
           print(f'Caminho e chave iguais para {path}. Comparar dados e metadados')
+          print(resource_hash(datapackage, path.split(' - ')[1]))
+          print(resource_hash(dataset, path.split(' - ')[1]))
+          print(resource_hash_2(path.split(' - ')[2]))
+          print(resource_url_hash(ckan_instance, datapackage_remote_resource_paths[ckan_host][path]))
         else:
           print('problema no index, name, path')
       else:
@@ -205,7 +209,14 @@ def resouce_index_name_path(path, datapackage):
   else:
     return True
 
-def resource_hash(resource_path):
+def resource_hash(package, resouce_name):
+  if resouce_name != 'datapackage':
+    resource = package.get_resource(resouce_name)
+    resource.infer(stats=True)
+    return resource['stats']['hash']
+
+
+def resource_hash_2(resource_path):
   md5_hash = hashlib.md5()
   resource_content = open(resource_path, "rb").read()
   md5_hash.update(resource_content)
