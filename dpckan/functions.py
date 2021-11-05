@@ -159,11 +159,17 @@ def dataset_update(ckan_instance, datapackage):
   # Find ckan host url
   ckan_host = ckan_instance.address
   # Find datapackage.json id for ckan instance in local datapackage.json file
-  datapackage_id = datapackage['ckan_hosts'][ckan_host]['datapackage.json']
+  datapackage_id = ''
+  for key in datapackage['ckan_hosts'][ckan_host].keys():
+    if key.split(' - ')[-1] == 'datapackage.json':
+      datapackage_id = datapackage['ckan_hosts'][ckan_host][key]
   # Search datapackage.json resource in ckan instance using datapackage_id
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
   # Load ckan_datapackage_resource as json
-  dataset = json.loads(urlopen(ckan_datapackage_resource['url']).read())
+  dataset = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
+  dataset_diff(ckan_host, datapackage, dataset)
+
+def dataset_diff(ckan_host, datapackage, dataset):
   # Remote datapackage.json paths: keys
   datapackage_remote_resource_paths = dataset['ckan_hosts']
   # Local datapackage.json paths: keys
@@ -174,8 +180,10 @@ def dataset_update(ckan_instance, datapackage):
     if path in datapackage_local_resource_paths[ckan_host].keys():
       # If path and id are the same use diff to compare them
       if datapackage_remote_resource_paths[ckan_host][path] == datapackage_local_resource_paths[ckan_host][path]:
-        print(f'Caminho e chave iguais para {path}. Comparar dados e metadados')
-        print(resource_hash(path) == resource_url_hash(ckan_instance, datapackage_local_resource_paths[ckan_host][path]))
+        if resouce_index_name_path(path, datapackage):
+          print(f'Caminho e chave iguais para {path}. Comparar dados e metadados')
+        else:
+          print('problema no index, name, path')
       else:
         # path are the same but id is different something must be wrong, suggest confering process
         print(f'{path} com ids diferentes, conferir')
@@ -187,6 +195,15 @@ def dataset_update(ckan_instance, datapackage):
     # If local path doesn't exist in remote instance sugest creation
     if path not in datapackage_remote_resource_paths[ckan_host].keys():
       print(f'{path} não existe na instância {ckan_host}. utilize `dpckan resource create` para cria-lo')
+
+def resouce_index_name_path(path, datapackage):
+  if path.split(' - ')[-1] != 'datapackage.json':
+    resource_index = int(path.split(' - ')[0])
+    resouce_name = path.split(' - ')[1]
+    resouce_path = path.split(' - ')[2]
+    return datapackage['resources'][resource_index]['name'] == resouce_name and datapackage['resources'][resource_index]['path'] == resouce_path
+  else:
+    return True
 
 def resource_hash(resource_path):
   md5_hash = hashlib.md5()
@@ -270,65 +287,65 @@ def resource_diff(ckan_instance, datapackage, resource_name):
   return diffs, oks
 
 
-def dataset_diff(ckan_instance, datapackage):
-  dp_dataset = frictionless_to_ckan(datapackage)
-  ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
+# def dataset_diff(ckan_instance, datapackage):
+#   dp_dataset = frictionless_to_ckan(datapackage)
+#   ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
 
-  diffs = []
-  oks = []
-  # TODO, add more
-  fields = ["title", "version", "url", "license_id"]
+#   diffs = []
+#   oks = []
+#   # TODO, add more
+#   fields = ["title", "version", "url", "license_id"]
 
-  for field in fields:
-    if dp_dataset.get(field) == ckan_dataset.get(field):
-      oks.append(field)
-    else:
-      diffs.append(
-        {
-          'field_name': field,
-          'ckan_value': ckan_dataset.get(field),
-          'datapackage_value': dp_dataset.get(field)
-        }
-      )
+#   for field in fields:
+#     if dp_dataset.get(field) == ckan_dataset.get(field):
+#       oks.append(field)
+#     else:
+#       diffs.append(
+#         {
+#           'field_name': field,
+#           'ckan_value': ckan_dataset.get(field),
+#           'datapackage_value': dp_dataset.get(field)
+#         }
+#       )
 
-  # check org (dataset use ID, datapackage uses name)
-  if dp_dataset['owner_org'] == ckan_dataset['organization']['name']:
-    oks.append('owner_org')
-  else:
-    diffs.append(
-        {
-          'field_name': 'owner_org',
-          'ckan_value': ckan_dataset['organization']['name'],
-          'datapackage_value': dp_dataset['owner_org']
-        }
-      )
+#   # check org (dataset use ID, datapackage uses name)
+#   if dp_dataset['owner_org'] == ckan_dataset['organization']['name']:
+#     oks.append('owner_org')
+#   else:
+#     diffs.append(
+#         {
+#           'field_name': 'owner_org',
+#           'ckan_value': ckan_dataset['organization']['name'],
+#           'datapackage_value': dp_dataset['owner_org']
+#         }
+#       )
 
-  # Analyze tags
-  dp_tags = sorted([t['name'] for t in dp_dataset['tags']])
-  ckan_tags = sorted([t['name'] for t in ckan_dataset['tags']])
-  if dp_tags == ckan_tags:
-    oks.append('tags')
-  else:
-    diffs.append(
-        {
-          'field_name': 'tags',
-          'ckan_value': ckan_tags,
-          'datapackage_value': dp_tags
-        }
-      )
+#   # Analyze tags
+#   dp_tags = sorted([t['name'] for t in dp_dataset['tags']])
+#   ckan_tags = sorted([t['name'] for t in ckan_dataset['tags']])
+#   if dp_tags == ckan_tags:
+#     oks.append('tags')
+#   else:
+#     diffs.append(
+#         {
+#           'field_name': 'tags',
+#           'ckan_value': ckan_tags,
+#           'datapackage_value': dp_tags
+#         }
+#       )
 
-  # Analyze notes
-  dp_notes = dp_dataset['notes'].replace('\n', '')
-  ckan_notes = ckan_dataset['notes'].replace('\n', '')
-  if dp_tags == ckan_tags:
-    oks.append('notes')
-  else:
-    diffs.append(
-        {
-          'field_name': 'notes',
-          'ckan_value': ckan_tags,
-          'datapackage_value': dp_tags
-        }
-      )
+#   # Analyze notes
+#   dp_notes = dp_dataset['notes'].replace('\n', '')
+#   ckan_notes = ckan_dataset['notes'].replace('\n', '')
+#   if dp_tags == ckan_tags:
+#     oks.append('notes')
+#   else:
+#     diffs.append(
+#         {
+#           'field_name': 'notes',
+#           'ckan_value': ckan_tags,
+#           'datapackage_value': dp_tags
+#         }
+#       )
 
-  return diffs, oks
+#   return diffs, oks
