@@ -48,10 +48,11 @@ def dataset_create(ckan_instance, package):
                               resource_ckan['id'],
                               package.get_resource(resource_name)
                               )
-    update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, resource_ckan['id'])
+    resource_index = package.resource_names.index(resource_name)
+    update_datapackage_with_ckan_ids(ckan_instance, package, resource_index, resource_path, resource_name, resource_ckan['id'])
   create_datapackage_json_resource(ckan_instance, package)
 
-def update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, resource_id):
+def update_datapackage_with_ckan_ids(ckan_instance, package, resource_index, resource_path, resource_name, resource_id):
   # ipdb.set_trace(context=10)
   dp = ''
   if package.basepath == '':
@@ -61,13 +62,13 @@ def update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, reso
   if 'ckan_hosts' not in dp:
     dp['ckan_hosts'] = {}
     dp['ckan_hosts'][ckan_instance.address] = {}
-    dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
+    dp['ckan_hosts'][ckan_instance.address][f'{resource_index} - {resource_name} - {resource_path}'] = resource_id
   else:
     if ckan_instance.address not in dp['ckan_hosts']:
       dp['ckan_hosts'][ckan_instance.address] = {}
-      dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
+      dp['ckan_hosts'][ckan_instance.address][f'{resource_index} - {resource_name} - {resource_path}'] = resource_id
     else:
-      dp['ckan_hosts'][ckan_instance.address][resource_path] = resource_id
+      dp['ckan_hosts'][ckan_instance.address][f'{resource_index} - {resource_name} - {resource_path}'] = resource_id
   if package.basepath == '':
     dp.to_json("datapackage.json")
   else:
@@ -140,7 +141,8 @@ def create_datapackage_json_resource(ckan_instance, datapackage):
   resource_ckan = ckan_instance.action.resource_create(package_id = datapackage.name,
                                        name = 'datapackage.json',
                                        upload = open(os.path.join(datapackage.basepath, 'datapackage.json'), 'rb'))
-  update_datapackage_with_ckan_ids(ckan_instance, datapackage, 'datapackage.json', resource_ckan['id'])
+  datapackage_position = len(datapackage['ckan_hosts'][ckan_instance.address])
+  update_datapackage_with_ckan_ids(ckan_instance, datapackage, datapackage_position, 'datapackage.json', 'datapackage', resource_ckan['id'])
   update_datapackage_json_resource(ckan_instance, datapackage)
 
 def update_datapackage_json_resource(ckan_instance, datapackage):
