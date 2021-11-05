@@ -38,6 +38,7 @@ def load_complete_datapackage(source):
 def dataset_create(ckan_instance, package):
   dataset = frictionless_to_ckan(package)
   ckan_instance.call_action('package_create', dataset)
+  clean_datapackage_with_ckan_ids(ckan_instance, package)
   for resource_name in package.resource_names:
     resource_path = package.get_resource(resource_name)['path']
     resource_ckan = resource_create(ckan_instance,
@@ -72,6 +73,18 @@ def update_datapackage_with_ckan_ids(ckan_instance, package, resource_path, reso
   else:
     dp.to_json(f"{package.basepath}/datapackage.json")
 
+def clean_datapackage_with_ckan_ids(ckan_instance, package):
+  dp = ''
+  if package.basepath == '':
+    dp = Package("datapackage.json")
+  else:
+    dp = Package(f"{package.basepath}/datapackage.json")
+  if 'ckan_hosts' in dp:
+    dp.pop('ckan_hosts')
+    if package.basepath == '':
+      dp.to_json("datapackage.json")
+    else:
+      dp.to_json(f"{package.basepath}/datapackage.json")
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
   if resource.schema.fields == []:
