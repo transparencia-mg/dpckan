@@ -1,5 +1,6 @@
 import click
 from ckanapi import RemoteCKAN
+from dpckan.validations import run_resource_validations
 from dpckan.functions import (load_complete_datapackage, 
                               update_datapackage_json_resource, 
                               resource_create,
@@ -41,7 +42,7 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
   # Show package to find datapackage.json resource id
   # Update datapakcage.json resource
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-
+  run_resource_validations(ckan_instance, package)
   update_datapackage_json_resource(ckan_instance, package)
   dataset_update(ckan_instance, package)
   # Create new resource

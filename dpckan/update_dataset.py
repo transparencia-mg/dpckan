@@ -1,6 +1,5 @@
 import click
 from ckanapi import RemoteCKAN
-from dpckan.validations import run_validations
 from dpckan.functions import (load_complete_datapackage, dataset_update, update_datapackage_json_resource)
                               
 def update(ckan_host, ckan_key, datapackage):
@@ -31,7 +30,6 @@ def update(ckan_host, ckan_key, datapackage):
   Conjunto de dados atualizado no ambiente desejado.
   """
   package = load_complete_datapackage(datapackage)
-  run_validations(ckan_host, ckan_key, package)
 
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
 

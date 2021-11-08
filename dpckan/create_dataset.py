@@ -1,7 +1,7 @@
 import sys
 import click
 from ckanapi import RemoteCKAN
-from dpckan.validations import run_validations
+from dpckan.validations import run_resource_validations
 from dpckan.functions import (delete_dataset, 
                               dataset_create,
                               is_dataset_published,
@@ -38,19 +38,15 @@ def create(ckan_host, ckan_key, datapackage):
   Conjunto de dados publicado no ambiente desejado.
   """
   package = load_complete_datapackage(datapackage)
-  run_validations(ckan_host, ckan_key, package)
-
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  if is_dataset_published(ckan_instance, package):
-    raise Exception('Conjunto de dados já existente.')
-  else:
-    # try:
-      dataset_create(ckan_instance, package)
-      print(f"Conjunto de dados {package.name} publicado. Datapackage.json Atualizado com id dos recursos publicados.")
-    # except Exception:
-    #   delete_dataset(ckan_instance, package.name)
-    #   print(f"Erro durante criação do conjunto de dados {package.name}")
-    #   sys.exit(1)
+  run_resource_validations(ckan_instance, package)
+  try:
+    dataset_create(ckan_instance, package, datapackage)
+    print(f"Conjunto de dados {package.name} publicado. Datapackage.json Atualizado com id dos recursos publicados.")
+  except Exception:
+    delete_dataset(ckan_instance, package.name)
+    print(f"Erro durante criação do conjunto de dados {package.name}")
+    sys.exit(1)
 
 @click.command(name='create')
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
