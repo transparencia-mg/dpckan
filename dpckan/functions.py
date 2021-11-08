@@ -1,4 +1,4 @@
-import ipdb
+# import ipdb
 import os
 import click
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
