@@ -1,4 +1,4 @@
-# import ipdb
+import ipdb
 import os
 import click
 import hashlib
@@ -157,62 +157,38 @@ def dataset_update(ckan_instance, datapackage):
   # Find ckan host url
   ckan_host = ckan_instance.address
   # Find datapackage.json id for ckan instance in local datapackage.json file
-  datapackage_id = ''
-  for key in datapackage['ckan_hosts'][ckan_host].keys():
-    if key.split(' - ')[-1] == 'datapackage.json':
-      datapackage_id = datapackage['ckan_hosts'][ckan_host][key]
-  # Search datapackage.json resource in ckan instance using datapackage_id
+  datapackage_id = datapackage['ckan_hosts'][ckan_instance.address]['datapackage.json']
+  # Find datapackage resource in ckan instance
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
   # Load ckan_datapackage_resource as json
   dataset = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
-  dataset_diff(ckan_instance, ckan_host, datapackage, dataset)
+  dataset_diff(ckan_instance, datapackage, dataset)
 
-def dataset_diff(ckan_instance, ckan_host, datapackage, dataset):
-  # Remote datapackage.json paths: keys
-  datapackage_remote_resource_paths = dataset['ckan_hosts']
-  # Local datapackage.json paths: keys
-  datapackage_local_resource_paths = datapackage['ckan_hosts']
-  # Compare paths in datapackage.json remote with local
-  for path in datapackage_remote_resource_paths[ckan_host].keys():
-    # ipdb.set_trace(context=10)
-    if path in datapackage_local_resource_paths[ckan_host].keys():
-      # If path and id are the same use diff to compare them
-      if datapackage_remote_resource_paths[ckan_host][path] == datapackage_local_resource_paths[ckan_host][path]:
-        if resouce_index_name_path(path, datapackage):
-          print(f'Caminho e chave iguais para {path}. Comparar dados e metadados')
-          print(resource_hash(datapackage, path.split(' - ')[1]))
-          print(resource_hash(dataset, path.split(' - ')[1]))
-          print(resource_hash_2(path.split(' - ')[2]))
-          print(resource_url_hash(ckan_instance, datapackage_remote_resource_paths[ckan_host][path]))
-        else:
-          print('problema no index, name, path')
-      else:
-        # path are the same but id is different something must be wrong, suggest confering process
-        print(f'{path} com ids diferentes, conferir')
+def dataset_diff(ckan_instance, datapackage, dataset):
+  # Remote datapackage.json resources
+  dataset_remote_resources = dataset['ckan_hosts'][ckan_instance.address]
+  # Local datapackage.json resource
+  datapackage_local_resources = datapackage['ckan_hosts'][ckan_instance.address]
+  # Compare resources in datapackage.json remote with local
+  for name in dataset_remote_resources.keys():
+    if name in datapackage_local_resources.keys():
+      print(f'Caminho e chave iguais para recurso {name}. Comparar dados e metadados')
+      print(resource_hash(datapackage, name))
+      print(resource_hash(dataset, name))
+      print(resource_url_hash(ckan_instance, dataset_remote_resources[name]))
     else:
-      # Is path doesn't exist in local datapackage.json suggest delete resource from remote
-      print(f'{path} não existe no arquivo datapackage.json local, utilize `dpckan resource delete` para excluir recurso na instância {ckan_host}')
-  # Compare paths in datapackage.json local with remote
-  for path in datapackage_local_resource_paths[ckan_host].keys():
-    # If local path doesn't exist in remote instance sugest creation
-    if path not in datapackage_remote_resource_paths[ckan_host].keys():
-      print(f'{path} não existe na instância {ckan_host}. utilize `dpckan resource create` para cria-lo')
-
-def resouce_index_name_path(path, datapackage):
-  if path.split(' - ')[-1] != 'datapackage.json':
-    resource_index = int(path.split(' - ')[0])
-    resouce_name = path.split(' - ')[1]
-    resouce_path = path.split(' - ')[2]
-    return datapackage['resources'][resource_index]['name'] == resouce_name and datapackage['resources'][resource_index]['path'] == resouce_path
-  else:
-    return True
+      print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_host}')
+  # Compare resources in datapackage.json local with remote
+  for name in datapackage_local_resources.keys():
+    # If local name doesn't exist in remote instance sugest creation
+    if name not in dataset_remote_resources.keys():
+      print(f'Recurso {name} não existe na instância {ckan_host}. utilize `dpckan resource create` para cria-lo')
 
 def resource_hash(package, resouce_name):
-  if resouce_name != 'datapackage':
+  if resouce_name != 'datapackage.json':
     resource = package.get_resource(resouce_name)
     resource.infer(stats=True)
     return resource['stats']['hash']
-
 
 def resource_hash_2(resource_path):
   md5_hash = hashlib.md5()
