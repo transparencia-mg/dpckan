@@ -5,6 +5,16 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 import package_information
 
+# PREPARE
+
+INSTALL_REQUIRES = [
+    "frictionless-ckan-mapper>=1.0.6",
+    "python-dotenv>=0.19.1",
+    "ckanapi>=4.0.0",
+    "frictionless>=4.16.6",
+    "click>=8.0.1"
+]
+
 if __name__ == '__main__':
   # Setting up
   setup(
@@ -17,7 +27,7 @@ if __name__ == '__main__':
       long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.md').read(),
       url="https://github.com/dados-mg/dpkgckanmg",
       packages=find_packages(),
-      install_requires=open('requirements.txt').read(),
+      install_requires=INSTALL_REQUIRES,
       keywords=['python', 'ckan'],
       classifiers=[
           "Development Status :: 1 - Planning",

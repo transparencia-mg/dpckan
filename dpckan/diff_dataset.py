@@ -1,7 +1,6 @@
 import sys
 import click
 from ckanapi import RemoteCKAN
-from dpckan.validations import run_validations
 from dpckan.functions import (
   load_complete_datapackage,
   is_dataset_published,
@@ -38,7 +37,6 @@ def diff_dataset(ckan_host, ckan_key, datapackage):
 
   """
   package = load_complete_datapackage(datapackage)
-  run_validations(ckan_host, ckan_key, package)
 
   ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
   if not is_dataset_published(ckan_instance, package):
