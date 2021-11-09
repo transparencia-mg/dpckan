@@ -172,10 +172,12 @@ def dataset_diff(ckan_instance, datapackage, dataset):
   # Compare resources in datapackage.json remote with local
   for name in dataset_remote_resources.keys():
     if name in datapackage_local_resources.keys():
-      print(f'Caminho e chave iguais para recurso {name}. Comparar dados e metadados')
-      print(resource_hash(datapackage, name))
-      print(resource_hash(dataset, name))
-      print(resource_url_hash(ckan_instance, dataset_remote_resources[name]))
+      if name != 'datapackage.json':
+        print(f'Caminho e chave iguais para recurso {name}. Comparar dados e metadados')
+        is_data_changed = resource_hash(datapackage.get_resource(name)['path']) == resource_url_hash(ckan_instance, dataset_remote_resources[name])
+        is_metadata_changed = datapackage.get_resource(name) == dataset.get_resource(name)
+        print(f'Recurso {name} dados iguais: {is_data_changed}')
+        print(f'Recurso {name} metadados iguais: {is_metadata_changed}')
     else:
       print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_host}')
   # Compare resources in datapackage.json local with remote
@@ -184,13 +186,13 @@ def dataset_diff(ckan_instance, datapackage, dataset):
     if name not in dataset_remote_resources.keys():
       print(f'Recurso {name} não existe na instância {ckan_host}. utilize `dpckan resource create` para cria-lo')
 
-def resource_hash(package, resouce_name):
-  if resouce_name != 'datapackage.json':
-    resource = package.get_resource(resouce_name)
-    resource.infer(stats=True)
-    return resource['stats']['hash']
+# def resource_hash(package, resouce_name):
+#   if resouce_name != 'datapackage.json':
+#     resource = package.get_resource(resouce_name)
+#     resource.infer(stats=True)
+#     return resource['stats']['hash']
 
-def resource_hash_2(resource_path):
+def resource_hash(resource_path):
   md5_hash = hashlib.md5()
   resource_content = open(resource_path, "rb").read()
   md5_hash.update(resource_content)
