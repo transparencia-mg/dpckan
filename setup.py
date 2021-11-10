@@ -24,7 +24,7 @@ if __name__ == '__main__':
       author_email=package_information.email_author,
       description=package_information.description,
       long_description_content_type="text/markdown",
-      long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.md').read(),
+      long_description=open('README.md', encoding='utf-8').read() + '\n\n' + open('CHANGELOG.md', encoding='utf-8').read(),
       url="https://github.com/dados-mg/dpkgckanmg",
       packages=find_packages(),
       install_requires=INSTALL_REQUIRES,
