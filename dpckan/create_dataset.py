@@ -1,7 +1,7 @@
 import sys
 import click
 from ckanapi import RemoteCKAN
-from dpckan.validations import run_resource_validations
+from dpckan.validations import run_dataset_validations
 from dpckan.functions import (delete_dataset, 
                               dataset_create,
                               is_dataset_published,
@@ -39,9 +39,9 @@ def create(ckan_host, ckan_key, datapackage):
   """
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_resource_validations(ckan_instance, package)
+  run_dataset_validations(ckan_instance, package)
   try:
-    dataset_create(ckan_instance, package, datapackage)
+    dataset_create(ckan_instance, package)
     print(f"Conjunto de dados {package.name} publicado. Datapackage.json Atualizado com id dos recursos publicados.")
   except Exception:
     delete_dataset(ckan_instance, package.name)
