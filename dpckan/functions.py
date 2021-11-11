@@ -51,7 +51,6 @@ def dataset_create(ckan_instance, package):
   create_datapackage_json_resource(ckan_instance, package)
 
 def update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_id):
-  # ipdb.set_trace(context=10)
   dp = ''
   if package.basepath == '':
     dp = Package("datapackage.json")
@@ -201,7 +200,6 @@ def resource_hash(resource_path):
 def resource_url_hash(ckan_instance, resource_id):
   md5_hash = hashlib.md5()
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = resource_id)
-  # ipdb.set_trace(context=10)
   resouce_content = urlopen(ckan_datapackage_resource['url']).read()
   md5_hash.update(resouce_content)
   resource_hash = md5_hash.hexdigest()
@@ -216,11 +214,12 @@ def frictionless_to_ckan(datapackage):
   if "notes" not in dataset.keys():
     dataset["notes"] = ""
   if os.path.isfile(README_path):
-    dataset["notes"] = f"{dataset['notes']}\n{open(README_path).read()}"
+    dataset["notes"] = ""
+    dataset["notes"] += f"\n{open(README_path).read()}"
   if os.path.isfile(CONTRIBUTING_path):
-    dataset["notes"] = f"{dataset['notes']}\n{open(CONTRIBUTING_path).read()}"
+    dataset["notes"] += f"\n{open(CONTRIBUTING_path).read()}"
   if os.path.isfile(CHANGELOG_path):
-    dataset["notes"] = f"{dataset['notes']}\n{open(CHANGELOG_path).read()}"
+    dataset["notes"] += f"\n{open(CHANGELOG_path).read()}"
   if 'id' in dataset.keys():
     dataset.update({ "id" : datapackage.name})
   return dataset
