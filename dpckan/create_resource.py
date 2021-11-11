@@ -58,7 +58,8 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
               help="Ckan host, exemplo: https://demo.ckan.org/")  # -H para respeitar convenção de -h ser help
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json')
+@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
+              help="Caminho para arquivo datapackage.json")
 @click.option('--resource-name', '-rn', required=True)
 def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name):
   """

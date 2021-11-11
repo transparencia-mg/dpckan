@@ -42,7 +42,8 @@ def update(ckan_host, ckan_key, datapackage):
               help="Ckan host, exemplo: https://demo.ckan.org/")
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json')
+@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
+              help="Caminho para arquivo datapackage.json")
 def update_cli(ckan_host, ckan_key, datapackage):
   """
   Função CLI responsável pela atualização de um conjunto de dados na instância CKAN desejada.

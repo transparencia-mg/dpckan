@@ -60,7 +60,8 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
               help="Ckan host, exemplo: http://dados.mg.gov.br ou https://dados.mg.gov.br")  # -H para respeitar convenção de -h ser help
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json')
+@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
+              help="Caminho para arquivo datapackage.json")
 @click.option('--resource-id', '-id', required=True,
               help="Id do recurso a ser atualizado.")
 @click.option('--resource-name', '-rn', required=True)

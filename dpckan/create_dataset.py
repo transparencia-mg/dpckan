@@ -53,7 +53,8 @@ def create(ckan_host, ckan_key, datapackage):
               help="Ckan host, exemplo: https://demo.ckan.org/")  # -H para respeitar convenção de -h ser help
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json')
+@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
+              help="Caminho para arquivo datapackage.json")
 def create_cli(ckan_host, ckan_key, datapackage):
   """
   Função CLI responsável pela publicação de um conjunto de dados na instância CKAN desejada.
