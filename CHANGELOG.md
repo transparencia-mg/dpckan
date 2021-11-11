@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.7 (11/11/2021)
+------------------
+- Melhoria da implementação da documentação do conjunto de dados publicados no CKAN
+
 0.1.6 (11/11/2021)
 ------------------
 - Validando a existência da proprieda owner_org do arquivo datapackage.json
