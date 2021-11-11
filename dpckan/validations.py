@@ -13,7 +13,7 @@ def run_dataset_validations(ckan_instance, package, stop):
   is_host_valid(ckan_instance)
   is_dataset_published_check(ckan_instance, package)
 
-def run_resource_validations(ckan_instance, package):
+def run_resource_validations(ckan_instance, package, stop):
   """
     Run validations before dataset publication
   """

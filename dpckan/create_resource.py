@@ -7,7 +7,7 @@ from dpckan.functions import (load_complete_datapackage,
                               resource_update_datastore_metadata,
                               dataset_update)
 
-def create_resource(ckan_host, ckan_key, datapackage, resource_name):
+def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   """
   Função responsável pela publicação de um recurso em conjunto de dados já existente na instância CKAN desejada.
 
@@ -42,9 +42,9 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
   # Show package to find datapackage.json resource id
   # Update datapakcage.json resource
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_resource_validations(ckan_instance, package)
+  run_resource_validations(ckan_instance, package, stop)
   update_datapackage_json_resource(ckan_instance, package)
-  dataset_update(ckan_instance, package)
+  # dataset_update(ckan_instance, package)
   # Create new resource
   resource_ckan = resource_create(ckan_instance,
                                   package.name,
@@ -61,7 +61,8 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name):
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json',
               help="Caminho para arquivo datapackage.json")
 @click.option('--resource-name', '-rn', required=True)
-def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name):
+@click.option('--stop', '-s', is_flag=True, help="Parar execução caso validação frictionless retorne algum erro")
+def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name, stop):
   """
   Função CLI responsável pela publicação de um recurso em conjunto de dados já existente na instância CKAN desejada.
 
@@ -95,5 +96,5 @@ def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name):
 
   Recurso criado em um conjunto de dados previamente publicado no ambiente desejado.
   """
-  create_resource(ckan_host, ckan_key, datapackage, resource_name)
+  create_resource(ckan_host, ckan_key, datapackage, resource_name, stop)
 
