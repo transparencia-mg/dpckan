@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.1.5 (11/11/2021)
+------------------
+- Melhoria de documentação click (--help)
+- Inclusão de flag --stop para interromper execução em caso de falha de validação frictionless
+
 0.1.4 (08/11/2021)
 ------------------
 - Separação pacotes de desenvolvimento (requirements.txt) de pacotes de utilização (setup.py)
