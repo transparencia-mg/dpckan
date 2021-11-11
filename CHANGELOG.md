@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.1.6 (11/11/2021)
+------------------
+- Validando a existência da proprieda owner_org do arquivo datapackage.json
+- Validando a existência do valor da propriedade owner_org do arquivo datapackage.json na instância do CKAN desejada
+
 0.1.5 (11/11/2021)
 ------------------
 - Melhoria de documentação click (--help)
