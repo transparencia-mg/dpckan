@@ -4,20 +4,20 @@ import click
 from dpckan.functions import is_dataset_published
 from frictionless import validate
 
-def run_dataset_validations(ckan_instance, package):
+def run_dataset_validations(ckan_instance, package, stop):
   """
     Run validations before dataset publication
   """
-  is_dataset_valid(package)
+  is_dataset_valid(package, stop)
   is_datapackage_valid(package)
   is_host_valid(ckan_instance)
   is_dataset_published_check(ckan_instance, package)
 
-def run_resource_validations(ckan_instance, package):
+def run_resource_validations(ckan_instance, package, stop):
   """
     Run validations before dataset publication
   """
-  is_dataset_valid(package)
+  is_dataset_valid(package, stop)
   is_datapackage_valid(package)
   is_host_valid(ckan_instance)
 
@@ -34,12 +34,13 @@ def is_dataset_published_check(ckan_instance, package):
     click.echo(f'Dataset {package.name} já publicado acesse {ckan_instance.address}/dataset/{package.name}')
     sys.exit(1)
 
-def is_dataset_valid(package):
+def is_dataset_valid(package, stop):
   report = validate(package)
   if report.valid == False:
-    for error in report.errors:
-      click.echo(error.message)
-    sys.exit(1)
+    click.echo('Dataset com algum erro de validação frictionless')
+    if stop == True:
+      click.echo('Flag --stop acionada para interromper a execução em caso de erro de validação frictionless')
+      sys.exit(1)
 
 def is_datapackage_valid(package):
   """

@@ -10,7 +10,7 @@ from dpckan.functions import (delete_dataset,
 def hello():
   print('heloo')
 
-def create(ckan_host, ckan_key, datapackage):
+def create(ckan_host, ckan_key, datapackage, stop):
   """
   Função responsável pela publicação de um conjunto de dados na instância CKAN desejada.
 
@@ -39,7 +39,7 @@ def create(ckan_host, ckan_key, datapackage):
   """
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_dataset_validations(ckan_instance, package)
+  run_dataset_validations(ckan_instance, package, stop)
   try:
     dataset_create(ckan_instance, package)
     print(f"Conjunto de dados {package.name} publicado. Datapackage.json Atualizado com id dos recursos publicados.")
@@ -53,8 +53,10 @@ def create(ckan_host, ckan_key, datapackage):
               help="Ckan host, exemplo: https://demo.ckan.org/")  # -H para respeitar convenção de -h ser help
 @click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json')
-def create_cli(ckan_host, ckan_key, datapackage):
+@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
+              help="Caminho para arquivo datapackage.json")
+@click.option('--stop', '-s', is_flag=True, help="Parar execução caso validação frictionless retorne algum erro")
+def create_cli(ckan_host, ckan_key, datapackage, stop):
   """
   Função CLI responsável pela publicação de um conjunto de dados na instância CKAN desejada.
 
@@ -84,4 +86,4 @@ def create_cli(ckan_host, ckan_key, datapackage):
 
   Conjunto de dados publicado no ambiente desejado.
   """
-  create(ckan_host, ckan_key, datapackage)
+  create(ckan_host, ckan_key, datapackage, stop)
