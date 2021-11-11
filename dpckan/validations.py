@@ -1,3 +1,4 @@
+import ipdb
 import json
 import sys
 import click
@@ -8,18 +9,21 @@ def run_dataset_validations(ckan_instance, package, stop):
   """
     Run validations before dataset publication
   """
-  is_dataset_valid(package, stop)
-  is_datapackage_valid(package)
   is_host_valid(ckan_instance)
   is_dataset_published_check(ckan_instance, package)
+  is_datapackage_valid(package)
+  is_owner_org_valid(ckan_instance, package)
+  is_dataset_valid(package, stop)
+
 
 def run_resource_validations(ckan_instance, package, stop):
   """
     Run validations before dataset publication
   """
-  is_dataset_valid(package, stop)
-  is_datapackage_valid(package)
   is_host_valid(ckan_instance)
+  is_datapackage_valid(package)
+  is_owner_org_valid(ckan_instance, package)
+  is_dataset_valid(package, stop)
 
 def is_host_valid(ckan_instance):
   demo = ckan_instance
@@ -41,6 +45,12 @@ def is_dataset_valid(package, stop):
     if stop == True:
       click.echo('Flag --stop acionada para interromper a execução em caso de erro de validação frictionless')
       sys.exit(1)
+
+def is_owner_org_valid(ckan_instance, package):
+  result = ckan_instance.action.organization_list(id = package.name)
+  if package['owner_org'] not in result:
+    click.echo(f"Propriedade `owner_org` {package['owner_org']} não existente na instância CKAN {ckan_instance.address}")
+    sys.exit(1)
 
 def is_datapackage_valid(package):
   """
@@ -68,11 +78,16 @@ def is_datapackage_valid(package):
   if f"name" in package.keys():
     pass
   else:
-    click.echo("Arquivo datapackage.json sem a chave 'name' obrigatória")
+    click.echo("Arquivo datapackage.json sem a propriedade `name` obrigatória")
     sys.exit(1)
   if f"resources" in package.keys():
     pass
   else:
-    click.echo("Arquivo datapackage.json sem a chave 'resources' obrigatória")
+    click.echo("Arquivo datapackage.json sem a propriedade `resources` obrigatória")
+    sys.exit(1)
+  if f"owner_org" in package.keys():
+    pass
+  else:
+    click.echo("Arquivo datapackage.json sem a propriedade `owner_org` obrigatória")
     sys.exit(1)
 
