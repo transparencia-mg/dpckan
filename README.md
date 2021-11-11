@@ -88,8 +88,15 @@ $ dpckan resource create --help
 $ dpckan resource update --help
 ```
 
-### Criando e atualizando com um conjunto de dados via terminal
+### Interrompendo execução em caso de erros de validação frictionless
 
+Durante a execução dos comandos dpckan a biblioteca `frictionless` será utilizada para [validação](https://framework.frictionlessdata.io/docs/guides/validation-guide) local do conjunto de dados via `frictionless validate`. Erros durante esta validação serão informados ao usuário mas somente interromperão a execução se a flag `--stop` for passada como parâmetro, conforme demonstrado abaixo:
+
+```bash
+$ dpckan dataset create --stop
+```
+
+### Criando e atualizando com um conjunto de dados via terminal
 
 - Para criar um conjunto de dados, execute o comando no diretório aonde o arquivo datapackage.json se encontra:
 
