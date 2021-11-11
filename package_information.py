@@ -1,7 +1,7 @@
 # Variáveis criadas para unificar informações entre os arquivos setup.py e docs/conf.py
 # Variáveis author, copyright e licence utilizadas para criação/atualização do arquivo LICENCE.txt (rotina Make durante processo de atualização do pacote "make update-package")
 name = 'dpckan'
-version = '0.1.6'
+version = '0.1.7'
 author = 'CONTROLADORIA GERAL DO ESTADO DE MINAS GERAIS - CGE/MG'
 email_author = 'dadosabertos@cge.mg.gov.br'
 description = 'Funções para gestão de pacotes de dados no portal dados.mg.gov.br'

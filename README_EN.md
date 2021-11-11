@@ -86,8 +86,15 @@ $ dpckan resource create --help
 $ dpckan resource update --help
 ```
 
-### Creating and Updating a Dataset via Terminal
+### Interrupting execution in case of frictionless validation errors
 
+During the execution of the dpckan commands the `frictionless` library will be used to [validate](https://framework.frictionlessdata.io/docs/guides/validation-guide) local dataset via `frictionless validate`. Errors during this validation will be reported to the user but they will only interrupt execution if the `--stop` flag is passed as a parameter, as shown below:
+
+```bash
+$ dpckan dataset create --stop
+```
+
+### Creating and Updating a Dataset via Terminal
 
 - To create a dataset, run the command in the directory where the datapackage.json file is located:
 
