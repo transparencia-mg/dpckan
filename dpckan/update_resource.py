@@ -1,12 +1,13 @@
 import click
 from ckanapi import RemoteCKAN
+from dpckan.validations import run_resource_validations
 from dpckan.functions import (load_complete_datapackage, 
                               update_datapackage_json_resource, 
                               resource_update,
                               resource_update_datastore_metadata,
                               dataset_update)
 
-def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name):
+def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name, stop):
   """
   Função responsável pela atualização de um recurso em conjunto de dados já existente na instância CKAN desejada.
 
@@ -29,11 +30,11 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
 
   resource_id: string
 
-    Id do recurso a ser atualizado na instância CKAN desejada.
+    Id do recurso a ser atualizado na instância CKAN desejada. Ultima parte da url do recurso no CKAN.
 
   resource_name: string
 
-    Nome do recurso, presente no arquivo datapackage.json, que será atualizado.
+    Nome do recurso que será atualizado. Propriedade `name` do resource dentro do arquivo datapackage.json.
 
   Retorna:
 
@@ -43,10 +44,11 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   """
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
+  run_resource_validations(ckan_instance, package, stop)
   # Show package to find datapackage.json resource id
   # Update datapakcage.json resource
   update_datapackage_json_resource(ckan_instance, package)
-  dataset_update(ckan_instance, package)
+  # dataset_update(ckan_instance, package)
   resource_update(ckan_instance,
                   resource_id,
                   package.get_resource(resource_name))
@@ -63,9 +65,11 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json',
               help="Caminho para arquivo datapackage.json")
 @click.option('--resource-id', '-id', required=True,
-              help="Id do recurso a ser atualizado.")
-@click.option('--resource-name', '-rn', required=True)
-def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_name):
+              help="Id do recurso a ser atualizado na instância CKAN desejada. Ultima parte da url do recurso no CKAN")
+@click.option('--resource-name', '-rn', required=True,
+              help="Nome do recurso que será atualizado. Propriedade `name` do resource dentro do arquivo datapackage.json")
+@click.option('--stop', '-s', is_flag=True, help="Parar execução caso validação frictionless retorne algum erro")
+def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_name, stop):
   """
   Função CLI responsável pela atualização de um recurso em conjunto de dados já existente na instância CKAN desejada.
 
@@ -91,11 +95,11 @@ def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_
 
   resource_id: string
 
-    Id do recurso a ser atualizado na instância CKAN desejada.
+    Id do recurso a ser atualizado na instância CKAN desejada. Ultima parte da url do recurso no CKAN.
 
   resource_name: string
 
-    Nome do recurso, presente no arquivo datapackage.json, que será atualizado.
+    Nome do recurso que será atualizado. Propriedade `name` do resource dentro do arquivo datapackage.json.
 
   Retorna:
 
@@ -103,4 +107,4 @@ def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_
 
   Recurso atualizado em um conjunto de dados previamente publicado no ambiente desejado.
   """
-  update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name)
+  update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name, stop)
