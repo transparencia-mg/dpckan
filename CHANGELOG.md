@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.1.10 (12/11/2021)
+------------------
+- Dataset update primeira versão, atualizando recursos e metadados modificados
+- Pequenas refatorações
+
 0.1.9 (12/11/2021)
 ------------------
 - Correção pacote ipdb importado erradamente
