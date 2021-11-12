@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.1.8 (12/11/2021)
+------------------
+- Apaga propriedade ckan_hosts apenas da instância CKAN desejada
+- Expansão schema e dialetic presentes no recurso datapackage.json importados na instância CKAN
+
 0.1.7 (11/11/2021)
 ------------------
 - Melhoria da implementação da documentação do conjunto de dados publicados no CKAN
