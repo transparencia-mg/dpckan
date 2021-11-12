@@ -1,4 +1,3 @@
-import ipdb
 import os
 import click
 import hashlib
@@ -8,16 +7,32 @@ from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
 
-def datapackage_path():
-  """
-    Return the exact path to datapackage.json file. It must to be in the root directory
-  """
-  return 'datapackage.json'
+def load_complete_datapackage(source):
+  datapackage = Package(source)
+  for resource_name in datapackage.resource_names:
+    datapackage.get_resource(resource_name).dialect.expand()
+    datapackage.get_resource(resource_name).schema.expand()
+  return datapackage
 
-def resource_create(ckan_instance, package_id, resource):
-  
+def dataset_create(ckan_instance, datapackage):
+  # In this context datapackage is frictionless package object from datapackage.json local file
+  remote_datapackage = frictionless_to_ckan(datapackage)
+  ckan_instance.call_action('package_create', remote_datapackage)
+  clean_datapackage_with_ckan_ids(ckan_instance, datapackage)
+  for resource_name in datapackage.resource_names:
+    resource_ckan = resource_create(ckan_instance,
+                                    datapackage.name,
+                                    datapackage.get_resource(resource_name))
+    resource_update_datastore_metadata(ckan_instance,
+                              resource_ckan['id'],
+                              datapackage.get_resource(resource_name)
+                              )
+    update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_ckan['id'])
+  create_datapackage_json_resource(ckan_instance, datapackage)
+
+def resource_create(ckan_instance, datapackage_id, resource):
   click.echo(f"Criando recurso: {resource.name}")
-  payload = {"package_id":package_id,
+  payload = {"package_id":datapackage_id,
                "name": resource.title,
                "description": resource.description,
                "url": resource.path}
@@ -28,35 +43,9 @@ def resource_create(ckan_instance, package_id, resource):
     result = ckan_instance.call_action('resource_create', payload, files=upload_files)
   return result
 
-def load_complete_datapackage(source):
-  datapackage = Package(source)
-  for resource_name in datapackage.resource_names:
-    datapackage.get_resource(resource_name).dialect.expand()
-    datapackage.get_resource(resource_name).schema.expand()
-  return datapackage
-
-def dataset_create(ckan_instance, package):
-  dataset = frictionless_to_ckan(package)
-  ckan_instance.call_action('package_create', dataset)
-  clean_datapackage_with_ckan_ids(ckan_instance, package)
-  for resource_name in package.resource_names:
-    resource_path = package.get_resource(resource_name)['path']
-    resource_ckan = resource_create(ckan_instance,
-                                    package.name,
-                                    package.get_resource(resource_name))
-    resource_update_datastore_metadata(ckan_instance,
-                              resource_ckan['id'],
-                              package.get_resource(resource_name)
-                              )
-    update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_ckan['id'])
-  create_datapackage_json_resource(ckan_instance, package)
-
-def update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_id):
-  dp = ''
-  if package.basepath == '':
-    dp = Package("datapackage.json")
-  else:
-    dp = Package(f"{package.basepath}/datapackage.json")
+def update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_id):
+  basepath = find_dataset_basepath(datapackage)
+  dp = Package(f"{basepath}/datapackage.json")
   if 'ckan_hosts' not in dp:
     dp['ckan_hosts'] = {}
     dp['ckan_hosts'][ckan_instance.address] = {}
@@ -67,10 +56,7 @@ def update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, reso
       dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
     else:
       dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-  if package.basepath == '':
-    dp.to_json("datapackage.json")
-  else:
-    dp.to_json(f"{package.basepath}/datapackage.json")
+  dp.to_json(f"{basepath}/datapackage.json")
 
 def clean_datapackage_with_ckan_ids(ckan_instance, package):
   basepath = find_dataset_basepath(package)
@@ -79,13 +65,14 @@ def clean_datapackage_with_ckan_ids(ckan_instance, package):
     package['ckan_hosts'].pop(ckan_instance.address)
     package.to_json(f'{basepath}/datapackage.json')
 
-def find_dataset_basepath(package):
-  if package.basepath == '':
+def find_dataset_basepath(datapackage):
+  if datapackage.basepath == '':
     return '.'
   else:
-    return package.basepath
+    return datapackage.basepath
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
+  click.echo(f"Atualizando metadado de recurso: {resource.name}")
   if resource.schema.fields == []:
     pass
   else:
@@ -117,22 +104,17 @@ def is_dataset_published(ckan_instance, datapackage):
   return True
 
 def resource_update(ckan_instance, resource_id, resource):
-
   click.echo(f"Atualizando recurso: {resource.name}")
-
   payload = {"id": resource_id,
              "name": resource.title,
              "description": resource.description,
              "url": resource.path}
-
   if(resource.path.startswith('http')):
     result = ckan_instance.call_action('resource_update', payload)
   else:
     result = ckan_instance.call_action('resource_update', payload, 
                                        files={'upload': open(os.path.join(resource.basepath, resource.path), 'rb')})
   return result
-
-
 
 def create_datapackage_json_resource(ckan_instance, datapackage):
   click.echo("Criando datapackage.json")
@@ -165,8 +147,8 @@ def dataset_update(ckan_instance, datapackage):
   # Find datapackage resource in ckan instance
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
   # Load ckan_datapackage_resource as json
-  dataset = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
-  dataset_diff(ckan_instance, datapackage, dataset)
+  remote_datapackage = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
+  dataset_diff(ckan_instance, datapackage, remote_datapackage)
 
 def dataset_diff(ckan_instance, datapackage, dataset):
   # Remote datapackage.json resources
@@ -174,31 +156,32 @@ def dataset_diff(ckan_instance, datapackage, dataset):
   # Local datapackage.json resource
   datapackage_local_resources = datapackage['ckan_hosts'][ckan_instance.address]
   # Compare resources in datapackage.json remote with local
-  for name in dataset_remote_resources.keys():
-    if name in datapackage_local_resources.keys():
-      if name != 'datapackage.json':
-        print(f'Caminho e chave iguais para recurso {name}. Comparar dados e metadados')
-        is_data_changed = resource_hash(datapackage.get_resource(name)['path']) == resource_url_hash(ckan_instance, dataset_remote_resources[name])
-        is_metadata_changed = datapackage.get_resource(name) == dataset.get_resource(name)
-        print(f'Recurso {name} dados iguais: {is_data_changed}')
-        print(f'Recurso {name} metadados iguais: {is_metadata_changed}')
-    else:
-      print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_host}')
+  for name in dataset_remote_resources.keys(): # Iterate through remote ckan_hosts property
+    if name != 'datapackage.json':
+      if name in datapackage_local_resources.keys() and name in datapackage.resource_names: # Is this name valid in local ckan_hosts?
+        if name in datapackage.resource_names: # Is this name valid in local resources?
+          local_data_hash = resource_hash(datapackage, name)
+          remote_data_hash = resource_url_hash(ckan_instance, dataset_remote_resources[name])
+          if local_data_hash != remote_data_hash:
+            click.echo(f"Diferenças nos dados do recurso: {name}")
+            resource_update(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
+          if datapackage.get_resource(name) != dataset.get_resource(name):
+            click.echo(f"Diferenças nos metadados recurso: {name}")
+            resource_update_datastore_metadata(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
+            update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
+      else:
+        print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_instance.address}')
   # Compare resources in datapackage.json local with remote
-  for name in datapackage_local_resources.keys():
-    # If local name doesn't exist in remote instance sugest creation
-    if name not in dataset_remote_resources.keys():
-      print(f'Recurso {name} não existe na instância {ckan_host}. utilize `dpckan resource create` para cria-lo')
+  for name in datapackage.resource_names:
+    if name != 'datapackage.json':
+      if name not in dataset.resource_names:
+        print(f'Recurso {name} não existe na instância {ckan_instance.address}. utilize `dpckan resource create` para cria-lo')
 
-# def resource_hash(package, resouce_name):
-#   if resouce_name != 'datapackage.json':
-#     resource = package.get_resource(resouce_name)
-#     resource.infer(stats=True)
-#     return resource['stats']['hash']
-
-def resource_hash(resource_path):
+def resource_hash(datapackage, name):
+  basepath = find_dataset_basepath(datapackage)
+  resource_path = datapackage.get_resource(name)['path']
   md5_hash = hashlib.md5()
-  resource_content = open(resource_path, "rb").read()
+  resource_content = open(f'{basepath}/{resource_path}', "rb").read()
   md5_hash.update(resource_content)
   resource_hash = md5_hash.hexdigest()
   return resource_hash
@@ -340,3 +323,9 @@ def resource_diff(ckan_instance, datapackage, resource_name):
 #       )
 
 #   return diffs, oks
+
+# def resource_hash(package, resouce_name):
+#   if resouce_name != 'datapackage.json':
+#     resource = package.get_resource(resouce_name)
+#     resource.infer(stats=True)
+#     return resource['stats']['hash']
