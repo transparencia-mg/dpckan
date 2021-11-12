@@ -25,7 +25,8 @@ Todos os comandos exigem a indicação de uma instância CKAN (ex: https://demo.
 # CKAN_KEY=CC850181-6ZS9-4f4C-bf3f-fb4db7ce09f90 (Chave CKAN meramente ilustrativa)
 # Utilização sem necessidade de indicar explicitamente variáveis
 $ dpckan dataset create
-
+````
+```bash
 # CKAN_HOST_PRODUCAO=https://demo.ckan.org/
 # CKAN_KEY_PRODUCAO=CC850181-6ZS9-4f4C-bf3f-fb4db7ce09f90 (Chave CKAN meramente ilustrativa)
 # Utilização indicando explicitamente variáveis, através flags --ckan-host e --ckan-key
@@ -43,19 +44,22 @@ O cadastro das variáveis de ambiente `CKAN_HOST` e `CKAN_KEY`, necessárias par
 Alternativamente, o cadastro destas variáveis de ambiente poderá ser realizado em arquivo ".env", na raiz do conjunto de dados, sendo necessário a inclusão deste ".env" em arquivo ".gitignore", evitando assim a sincronização e consequente publicização destas chaves em repositórios online como [github](https://github.com/), conforme demostrado abaixo:
 
 
-```bash
+```
 # SOMENTE UTILIZE A OPÇÃO SUGERIDA ABAIXO SE POSSUIR FAMILIARIDADE COM O ASSUNTO, EVITANDO ASSIM PROBLEMAS COM ACESSO DE TERCEIROS NÃO AUTORIZADOS EM SUA INSTÂNCIA CKAN
 # CUIDADO: SOMENTE EXECUTE OS COMANDOS ABAIXO SE OS ARQUIVO ".env" e ".gitignore" NÃO EXISTIREM NA RAIZ DO CONJUNTO DE DADOS
 # CUIDADO: CASO COMANDOS ABAIXO SEJAM EXECUTADOS COM ".env" e ".gitignore" EXISTENTES TODO CONTEÚDO DOS MESMOS SERÁ APAGADO
 # CUIDADO: SOMENTE EXECUTE OS COMANDOS ABAIXO SE TIVER CERTEZA E CONHECIMENTO DO QUE SERÁ FEITO
-
+```
+```bash
 # Crie arquivo ".env" com estrutura para receber chaves CKAN_HOST e CKAN_KEY
 # Após a criação, abra o arquivo e inclua os valores para cada variável
 $ echo "CKAN_HOST=''\nCKAN_KEY=''" > .env
-
+```
+```bash
 # Crie arquivo ".gitignore" com configuração para excluir arquivo ".env" do controle de versão git
 $ echo ".env" > .gitignore
-
+```
+```bash
 # Confira se configuração foi realizada com sucesso
 # Comando abaixo deverá mostrar apenas criação/modificação de arquivo ".gitignore", não sendo apresentado nada para arquivo ".env"
 $ git status
@@ -71,17 +75,20 @@ $ git status
 # Informações gerais sobre o pacote e seus comandos
 # Utilização das flags --help ou -h retornará o mesmo resultado
 $ dpckan
-
+```
+```bash
 # Informações sobre comandos dataset e resource
 # Utilização das flags --help ou -h retornará o mesmo resultado
 $ dpckan dataset
 $ dpckan resource
-
+```
+```bash
 # Informações sobre subcomandos dataset
 # Utilização da flag -h retornará o mesmo resultado
 $ dpckan dataset create --help
 $ dpckan dataset update --help
-
+```
+```bash
 # Informações sobre subcomandos resource
 # Utilização da flag -h retornará o mesmo resultado
 $ dpckan resource create --help
@@ -118,7 +125,8 @@ $ dpckan dataset update
 
 ```bash
 $ dpckan resource create --resource-name nome-recurso
-
+```
+```bash
 # Utilização alias -rn para flag --resource-name
 $ dpckan resource create -rn nome-recurso
 ```
@@ -129,7 +137,8 @@ $ dpckan resource create -rn nome-recurso
 ```bash
 # Utilização flags --resource-name e --resource-id
 $ dpckan resource update --resource-name nome-recurso --resource-id id-recurso
-
+```
+```bash
 # Utilização alias -rn e -id para flags --resource-name e --resource-id respectivamente
 $ dpckan resource update -rn nome-recurso -id id-recurso
 ```
@@ -141,8 +150,8 @@ $ dpckan resource update -rn nome-recurso -id id-recurso
 ```bash
 # Utilização flag --datapackage
 $ dpckan resource update --datapackage local/path/para/datapackage.json --resource-name nome-recurso --resource-id id-recurso
-````
-````
+```
+```bash
 # Utilização alias -dp, -rn e -id para flags --datapackage,--resource-name e --resource-id respectivamente
 $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -id id-recurso
 ```
@@ -151,7 +160,7 @@ $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -
 ```bash
 # Utilização flags --ckan-host, --ckan-key, --resource-name e --resource-id
 $ dpckan resource update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO --resource-name nome-recurso --resource-id id-recurso
-````
+```
 ```bash
 # Utilização alias -H, -k, -rn e -id para flags --ckan-host, --ckan-key, --resource-name e --resource-id respectivamente
 $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-recurso -id id-rescurso
