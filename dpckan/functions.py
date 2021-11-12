@@ -7,26 +7,6 @@ from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
 
-def datapackage_path():
-  """
-    Return the exact path to datapackage.json file. It must to be in the root directory
-  """
-  return 'datapackage.json'
-
-def resource_create(ckan_instance, package_id, resource):
-  
-  click.echo(f"Criando recurso: {resource.name}")
-  payload = {"package_id":package_id,
-               "name": resource.title,
-               "description": resource.description,
-               "url": resource.path}
-  if(resource.path.startswith('http')):
-    result = ckan_instance.call_action('resource_create', payload)
-  else:
-    upload_files = {'upload': open(os.path.join(resource.basepath, resource.path), 'rb')}
-    result = ckan_instance.call_action('resource_create', payload, files=upload_files)
-  return result
-
 def load_complete_datapackage(source):
   datapackage = Package(source)
   for resource_name in datapackage.resource_names:
@@ -49,6 +29,23 @@ def dataset_create(ckan_instance, package):
                               )
     update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_ckan['id'])
   create_datapackage_json_resource(ckan_instance, package)
+
+def resource_create(ckan_instance, package_id, resource):
+  click.echo(f"Criando recurso: {resource.name}")
+  payload = {"package_id":package_id,
+               "name": resource.title,
+               "description": resource.description,
+               "url": resource.path}
+  if(resource.path.startswith('http')):
+    result = ckan_instance.call_action('resource_create', payload)
+  else:
+    upload_files = {'upload': open(os.path.join(resource.basepath, resource.path), 'rb')}
+    result = ckan_instance.call_action('resource_create', payload, files=upload_files)
+  return result
+
+
+
+
 
 def update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_id):
   dp = ''
