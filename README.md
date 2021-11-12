@@ -141,7 +141,8 @@ $ dpckan resource update -rn nome-recurso -id id-recurso
 ```bash
 # Utilização flag --datapackage
 $ dpckan resource update --datapackage local/path/para/datapackage.json --resource-name nome-recurso --resource-id id-recurso
-
+````
+````
 # Utilização alias -dp, -rn e -id para flags --datapackage,--resource-name e --resource-id respectivamente
 $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -id id-recurso
 ```
@@ -150,7 +151,8 @@ $ dpckan resource update -dp local/path/para/datapackage.json -rn nome-recurso -
 ```bash
 # Utilização flags --ckan-host, --ckan-key, --resource-name e --resource-id
 $ dpckan resource update --ckan-host $CKAN_HOST_PRODUCAO --ckan-key $CKAN_KEY_PRODUCAO --resource-name nome-recurso --resource-id id-recurso
-
+````
+```bash
 # Utilização alias -H, -k, -rn e -id para flags --ckan-host, --ckan-key, --resource-name e --resource-id respectivamente
 $ dpckan resource update -H $CKAN_HOST_PRODUCAO -k $CKAN_KEY_PRODUCAO -rn nome-recurso -id id-rescurso
 ```
