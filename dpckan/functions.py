@@ -156,25 +156,26 @@ def dataset_diff(ckan_instance, datapackage, dataset):
   # Local datapackage.json resource
   datapackage_local_resources = datapackage['ckan_hosts'][ckan_instance.address]
   # Compare resources in datapackage.json remote with local
-  for name in dataset_remote_resources.keys():
-    if name in datapackage_local_resources.keys():
-      if name != 'datapackage.json':
-        local_data_hash = resource_hash(datapackage, name)
-        remote_data_hash = resource_url_hash(ckan_instance, dataset_remote_resources[name])
-        if local_data_hash != remote_data_hash:
-          click.echo(f"Diferenças nos dados do recurso: {name}")
-          resource_update(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
-        if datapackage.get_resource(name) != dataset.get_resource(name):
-          click.echo(f"Diferenças nos metadados recurso: {name}")
-          resource_update_datastore_metadata(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
-          update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
-    else:
-      print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_host}')
+  for name in dataset_remote_resources.keys(): # Iterate through remote ckan_hosts property
+    if name != 'datapackage.json':
+      if name in datapackage_local_resources.keys() and name in datapackage.resource_names: # Is this name valid in local ckan_hosts?
+        if name in datapackage.resource_names: # Is this name valid in local resources?
+          local_data_hash = resource_hash(datapackage, name)
+          remote_data_hash = resource_url_hash(ckan_instance, dataset_remote_resources[name])
+          if local_data_hash != remote_data_hash:
+            click.echo(f"Diferenças nos dados do recurso: {name}")
+            resource_update(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
+          if datapackage.get_resource(name) != dataset.get_resource(name):
+            click.echo(f"Diferenças nos metadados recurso: {name}")
+            resource_update_datastore_metadata(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
+            update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
+      else:
+        print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_instance.address}')
   # Compare resources in datapackage.json local with remote
-  for name in datapackage_local_resources.keys():
-    # If local name doesn't exist in remote instance sugest creation
-    if name not in dataset_remote_resources.keys():
-      print(f'Recurso {name} não existe na instância {ckan_host}. utilize `dpckan resource create` para cria-lo')
+  for name in datapackage.resource_names:
+    if name != 'datapackage.json':
+      if name not in dataset.resource_names:
+        print(f'Recurso {name} não existe na instância {ckan_instance.address}. utilize `dpckan resource create` para cria-lo')
 
 def resource_hash(datapackage, name):
   basepath = find_dataset_basepath(datapackage)
