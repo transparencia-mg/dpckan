@@ -136,8 +136,11 @@ def resource_update(ckan_instance, resource_id, resource):
 
 def create_datapackage_json_resource(ckan_instance, datapackage):
   click.echo("Criando datapackage.json")
+  basepath = find_dataset_basepath(datapackage)
+  expand_datapackage(datapackage, basepath)
   resource_ckan = ckan_instance.action.resource_create(package_id = datapackage.name,
-                                       name = 'datapackage.json')
+                                       name = 'datapackage.json',
+                                       upload = open(f"{basepath}/temp/extended_datapackage.json", 'rb'))
   update_datapackage_with_ckan_ids(ckan_instance, datapackage, 'datapackage.json', resource_ckan['id'])
   update_datapackage_json_resource(ckan_instance, datapackage, resource_ckan['id'])
 
@@ -146,7 +149,6 @@ def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
   basepath = find_dataset_basepath(datapackage)
   updated_datapackage = load_complete_datapackage(f'{basepath}/datapackage.json')
   expand_datapackage(updated_datapackage, basepath)
-  ipdb.set_trace(context=10)
   ckan_instance.action.resource_update(id = resource_id,
                                        upload = open(f"{basepath}/temp/extended_datapackage.json", 'rb'))
   os.system(f'rm -rf {basepath}/temp')
