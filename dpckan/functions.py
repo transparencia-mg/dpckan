@@ -72,17 +72,17 @@ def update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, reso
     dp.to_json(f"{package.basepath}/datapackage.json")
 
 def clean_datapackage_with_ckan_ids(ckan_instance, package):
-  dp = ''
+  basepath = find_dataset_basepath(package)
+  package = Package(f'{basepath}/datapackage.json')
+  if 'ckan_hosts' in package and ckan_instance.address in package['ckan_hosts']:
+    package['ckan_hosts'].pop(ckan_instance.address)
+    package.to_json(f'{basepath}/datapackage.json')
+
+def find_dataset_basepath(package):
   if package.basepath == '':
-    dp = Package("datapackage.json")
+    return '.'
   else:
-    dp = Package(f"{package.basepath}/datapackage.json")
-  if 'ckan_hosts' in dp:
-    dp.pop('ckan_hosts')
-    if package.basepath == '':
-      dp.to_json("datapackage.json")
-    else:
-      dp.to_json(f"{package.basepath}/datapackage.json")
+    return package.basepath
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
   if resource.schema.fields == []:
