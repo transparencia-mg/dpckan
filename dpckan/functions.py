@@ -194,7 +194,8 @@ def resource_hash(datapackage, name):
   resource_content = ''
   md5_hash = hashlib.md5()
   if name == 'datapackage.json':
-    resource_content = datapackage.to_json().encode('utf-8')
+    ckan_datapackage = frictionless_to_ckan(datapackage)
+    resource_content = json.dumps(ckan_datapackage).encode('utf-8')
   else:
     basepath = find_dataset_basepath(datapackage)
     resource_path = datapackage.get_resource(name)['path']
@@ -204,10 +205,24 @@ def resource_hash(datapackage, name):
   return resource_hash
 
 def resource_url_hash(ckan_instance, resource_id):
+  resource_content = ''
   md5_hash = hashlib.md5()
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = resource_id)
-  resouce_content = urlopen(ckan_datapackage_resource['url']).read()
-  md5_hash.update(resouce_content)
+  if ckan_datapackage_resource['name'] == 'datapackage.json':
+    # Buscar os metatados do dataset para retirar a key notes
+    ckan_datapackage = ckan_instance.action.package_show(id=ckan_datapackage_resource['package_id'])
+    # Buscar arquivo datapackage.json remoto para criar hash
+    resource_content = urlopen(ckan_datapackage_resource['url']).read()
+    resource_content = json.loads(resource_content.decode('utf-8'))
+    resource_content = Package(resource_content)
+    # Convert para metadados ckan para igualar à conversão do arquivo local
+    # Esta conversão é importante para comparar modificações README, CHANGELOG e CONTRIBUTING
+    resource_content = frictionless_to_ckan(resource_content)
+    resource_content['notes'] = ckan_datapackage['notes']
+    resource_content = json.dumps(resource_content).encode('utf-8')
+  else:
+    resource_content = urlopen(ckan_datapackage_resource['url']).read()
+  md5_hash.update(resource_content)
   resource_hash = md5_hash.hexdigest()
   return resource_hash
 
