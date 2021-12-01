@@ -169,19 +169,36 @@ def dataset_diff(ckan_instance, datapackage, dataset):
             click.echo(f"Diferenças nos metadados recurso: {name}")
             resource_update_datastore_metadata(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
             update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
+            dataset_patch(ckan_instance, datapackage)
       else:
         print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_instance.address}')
+    if name == 'datapackage.json':
+      local_data_hash = resource_hash(datapackage, name)
+      remote_data_hash = resource_url_hash(ckan_instance, dataset_remote_resources[name])
+      if local_data_hash != remote_data_hash:
+        click.echo(f"Diferenças nos metadados do conjunto: {dataset.name}")
+        update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
+        dataset_patch(ckan_instance, datapackage)
   # Compare resources in datapackage.json local with remote
   for name in datapackage.resource_names:
     if name != 'datapackage.json':
       if name not in dataset.resource_names:
         print(f'Recurso {name} não existe na instância {ckan_instance.address}. utilize `dpckan resource create` para cria-lo')
 
+def dataset_patch(ckan_instance, datapackage):
+  ckan_datapackage = frictionless_to_ckan(datapackage)
+  ckan_datapackage['id'] = datapackage.name
+  ckan_instance.call_action('package_patch', ckan_datapackage)
+
 def resource_hash(datapackage, name):
-  basepath = find_dataset_basepath(datapackage)
-  resource_path = datapackage.get_resource(name)['path']
+  resource_content = ''
   md5_hash = hashlib.md5()
-  resource_content = open(f'{basepath}/{resource_path}', "rb").read()
+  if name == 'datapackage.json':
+    resource_content = datapackage.to_json().encode('utf-8')
+  else:
+    basepath = find_dataset_basepath(datapackage)
+    resource_path = datapackage.get_resource(name)['path']
+    resource_content = open(f'{basepath}/{resource_path}', "rb").read()
   md5_hash.update(resource_content)
   resource_hash = md5_hash.hexdigest()
   return resource_hash
