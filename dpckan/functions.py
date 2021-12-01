@@ -204,11 +204,11 @@ def frictionless_to_ckan(datapackage):
     dataset["notes"] = ""
   if os.path.isfile(README_path):
     dataset["notes"] = ""
-    dataset["notes"] += f"\n{open(README_path).read()}"
+    dataset["notes"] += f"\n{open(README_path, encoding='utf-8').read()}"
   if os.path.isfile(CONTRIBUTING_path):
-    dataset["notes"] += f"\n{open(CONTRIBUTING_path).read()}"
+    dataset["notes"] += f"\n{open(CONTRIBUTING_path, encoding='utf-8').read()}"
   if os.path.isfile(CHANGELOG_path):
-    dataset["notes"] += f"\n{open(CHANGELOG_path).read()}"
+    dataset["notes"] += f"\n{open(CHANGELOG_path, encoding='utf-8').read()}"
   if 'id' in dataset.keys():
     dataset.update({ "id" : datapackage.name})
   return dataset

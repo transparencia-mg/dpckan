@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.11 (01/12/2021)
+------------------
+- Adicionando encoding para subir arquivos README, CONTRIBUTING e CHANGELOG para CKAN
+
 0.1.10 (12/11/2021)
 ------------------
 - Dataset update primeira versão, atualizando recursos e metadados modificados
