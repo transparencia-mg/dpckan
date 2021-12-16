@@ -12,7 +12,6 @@ def run_dataset_validations(ckan_instance, package, stop):
   is_dataset_published_check(ckan_instance, package)
   is_datapackage_valid(package)
   is_owner_org_valid(ckan_instance, package)
-  is_dataset_valid(package, stop)
 
 
 def run_resource_validations(ckan_instance, package, stop):
@@ -22,7 +21,6 @@ def run_resource_validations(ckan_instance, package, stop):
   is_host_valid(ckan_instance)
   is_datapackage_valid(package)
   is_owner_org_valid(ckan_instance, package)
-  is_dataset_valid(package, stop)
 
 def is_host_valid(ckan_instance):
   demo = ckan_instance
@@ -36,14 +34,6 @@ def is_dataset_published_check(ckan_instance, package):
   if is_dataset_published(ckan_instance, package):
     click.echo(f'Dataset {package.name} já publicado acesse {ckan_instance.address}/dataset/{package.name}')
     sys.exit(1)
-
-def is_dataset_valid(package, stop):
-  report = validate(package)
-  if report.valid == False:
-    click.echo('Dataset com algum erro de validação frictionless')
-    if stop == True:
-      click.echo('Flag --stop acionada para interromper a execução em caso de erro de validação frictionless')
-      sys.exit(1)
 
 def is_owner_org_valid(ckan_instance, package):
   result = ckan_instance.action.organization_list(id = package.name)
