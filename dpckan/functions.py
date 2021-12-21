@@ -14,7 +14,7 @@ def load_complete_datapackage(source):
     datapackage.get_resource(resource_name).schema.expand()
   return datapackage
 
-def dataset_create(ckan_instance, datapackage):
+def dataset_create(ckan_instance, datapackage, metadata):
   # In this context datapackage is frictionless package object from datapackage.json local file
   remote_datapackage = frictionless_to_ckan(datapackage)
   ckan_instance.call_action('package_create', remote_datapackage)
@@ -23,12 +23,13 @@ def dataset_create(ckan_instance, datapackage):
     resource_ckan = resource_create(ckan_instance,
                                     datapackage.name,
                                     datapackage.get_resource(resource_name))
-    resource_update_datastore_metadata(ckan_instance,
-                              resource_ckan['id'],
-                              datapackage.get_resource(resource_name)
-                              )
+    if metadata == True:
+      resource_update_datastore_metadata(ckan_instance,
+                                resource_ckan['id'],
+                                datapackage.get_resource(resource_name)
+                                )
     update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_ckan['id'])
-  create_datapackage_json_resource(ckan_instance, datapackage)
+  create_datapackage_json_resource(ckan_instance, datapackage, metadata)
 
 def resource_create(ckan_instance, datapackage_id, resource):
   click.echo(f"Criando recurso: {resource.name}")
@@ -116,7 +117,7 @@ def resource_update(ckan_instance, resource_id, resource):
                                        files={'upload': open(os.path.join(resource.basepath, resource.path), 'rb')})
   return result
 
-def create_datapackage_json_resource(ckan_instance, datapackage):
+def create_datapackage_json_resource(ckan_instance, datapackage, metadata):
   click.echo("Criando datapackage.json")
   basepath = find_dataset_basepath(datapackage)
   expand_datapackage(datapackage, basepath)
@@ -124,7 +125,8 @@ def create_datapackage_json_resource(ckan_instance, datapackage):
                                        name = 'datapackage.json',
                                        upload = open(f"{basepath}/temp/extended_datapackage.json", 'rb'))
   update_datapackage_with_ckan_ids(ckan_instance, datapackage, 'datapackage.json', resource_ckan['id'])
-  update_datapackage_json_resource(ckan_instance, datapackage, resource_ckan['id'])
+  if metadata == True:
+    update_datapackage_json_resource(ckan_instance, datapackage, resource_ckan['id'])
 
 def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
   click.echo(f"Atualizando datapackage.json")
