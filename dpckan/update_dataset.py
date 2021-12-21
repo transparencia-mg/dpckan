@@ -2,7 +2,7 @@ import click
 from ckanapi import RemoteCKAN
 from dpckan.functions import (load_complete_datapackage, dataset_update, update_datapackage_json_resource)
                               
-def update(ckan_host, ckan_key, datapackage):
+def update(ckan_host, ckan_key, datapackage, metadata):
   """
   Função responsável pela atualização de um conjunto de dados na instância CKAN desejada.
 
@@ -34,7 +34,7 @@ def update(ckan_host, ckan_key, datapackage):
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
 
   # update_datapackage_json_resource(ckan_instance, package)
-  dataset_update(ckan_instance, package)
+  dataset_update(ckan_instance, package, metadata)
 
 
 @click.command(name='update')
@@ -44,7 +44,8 @@ def update(ckan_host, ckan_key, datapackage):
               help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json',
               help="Caminho para arquivo datapackage.json")
-def update_cli(ckan_host, ckan_key, datapackage):
+@click.option('--metadata', '-m', is_flag=False, help="Indica se os recursos publicados terão metadados carregados no datastore")
+def update_cli(ckan_host, ckan_key, datapackage, metadata):
   """
   Função CLI responsável pela atualização de um conjunto de dados na instância CKAN desejada.
 
@@ -74,5 +75,5 @@ def update_cli(ckan_host, ckan_key, datapackage):
 
   Conjunto de dados atualizado no ambiente desejado.
   """
-  update(ckan_host, ckan_key, datapackage)
+  update(ckan_host, ckan_key, datapackage, metadata)
 

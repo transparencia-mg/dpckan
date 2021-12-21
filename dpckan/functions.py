@@ -29,7 +29,7 @@ def dataset_create(ckan_instance, datapackage, metadata):
                                 datapackage.get_resource(resource_name)
                                 )
     update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_ckan['id'])
-  create_datapackage_json_resource(ckan_instance, datapackage, metadata)
+  create_datapackage_json_resource(ckan_instance, datapackage)
 
 def resource_create(ckan_instance, datapackage_id, resource):
   click.echo(f"Criando recurso: {resource.name}")
@@ -117,7 +117,7 @@ def resource_update(ckan_instance, resource_id, resource):
                                        files={'upload': open(os.path.join(resource.basepath, resource.path), 'rb')})
   return result
 
-def create_datapackage_json_resource(ckan_instance, datapackage, metadata):
+def create_datapackage_json_resource(ckan_instance, datapackage):
   click.echo("Criando datapackage.json")
   basepath = find_dataset_basepath(datapackage)
   expand_datapackage(datapackage, basepath)
@@ -125,8 +125,7 @@ def create_datapackage_json_resource(ckan_instance, datapackage, metadata):
                                        name = 'datapackage.json',
                                        upload = open(f"{basepath}/temp/extended_datapackage.json", 'rb'))
   update_datapackage_with_ckan_ids(ckan_instance, datapackage, 'datapackage.json', resource_ckan['id'])
-  if metadata == True:
-    update_datapackage_json_resource(ckan_instance, datapackage, resource_ckan['id'])
+  update_datapackage_json_resource(ckan_instance, datapackage, resource_ckan['id'])
 
 def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
   click.echo(f"Atualizando datapackage.json")
@@ -140,7 +139,7 @@ def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
 def expand_datapackage(datapackage, basepath):
   datapackage.to_json(f'{basepath}/temp/extended_datapackage.json')
 
-def dataset_update(ckan_instance, datapackage):
+def dataset_update(ckan_instance, datapackage, metadata):
   click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
   # Find ckan host url
   ckan_host = ckan_instance.address
@@ -150,9 +149,9 @@ def dataset_update(ckan_instance, datapackage):
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
   # Load ckan_datapackage_resource as json
   remote_datapackage = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
-  dataset_diff(ckan_instance, datapackage, remote_datapackage)
+  dataset_diff(ckan_instance, datapackage, remote_datapackage, metadata)
 
-def dataset_diff(ckan_instance, datapackage, dataset):
+def dataset_diff(ckan_instance, datapackage, dataset, metadata):
   # Remote datapackage.json resources
   dataset_remote_resources = dataset['ckan_hosts'][ckan_instance.address]
   # Local datapackage.json resource
@@ -167,9 +166,12 @@ def dataset_diff(ckan_instance, datapackage, dataset):
           if local_data_hash != remote_data_hash:
             click.echo(f"Diferenças nos dados do recurso: {name}")
             resource_update(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
-          if datapackage.get_resource(name) != dataset.get_resource(name):
+          if datapackage.get_resource(name) != dataset.get_resource(name) and metadata == True:
             click.echo(f"Diferenças nos metadados recurso: {name}")
             resource_update_datastore_metadata(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
+            update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
+            dataset_patch(ckan_instance, datapackage)
+          if datapackage.get_resource(name) != dataset.get_resource(name):
             update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
             dataset_patch(ckan_instance, datapackage)
       else:
