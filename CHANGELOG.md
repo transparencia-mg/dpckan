@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.12 (21/12/2021)
+------------------
+- Adiciona Flag metadata para acionamento datastore durante criação e atualização de conjunto de dados
+
 0.1.11 (01/12/2021)
 ------------------
 - Adicionando encoding para subir arquivos README, CONTRIBUTING e CHANGELOG para CKAN
