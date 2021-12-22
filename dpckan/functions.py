@@ -123,7 +123,7 @@ def create_datapackage_json_resource(ckan_instance, datapackage):
   expand_datapackage(datapackage, basepath)
   resource_ckan = ckan_instance.action.resource_create(package_id = datapackage.name,
                                        name = 'datapackage.json',
-                                       upload = open(f"{basepath}/temp/extended_datapackage.json", 'rb'))
+                                       upload = open(f"{basepath}/temp/datapackage.json", 'rb'))
   update_datapackage_with_ckan_ids(ckan_instance, datapackage, 'datapackage.json', resource_ckan['id'])
   update_datapackage_json_resource(ckan_instance, datapackage, resource_ckan['id'])
 
@@ -133,11 +133,11 @@ def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
   updated_datapackage = load_complete_datapackage(f'{basepath}/datapackage.json')
   expand_datapackage(updated_datapackage, basepath)
   ckan_instance.action.resource_update(id = resource_id,
-                                       upload = open(f"{basepath}/temp/extended_datapackage.json", 'rb'))
+                                       upload = open(f"{basepath}/temp/datapackage.json", 'rb'))
   os.system(f'rm -rf {basepath}/temp')
 
 def expand_datapackage(datapackage, basepath):
-  datapackage.to_json(f'{basepath}/temp/extended_datapackage.json')
+  datapackage.to_json(f'{basepath}/temp/datapackage.json')
 
 def dataset_update(ckan_instance, datapackage, metadata):
   click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
