@@ -1,6 +1,7 @@
 import os
 import click
 from ckanapi import RemoteCKAN
+import shutil
 from urllib import request
 
 def get_dataset(ckan_host, dataset_id):
@@ -29,6 +30,11 @@ def get_dataset(ckan_host, dataset_id):
   ckan_instance = RemoteCKAN(ckan_host)
   dataset_information = ckan_instance.action.package_show(id = dataset_id)
   if not os.path.exists('data'):
+    click.echo('Criando pasta data.')
+    os.makedirs('data')
+  else:
+    click.echo('Limpando conteúdo de pasta data existente.')
+    shutil.rmtree('data')
     os.makedirs('data')
   for resource in dataset_information["resources"]:
     resource_url = resource["url"]
