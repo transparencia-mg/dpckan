@@ -132,7 +132,7 @@ $ dpckan dataset get --dataset-id id-dataset
 - Observações:
   - A execução conforme exemplo acima considera a existência de variável de ambiente CKAN_HOST.
   - O id do dataset ou nome do conjunto pode ser encontrado no final da url que dá acesso ao mesmo, exemplo: https://demo.ckan.org/dataset/dataset-id.
-
+  - Sugere-se executar o comando em um diretório vazio, uma vez que arquivos e diretórios serão baixados/criados na raiz de onde o comando for executado.
 
 ### Criando e atualizando com um conjunto de dados via terminal
 
