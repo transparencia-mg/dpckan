@@ -8,6 +8,8 @@ def get_dataset(ckan_host, dataset_id):
   """
   Função responsável por realizar o download de um conjunto de dados publicado na instância CKAN informada.
 
+  Sugerimos executar este comando em um diretório vazio
+
   Parâmetros:
 
   -------
@@ -26,6 +28,7 @@ def get_dataset(ckan_host, dataset_id):
   -------
 
   Download do conjunto de dados desejado.
+  Arquivo datapackage.json será salvo na raiz do diretório (ou local aonde o comando será executado), enquanto que os arquivos de data serão salvos no diretório "data".
   """
   ckan_instance = RemoteCKAN(ckan_host)
   dataset_information = ckan_instance.action.package_show(id = dataset_id)
