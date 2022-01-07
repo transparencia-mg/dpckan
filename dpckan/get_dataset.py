@@ -1,6 +1,7 @@
 import os
 import click
 from ckanapi import RemoteCKAN
+from dpckan.functions import (download_resource_from_ckan)
 
 def get_dataset(ckan_host, dataset_id):
   """
@@ -27,12 +28,17 @@ def get_dataset(ckan_host, dataset_id):
   """
   ckan_instance = RemoteCKAN(ckan_host)
   dataset_information = ckan_instance.action.package_show(id = dataset_id)
-  os.makedirs('data')
+  if not os.path.exists('data'):
+    os.makedirs('data')
   for resource in dataset_information["resources"]:
+    import ipdb; ipdb.set_trace(context=10)
+    resource_url = resource["url"]
+    resource_content = download_resource_from_ckan(resource_url)
     if resource["name"] == 'datapackage.json':
-      open('datapackage.json', 'w', encoding='utf-8')
+      open('datapackage.json', 'w', encoding='utf-8').write(resource_content.content)
     else:
-      open(f'data/{"-".join(resource["name"].split())}', 'w', encoding='utf-8')
+      file_name = resource_url.split('/')[-1]
+      open(f'data/{file_name}', 'wb', encoding='utf-8').write(resource_content.content)
 
 @click.command(name='get')
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,

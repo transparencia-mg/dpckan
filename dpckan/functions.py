@@ -2,6 +2,7 @@ import os
 import click
 import hashlib
 import json
+import requests
 from urllib.request import urlopen
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
@@ -296,6 +297,9 @@ def resource_diff(ckan_instance, datapackage, resource_name):
 
   return diffs, oks
 
+def download_resource_from_ckan(resource_url):
+  resource_content = requests.get(resource_url, allow_redirects=True)
+  return resource_content
 
 # def dataset_diff(ckan_instance, datapackage):
 #   dp_dataset = frictionless_to_ckan(datapackage)
