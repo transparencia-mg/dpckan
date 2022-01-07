@@ -1,10 +1,6 @@
 import sys
 import click
 from ckanapi import RemoteCKAN
-from dpckan.functions import (delete_dataset,
-                              dataset_create,
-                              is_dataset_published,
-                              load_complete_datapackage)
 
 def get_dataset(ckan_host, dataset_id):
   """
@@ -29,7 +25,13 @@ def get_dataset(ckan_host, dataset_id):
 
   Download do conjunto de dados desejado.
   """
-
+  ckan_instance = RemoteCKAN(ckan_host)
+  dataset_information = ckan_instance.action.package_show(id = dataset_id)
+  for resource in dataset_information["resources"]:
+    if resource["name"] == 'datapackage.json':
+      pass
+    else:
+      pass
 
 @click.command(name='get')
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
