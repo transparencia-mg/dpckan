@@ -6,7 +6,7 @@ from dpckan.functions import (delete_dataset,
                               is_dataset_published,
                               load_complete_datapackage)
 
-def get(ckan_host, dataset_id):
+def get_dataset(ckan_host, dataset_id):
   """
   Função responsável por realizar o download de um conjunto de dados publicado na instância CKAN informada.
 
@@ -36,7 +36,7 @@ def get(ckan_host, dataset_id):
               help="Ckan host, exemplo: https://demo.ckan.org/")  # -H para respeitar convenção de -h ser help
 @click.option('--dataset-id', '-id', required=True,
               help="Nome do conjunto de dados na instância CKAN informada")
-def get_cli(ckan_host, dataset_id):
+def get_dataset_cli(ckan_host, dataset_id):
   """
   Função CLI responsável por realizar o download de um conjunto de dados publicado na instância CKAN informada.
 
@@ -62,4 +62,4 @@ def get_cli(ckan_host, dataset_id):
 
   Download do conjunto de dados desejado.
   """
-  get(ckan_host, dataset_id)
+  get_dataset(ckan_host, dataset_id)
