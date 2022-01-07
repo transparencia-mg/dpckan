@@ -39,9 +39,11 @@ def get_dataset(ckan_host, dataset_id):
   for resource in dataset_information["resources"]:
     resource_url = resource["url"]
     if resource["name"] == 'datapackage.json':
+      click.echo('Baixando datapackage.json.')
       request.urlretrieve(resource_url, 'datapackage.json')
     else:
       file_name = resource_url.split('/')[-1]
+      click.echo(f'Baixando recurso {file_name}.')
       request.urlretrieve(resource_url, f'data/{file_name}')
 
 @click.command(name='get')
