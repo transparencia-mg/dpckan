@@ -1,4 +1,4 @@
-import sys
+import os
 import click
 from ckanapi import RemoteCKAN
 
@@ -27,11 +27,12 @@ def get_dataset(ckan_host, dataset_id):
   """
   ckan_instance = RemoteCKAN(ckan_host)
   dataset_information = ckan_instance.action.package_show(id = dataset_id)
+  os.makedirs('data')
   for resource in dataset_information["resources"]:
     if resource["name"] == 'datapackage.json':
-      pass
+      open('datapackage.json', 'w', encoding='utf-8')
     else:
-      pass
+      open(f'data/{"-".join(resource["name"].split())}', 'w', encoding='utf-8')
 
 @click.command(name='get')
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
