@@ -45,17 +45,20 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   run_resource_validations(ckan_instance, package, stop)
-  # Show package to find datapackage.json resource id
-  # Update datapakcage.json resource
-  update_datapackage_json_resource(ckan_instance, package)
-  # dataset_update(ckan_instance, package)
+  run_resource_validations(ckan_instance, package, stop)
   resource_update(ckan_instance,
                   resource_id,
                   package.get_resource(resource_name))
   resource_update_datastore_metadata(ckan_instance,
                             resource_id,
                             package.get_resource(resource_name))
-
+  # Update datapackage
+  # Show package to find datapackage.json resource id
+  ckan_datapackage_resources = ckan_instance.action.package_show(id=package.name)["resources"]
+  # Filtering datackage id - https://stackoverflow.com/a/48192370/11755155
+  datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["name"] == "datapackage.json"][0]
+  # Update datapackage remotly
+  update_datapackage_json_resource(ckan_instance, package, datapackage_resource_id)
 
 @click.command()
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
