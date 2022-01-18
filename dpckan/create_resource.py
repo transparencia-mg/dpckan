@@ -31,7 +31,7 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
 
   resource_name: string
 
-    Nome do recurso que será criado (presente no arquivo datapackage.json).
+    Nome do recurso que será criado. Propriedade `name` do resource dentro do arquivo datapackage.json.
 
   Retorna
 
@@ -94,7 +94,7 @@ def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name, stop):
 
   resource_name: string
 
-    Nome do recurso que será criado (presente no arquivo datapackage.json).
+    Nome do recurso que será criado. Propriedade `name` do resource dentro do arquivo datapackage.json.
 
   Retorna:
 
