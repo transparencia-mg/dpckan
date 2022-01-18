@@ -40,7 +40,6 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   Recurso criado em um conjunto de dados previamente publicado no ambiente desejado.
   """
   package = load_complete_datapackage(datapackage)
-  # Update datapakcage.json resource
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   run_resource_validations(ckan_instance, package, stop)
   # Create new resource
