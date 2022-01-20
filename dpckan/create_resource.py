@@ -53,7 +53,7 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   # Show package to find datapackage.json resource id
   ckan_datapackage_resources = ckan_instance.action.package_show(id=package.name)["resources"]
   # Filtering datackage id - https://stackoverflow.com/a/48192370/11755155
-  datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["name"] == "datapackage.json"][0]
+  datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["name"].split('/')[-1] == "datapackage.json"][0]
   # Update datapackage localy
   update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_ckan['id'])
   # Update datapackage remotly
