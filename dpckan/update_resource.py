@@ -56,7 +56,7 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   # Show package to find datapackage.json resource id
   ckan_datapackage_resources = ckan_instance.action.package_show(id=package.name)["resources"]
   # Filtering datackage id - https://stackoverflow.com/a/48192370/11755155
-  datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["name"].split('/')[-1] == "datapackage.json"][0]
+  datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
   # Update datapackage remotly
   update_datapackage_json_resource(ckan_instance, package, datapackage_resource_id)
 
