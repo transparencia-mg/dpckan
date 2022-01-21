@@ -45,7 +45,6 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   run_resource_validations(ckan_instance, package, stop)
-  run_resource_validations(ckan_instance, package, stop)
   resource_update(ckan_instance,
                   resource_id,
                   package.get_resource(resource_name))
