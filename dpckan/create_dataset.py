@@ -7,7 +7,7 @@ from dpckan.functions import (delete_dataset,
                               is_dataset_published,
                               load_complete_datapackage)
 
-def create(ckan_host, ckan_key, datapackage, stop, metadata):
+def create(ckan_host, ckan_key, datapackage, stop, datastore):
   """
   Função responsável pela publicação de um conjunto de dados na instância CKAN desejada.
 
@@ -38,7 +38,7 @@ def create(ckan_host, ckan_key, datapackage, stop, metadata):
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   run_dataset_validations(ckan_instance, local_datapackage, stop)
   try:
-    dataset_create(ckan_instance, local_datapackage, metadata)
+    dataset_create(ckan_instance, local_datapackage, datastore)
     print(f"Conjunto de dados {local_datapackage.name} publicado. Datapackage.json Atualizado com id dos recursos publicados.")
   except Exception:
     delete_dataset(ckan_instance, local_datapackage.name)
@@ -53,8 +53,8 @@ def create(ckan_host, ckan_key, datapackage, stop, metadata):
 @click.option('--datapackage', '-dp', required=True, default='datapackage.json',
               help="Caminho para arquivo datapackage.json")
 @click.option('--stop', '-s', is_flag=True, help="Parar execução caso validação frictionless retorne algum erro")
-@click.option('--metadata', '-m', is_flag=False, help="Indica se os recursos publicados terão metadados carregados no datastore")
-def create_cli(ckan_host, ckan_key, datapackage, stop, metadata):
+@click.option('--datastore/--no-datastore', default=False, help="Indica se os recursos publicados terão dados e metadados carregados no DataStore")
+def create_cli(ckan_host, ckan_key, datapackage, stop, datastore):
   """
   Função CLI responsável pela publicação de um conjunto de dados na instância CKAN desejada.
 
@@ -84,4 +84,4 @@ def create_cli(ckan_host, ckan_key, datapackage, stop, metadata):
 
   Conjunto de dados publicado no ambiente desejado.
   """
-  create(ckan_host, ckan_key, datapackage, stop, metadata)
+  create(ckan_host, ckan_key, datapackage, stop, datastore)
