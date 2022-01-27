@@ -296,6 +296,12 @@ def resource_diff(ckan_instance, datapackage, resource_name):
 
   return diffs, oks
 
+def get_ckan_datapackage_resource_id(ckan_instance, dataset_id):
+  # Use show_package endpoint in ckan api to retrieve all dataset's resources
+  ckan_datapackage_resources = ckan_instance.action.package_show(id=dataset_id)["resources"]
+  # Filtering datackage_id - https://stackoverflow.com/a/48192370/11755155
+  ckan_datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
+  return ckan_datapackage_resource_id
 
 # def dataset_diff(ckan_instance, datapackage):
 #   dp_dataset = frictionless_to_ckan(datapackage)
