@@ -14,7 +14,7 @@ def load_complete_datapackage(source):
     datapackage.get_resource(resource_name).schema.expand()
   return datapackage
 
-def dataset_create(ckan_instance, datapackage, metadata):
+def dataset_create(ckan_instance, datapackage, datastore):
   # In this context datapackage is frictionless package object from datapackage.json local file
   remote_datapackage = frictionless_to_ckan(datapackage)
   ckan_instance.call_action('package_create', remote_datapackage)
@@ -23,7 +23,7 @@ def dataset_create(ckan_instance, datapackage, metadata):
     resource_ckan = resource_create(ckan_instance,
                                     datapackage.name,
                                     datapackage.get_resource(resource_name))
-    if metadata == True:
+    if datastore == True:
       resource_update_datastore_metadata(ckan_instance,
                                 resource_ckan['id'],
                                 datapackage.get_resource(resource_name)
@@ -139,7 +139,7 @@ def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
 def expand_datapackage(datapackage, basepath):
   datapackage.to_json(f'{basepath}/temp/datapackage.json')
 
-def dataset_update(ckan_instance, datapackage, metadata):
+def dataset_update(ckan_instance, datapackage, datastore):
   click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
   # Find ckan host url
   ckan_host = ckan_instance.address
@@ -149,9 +149,9 @@ def dataset_update(ckan_instance, datapackage, metadata):
   ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
   # Load ckan_datapackage_resource as json
   remote_datapackage = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
-  dataset_diff(ckan_instance, datapackage, remote_datapackage, metadata)
+  dataset_diff(ckan_instance, datapackage, remote_datapackage, datastore)
 
-def dataset_diff(ckan_instance, datapackage, dataset, metadata):
+def dataset_diff(ckan_instance, datapackage, dataset, datastore):
   # Remote datapackage.json resources
   dataset_remote_resources = dataset['ckan_hosts'][ckan_instance.address]
   # Local datapackage.json resource
@@ -166,7 +166,7 @@ def dataset_diff(ckan_instance, datapackage, dataset, metadata):
           if local_data_hash != remote_data_hash:
             click.echo(f"Diferenças nos dados do recurso: {name}")
             resource_update(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
-          if datapackage.get_resource(name) != dataset.get_resource(name) and metadata == True:
+          if datapackage.get_resource(name) != dataset.get_resource(name) and datastore == True:
             click.echo(f"Diferenças nos metadados recurso: {name}")
             resource_update_datastore_metadata(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
             update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
