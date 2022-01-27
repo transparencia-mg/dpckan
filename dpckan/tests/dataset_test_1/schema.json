@@ -1,0 +1,28 @@
+{
+        "fields": [
+          {
+            "name": "id",
+            "type": "integer",
+            "format": "default",
+            "title": "Incremental counter",
+            "description": "An integer counter for the rows. Does markdown [links](https://github.com/fjuniorr) works. \nSimply click install.  \n## Here is a header  \n* And an indent  \n* Indented bullet  \n \n I can quote things \n > Here is some quoted text \n>\n> That span multiple lines"
+          },
+          {
+            "name": "letter",
+            "type": "string",
+            "format": "default",
+            "title": "Alfhabet letter",
+            "description": "A lower case alfabet letter",
+            "constraints": {
+              "enum": ["a", "e", "i", "o", "u"]
+            }
+          },
+          {
+            "name": "vowel",
+            "type": "boolean",
+            "format": "default",
+            "title": "Grammer of letter",
+            "description": "Is the letter a vowel?"
+          }
+        ]
+}

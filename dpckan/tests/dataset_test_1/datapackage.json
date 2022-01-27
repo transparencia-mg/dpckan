@@ -1,0 +1,93 @@
+{
+  "profile": "tabular-data-package",
+  "resources": [
+    {
+      "name": "letters-consonants",
+      "path": "./data/letters-consonants.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "id",
+            "type": "integer",
+            "format": "default",
+            "title": "Incremental counter",
+            "description": "An integer counter for the rows."
+          },
+          {
+            "name": "letter",
+            "type": "string",
+            "format": "default",
+            "title": "Alfhabet letter",
+            "description": "A lower case consonant alfabet letter. `foobar`"
+          },
+          {
+            "name": "vowel",
+            "type": "boolean",
+            "format": "default",
+            "title": "Grammer of letter",
+            "description": "Is the letter a vowel?no"
+          }
+        ]
+      },
+      "dialect": {
+        "delimiter": ";"
+      },
+      "title": "Letters consonants",
+      "format": "csv",
+      "encoding": "UTF-8",
+      "description": "This file contains the actual data with Letters consonants"
+    },
+    {
+      "name": "letters",
+      "path": "./data/letters-vowels.csv",
+      "profile": "tabular-data-resource",
+      "schema": "./schema.json",
+      "dialect": {
+        "delimiter": ","
+      },
+      "title": "This is the actual data",
+      "format": "csv",
+      "encoding": "UTF-8",
+      "description": "This file contains the actual data"
+    }
+  ],
+  "keywords": [
+    "letters",
+    "english grammar"
+  ],
+  "name": "letters-vowel",
+  "title": "A vowel letters dataset",
+  "description": "This is a dataset that say if a given letter is a vowel",
+  "homepage": "https://github.com/fjuniorr",
+  "version": "0.1.0",
+  "owner_org": "secretaria-de-estado-de-planejamento-e-gestao-seplag",
+  "contributors": [
+    {
+      "title": "Francisco Alves",
+      "role": "publisher",
+      "organization": "gabinete-militar-do-governador-gmg"
+    }
+  ],
+  "licenses": [
+    {
+      "name": "CC0-1.0",
+      "title": "CC0 1.0",
+      "path": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+  ],
+  "sources": [
+    {
+      "name": "CBOE VIX Page",
+      "path": "http://www.cboe.com/micro/vix/historical.aspx",
+      "title": "CBOE VIX Page"
+    }
+  ],
+  "ckan_hosts": {
+    "https://homologa.cge.mg.gov.br": {
+      "letters-consonants": "aa4c800d-63c2-41c1-ac41-7a83e08ee819",
+      "letters": "c7da457b-9da0-4a82-a173-a513fc416dda",
+      "datapackage.json": "8b9c659b-23c2-4bdf-9e7b-023f99c4ab62"
+    }
+  }
+}

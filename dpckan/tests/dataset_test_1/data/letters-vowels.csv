@@ -1,0 +1,7 @@
+id,letter,vowel
+1,a,FALSE
+1,a,TRUE
+5,e,TRUE
+9,i,TRUE
+15,o,TRUE
+21,u,TRUE
