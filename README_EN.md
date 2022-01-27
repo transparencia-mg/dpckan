@@ -112,24 +112,18 @@ $ dpckan dataset update
 
 ### Creating and Updating Resources via Terminal
 
-- To create a resource, run the following command in the directory where the datapackage.json file is located. Don't forget to modify the last argument with the name of the resource present in the datapackage.json file that will be created
+CAUTION: Same-named resources in addition to disrespect the [frictionless specification](https://specs.frictionlessdata.io/data-resource/#metadata-properties) confuse the user.
+
+To create a resource, run the following command in the directory where the datapackage.json file is located.
 
 ```bash
-$ dpckan resource create --resource-name resource-name
-
-# Use alias -rn for flag --resource-name
-$ dpckan resource create -rn resource-name
+$ dpckan resource create --resource-name <nome-recurso>
 ```
 
-
-- To update a resource, run the following command in the directory where the datapackage.json file is located. Don't forget to modify the last arguments with the name and id of the resource present in the datapackage.json file that will be updated
+To update a resource, run the following command in the directory where the datapackage.json file is located.
 
 ```bash
-# Usage flags --resource-name and --resource-id
-$ dpckan resource update --resource-name resource-name --resource-id resource-id
-
-# Use -rn and -id aliases for --resource-name and --resource-id flags respectively
-$ dpckan resource update -rn resource-name -id resource-id
+$ dpckan resource update --resource-name <nome-recurso> --resource-id <id-recurso>
 ```
 
 ### Using flags
