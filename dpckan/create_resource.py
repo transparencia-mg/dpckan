@@ -6,7 +6,8 @@ from dpckan.functions import (load_complete_datapackage,
                               resource_create,
                               resource_update_datastore_metadata,
                               dataset_update,
-                              update_datapackage_with_ckan_ids)
+                              update_datapackage_with_ckan_ids,
+                              get_ckan_datapackage_resource_id,)
 
 def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   """
@@ -49,15 +50,12 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   resource_update_datastore_metadata(ckan_instance,
                             resource_ckan['id'],
                             package.get_resource(resource_name))
-  # Update datapackage
-  # Show package to find datapackage.json resource id
-  ckan_datapackage_resources = ckan_instance.action.package_show(id=package.name)["resources"]
-  # Filtering datackage id - https://stackoverflow.com/a/48192370/11755155
-  datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
-  # Update datapackage localy
+  # Update local datapackage with new resource id
   update_datapackage_with_ckan_ids(ckan_instance, package, resource_name, resource_ckan['id'])
-  # Update datapackage remotly
-  update_datapackage_json_resource(ckan_instance, package, datapackage_resource_id)
+  # Find ckan datapackage resource id
+  ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, package.name)
+  # Update ckan datapackage resource
+  update_datapackage_json_resource(ckan_instance, package, ckan_datapackage_resource_id)
 
 @click.command()
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
