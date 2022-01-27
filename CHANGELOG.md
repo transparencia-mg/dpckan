@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.1.14 (27/12/2021)
+------------------
+- Corrige funcionamento da flag para acionamento do datastore nunca produzir efeitos
+- Altera nome da flag para acionamento do datastore durante criação e atualização de conjunto de dados de metadata para datastore
+
 0.1.13 (22/12/2021)
 ------------------
 -  Remove extended do nome do arquivo extended_datapackage.json durante criação de recursos datapackage.json
