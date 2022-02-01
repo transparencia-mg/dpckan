@@ -4,7 +4,7 @@ from ckanapi import RemoteCKAN
 from dpckan.functions import (
   load_complete_datapackage,
   is_dataset_published,
-  resource_diff
+  resource_data_diff
 )
 
 
@@ -43,7 +43,7 @@ def diff_resource(ckan_host, ckan_key, datapackage, resource_name):
     raise Exception('Conjunto de dados nao existente.')
 
   ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
-  return resource_diff(ckan_instance, package, resource_name)
+  return resource_data_diff(ckan_instance, package, resource_name)
 
 
 @click.command()

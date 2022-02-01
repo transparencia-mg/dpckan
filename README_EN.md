@@ -108,7 +108,11 @@ $dpckan dataset create
 $ dpckan dataset update
 ```
 
+CAUTION: Updating datasets assumes:
 
+* Dataset creation via `dpckan dataset create` command;
+* Resource creation via `dpckan resource create` command; and
+* Equality between the number and name of the local resources and the CKAN instance.
 
 ### Creating and Updating Resources via Terminal
 
