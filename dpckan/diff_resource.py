@@ -4,7 +4,6 @@ from ckanapi import RemoteCKAN
 from dpckan.functions import (
   load_complete_datapackage,
   is_dataset_published,
-  resource_data_diff
 )
 
 
