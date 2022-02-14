@@ -20,7 +20,7 @@ def dataset_create(ckan_instance, datapackage, datastore):
   remote_datapackage = frictionless_to_ckan(datapackage)
   click.echo(f"Criando conjunto: {datapackage.name}")
   ckan_instance.call_action('package_create', remote_datapackage)
-  datapackage['resources_ids'] = {}
+  resources_ids = {}
   for resource_name in datapackage.resource_names:
     resource_ckan = resource_create(ckan_instance,
                                     datapackage.name,
@@ -30,9 +30,10 @@ def dataset_create(ckan_instance, datapackage, datastore):
                                 resource_ckan['id'],
                                 datapackage.get_resource(resource_name)
                                 )
-    datapackage['resources_ids'][resource_name] = resource_ckan['id']
+    resources_ids[resource_name] = resource_ckan['id']
   ckan_datapackage_resource_id = create_datapackage_json_resource(ckan_instance, datapackage)
-  datapackage['resources_ids']['datapackage.json'] = ckan_datapackage_resource_id
+  resources_ids['datapackage.json'] = ckan_datapackage_resource_id
+  datapackage['resources_ids'] = resources_ids
   dataset_patch(ckan_instance, datapackage)
 
 def resource_create(ckan_instance, datapackage_id, resource):
