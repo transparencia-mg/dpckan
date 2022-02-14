@@ -4,8 +4,7 @@ from ckanapi import RemoteCKAN
 from dpckan.validations import run_dataset_validations
 from dpckan.functions import (delete_dataset, 
                               dataset_create,
-                              is_dataset_published,
-                              load_complete_datapackage)
+                              load_complete_datapackage,)
 
 def create(ckan_host, ckan_key, datapackage, stop, datastore):
   """

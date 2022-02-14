@@ -1,7 +1,5 @@
-import pytest
 from frictionless import Package
 from dpckan.functions import (load_complete_datapackage,
-                              get_ckan_dataset_resources_ids,
                               get_ckan_dataset_resources_names,)
 
 source = './dpckan/tests/dataset_test_1/datapackage.json'

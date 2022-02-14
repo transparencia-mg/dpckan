@@ -48,28 +48,6 @@ def resource_create(ckan_instance, datapackage_id, resource):
     result = ckan_instance.call_action('resource_create', payload, files=upload_files)
   return result
 
-def update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_id):
-  basepath = find_dataset_basepath(datapackage)
-  dp = Package(f"{basepath}/datapackage.json")
-  if 'ckan_hosts' not in dp:
-    dp['ckan_hosts'] = {}
-    dp['ckan_hosts'][ckan_instance.address] = {}
-    dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-  else:
-    if ckan_instance.address not in dp['ckan_hosts']:
-      dp['ckan_hosts'][ckan_instance.address] = {}
-      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-    else:
-      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-  dp.to_json(f"{basepath}/datapackage.json")
-
-def clean_datapackage_with_ckan_ids(ckan_instance, package):
-  basepath = find_dataset_basepath(package)
-  package = Package(f'{basepath}/datapackage.json')
-  if 'ckan_hosts' in package and ckan_instance.address in package['ckan_hosts']:
-    package['ckan_hosts'].pop(ckan_instance.address)
-    package.to_json(f'{basepath}/datapackage.json')
-
 def find_dataset_basepath(datapackage):
   if datapackage.basepath == '':
     return '.'
@@ -282,72 +260,3 @@ def get_ckan_datapackage_resource_id(ckan_instance, dataset_id):
   # Filtering datackage_id - https://stackoverflow.com/a/48192370/11755155
   ckan_datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
   return ckan_datapackage_resource_id
-
-# def dataset_diff(ckan_instance, datapackage):
-#   dp_dataset = frictionless_to_ckan(datapackage)
-#   ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
-
-#   diffs = []
-#   oks = []
-#   # TODO, add more
-#   fields = ["title", "version", "url", "license_id"]
-
-#   for field in fields:
-#     if dp_dataset.get(field) == ckan_dataset.get(field):
-#       oks.append(field)
-#     else:
-#       diffs.append(
-#         {
-#           'field_name': field,
-#           'ckan_value': ckan_dataset.get(field),
-#           'datapackage_value': dp_dataset.get(field)
-#         }
-#       )
-
-#   # check org (dataset use ID, datapackage uses name)
-#   if dp_dataset['owner_org'] == ckan_dataset['organization']['name']:
-#     oks.append('owner_org')
-#   else:
-#     diffs.append(
-#         {
-#           'field_name': 'owner_org',
-#           'ckan_value': ckan_dataset['organization']['name'],
-#           'datapackage_value': dp_dataset['owner_org']
-#         }
-#       )
-
-#   # Analyze tags
-#   dp_tags = sorted([t['name'] for t in dp_dataset['tags']])
-#   ckan_tags = sorted([t['name'] for t in ckan_dataset['tags']])
-#   if dp_tags == ckan_tags:
-#     oks.append('tags')
-#   else:
-#     diffs.append(
-#         {
-#           'field_name': 'tags',
-#           'ckan_value': ckan_tags,
-#           'datapackage_value': dp_tags
-#         }
-#       )
-
-#   # Analyze notes
-#   dp_notes = dp_dataset['notes'].replace('\n', '')
-#   ckan_notes = ckan_dataset['notes'].replace('\n', '')
-#   if dp_tags == ckan_tags:
-#     oks.append('notes')
-#   else:
-#     diffs.append(
-#         {
-#           'field_name': 'notes',
-#           'ckan_value': ckan_tags,
-#           'datapackage_value': dp_tags
-#         }
-#       )
-
-#   return diffs, oks
-
-# def resource_hash(package, resouce_name):
-#   if resouce_name != 'datapackage.json':
-#     resource = package.get_resource(resouce_name)
-#     resource.infer(stats=True)
-#     return resource['stats']['hash']

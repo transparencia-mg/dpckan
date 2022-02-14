@@ -1,6 +1,8 @@
 import click
 from ckanapi import RemoteCKAN
-from dpckan.functions import (load_complete_datapackage, dataset_update, update_datapackage_json_resource)
+from dpckan.functions import (load_complete_datapackage, 
+                              dataset_update, 
+                              update_datapackage_json_resource,)
                               
 def update(ckan_host, ckan_key, datapackage, datastore):
   """
