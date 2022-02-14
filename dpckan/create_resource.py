@@ -13,7 +13,7 @@ from dpckan.functions import (load_complete_datapackage,
                               resource_update_datastore_metadata,
                               get_ckan_dataset_resources_ids,
                               get_ckan_datapackage_resource_id,
-                              dataset_patch,)
+                              dataset_patch_resources_ids,)
 
 def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   package = load_complete_datapackage(datapackage)
@@ -31,7 +31,7 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   package['resources_ids'][resource_name] = resource_ckan['id']
   ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, package.name)
   update_datapackage_json_resource(ckan_instance, package, ckan_datapackage_resource_id)
-  dataset_patch(ckan_instance, package)
+  dataset_patch_resources_ids(ckan_instance, package)
 
 @click.command()
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,

@@ -34,7 +34,7 @@ def dataset_create(ckan_instance, datapackage, datastore):
   ckan_datapackage_resource_id = create_datapackage_json_resource(ckan_instance, datapackage)
   resources_ids['datapackage.json'] = ckan_datapackage_resource_id
   datapackage['resources_ids'] = resources_ids
-  dataset_patch(ckan_instance, datapackage)
+  dataset_patch_resources_ids(ckan_instance, datapackage)
 
 def resource_create(ckan_instance, datapackage_id, resource):
   click.echo(f"Criando recurso: {resource.name}")
@@ -231,8 +231,9 @@ def resource_url_hash(ckan_instance, resource_id):
   resource_hash = md5_hash.hexdigest()
   return resource_hash
 
-def dataset_patch(ckan_instance, datapackage):
-  ckan_datapackage = frictionless_to_ckan(datapackage)
+def dataset_patch_resources_ids(ckan_instance, datapackage):
+  ckan_datapackage = dict()
+  ckan_datapackage['extras'] = frictionless_to_ckan(datapackage)['extras']
   ckan_datapackage['id'] = datapackage.name
   ckan_instance.call_action('package_patch', ckan_datapackage)
 
