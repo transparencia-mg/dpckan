@@ -88,7 +88,7 @@ def is_dataset_published(ckan_instance, datapackage):
   return True
 
 def resource_update(ckan_instance, resource_id, resource):
-  click.echo(f"Updating resource {resource.name} data.")
+  click.echo(f"Updating data files of resource {resource.name}.")
   payload = {"id": resource_id,
              "name": resource.title,
              "description": resource.description,
@@ -124,7 +124,7 @@ def expand_datapackage(datapackage, basepath):
 def dataset_update(ckan_instance, datapackage, datastore):
   different_resources = dataset_diff(ckan_instance, datapackage)
   if len(different_resources) > 0:
-    click.echo(f'Updating dataset {datapackage.name} hosted in {ckan_instance.address}.')
+    click.echo(f'Updating dataset {ckan_instance.address}/dataset/{datapackage.name}.')
     for resource in different_resources:
       if resource['data_diff']:
         resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
@@ -134,7 +134,7 @@ def dataset_update(ckan_instance, datapackage, datastore):
     update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
     click.echo(f'Dataset {datapackage.name} updated.')
   else:
-    click.echo(f'Nothing to be updated in dataset: {datapackage.name} hosted in {ckan_instance.address}.')
+    click.echo(f'Nothing to be updated in dataset {ckan_instance.address}/dataset/{datapackage.name}.')
 
 def dataset_diff(ckan_instance, datapackage):
   different_resources = list()
@@ -153,7 +153,7 @@ def get_ckan_dataset_resources_ids(ckan_instance, datapackage):
   ckan_dataset_extras_property = ckan_dataset.get('extras')
   ckan_dataset_resources_ids = [i.get('value') for i in ckan_dataset_extras_property if i.get('key') == 'resources_ids']
   if len(ckan_dataset_resources_ids) == 0:
-    click.echo(f"Diff dataset {datapackage.name} error: 'resources_ids' not found in its 'extras' properties.")
+    click.echo(f"'resources_ids' property not found in 'extras' field of dataset {ckan_instance.address}/dataset/{datapackage.name}.")
     sys.exit(1)
   elif len(ckan_dataset_resources_ids) > 0:
     ckan_dataset_resources_ids = json.loads(ckan_dataset_resources_ids[0])
