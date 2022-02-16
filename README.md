@@ -103,7 +103,7 @@ Durante a execução dos comandos dpckan a biblioteca `frictionless` será utili
 $ dpckan dataset create --stop
 ```
 
-### Criando e atualizando com um conjunto de dados via terminal
+### Criando e atualizando um conjunto de dados via terminal
 
 Para criar um conjunto de dados, execute o comando no diretório aonde o arquivo datapackage.json se encontra:
 
