@@ -56,7 +56,7 @@ def find_dataset_basepath(datapackage):
     return datapackage.basepath
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
-  click.echo(f"Updating resource {resource.name} metadata.")
+  click.echo(f"Updating resource {resource.name} datastore.")
   if resource.schema.fields == []:
     pass
   else:
@@ -88,7 +88,7 @@ def is_dataset_published(ckan_instance, datapackage):
   return True
 
 def resource_update(ckan_instance, resource_id, resource):
-  click.echo(f"Updating data files of resource {resource.name}.")
+  click.echo(f"Updating data and metadata of resource {resource.name}.")
   payload = {"id": resource_id,
              "name": resource.title,
              "description": resource.description,
@@ -126,9 +126,8 @@ def dataset_update(ckan_instance, datapackage, datastore):
   if len(different_resources) > 0:
     click.echo(f'Updating dataset {ckan_instance.address}/dataset/{datapackage.name}.')
     for resource in different_resources:
-      if resource['data_diff']:
+      if resource['data_diff'] or resource['metadada_diff']:
         resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
-      if resource['metadada_diff']:
         resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
     ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
     update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
