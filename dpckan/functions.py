@@ -128,7 +128,8 @@ def dataset_update(ckan_instance, datapackage, datastore):
     for resource in different_resources:
       if resource['data_diff'] or resource['metadada_diff']:
         resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
-        resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
+        if datastore == True:
+          resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
     ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
     update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
     click.echo(f'Dataset {datapackage.name} updated.')
