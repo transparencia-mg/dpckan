@@ -1,12 +1,6 @@
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_resource_validations
-from dpckan.docstrings_common_definitions import (host_flag_,
-                                                 key_flag_,
-                                                 datapackage_flag_,
-                                                 resource_id_flag_,
-                                                 resource_name_flag_,
-                                                 stop_flag_,)
 from dpckan.functions import (load_complete_datapackage, 
                               update_datapackage_json_resource, 
                               resource_create,
@@ -15,10 +9,10 @@ from dpckan.functions import (load_complete_datapackage,
                               get_ckan_datapackage_resource_id,
                               dataset_patch_resources_ids,)
 
-def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
+def create_resource(ckan_host, ckan_key, datapackage, resource_name):
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_resource_validations(ckan_instance, package, stop)
+  run_resource_validations(ckan_instance, package)
   # Create new resource
   resource_ckan = resource_create(ckan_instance,
                                   package.name,
@@ -33,19 +27,10 @@ def create_resource(ckan_host, ckan_key, datapackage, resource_name, stop):
   update_datapackage_json_resource(ckan_instance, package, ckan_datapackage_resource_id)
   dataset_patch_resources_ids(ckan_instance, package)
 
-@click.command()
-@click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
-              help=host_flag_) # -H to respect convention of -h in help option
-@click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
-              help=key_flag_)
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
-              help=datapackage_flag_)
-@click.option('--resource-name', '-rn', required=True,
-              help=resource_name_flag_)
-@click.option('--stop', '-s', is_flag=True, help=stop_flag_)
-def create_resource_cli(ckan_host, ckan_key, datapackage, resource_name, stop):
+@click.command(name='create')
+@click.pass_context
+def create_resource_cli(ctx):
   """
-  Create a resource in a dataset published in ckan.
+  Create dataset resource in a CKAN instance.
   """
-  create_resource(ckan_host, ckan_key, datapackage, resource_name, stop)
-
+  create_resource(ctx.obj['CKAN_HOST'], ctx.obj['CKAN_KEY'], ctx.obj['DATAPACKAGE'], ctx.obj['RESOURCE_NAME'])

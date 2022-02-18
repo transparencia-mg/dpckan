@@ -4,7 +4,7 @@ import click
 from dpckan.functions import is_dataset_published
 from frictionless import validate
 
-def run_dataset_validations(ckan_instance, package, stop):
+def run_dataset_validations(ckan_instance, package):
   """
     Run validations before dataset publication
   """
@@ -14,7 +14,7 @@ def run_dataset_validations(ckan_instance, package, stop):
   is_owner_org_valid(ckan_instance, package)
 
 
-def run_resource_validations(ckan_instance, package, stop):
+def run_resource_validations(ckan_instance, package):
   """
     Run validations before dataset publication
   """

@@ -6,36 +6,10 @@ from dpckan.functions import (delete_dataset,
                               dataset_create,
                               load_complete_datapackage,)
 
-def create(ckan_host, ckan_key, datapackage, stop, datastore):
-  """
-  Função responsável pela publicação de um conjunto de dados na instância CKAN desejada.
-
-  Parâmetros:
-
-  -------
-
-  ckan_host: string
-
-    host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
-    Exemplo: https://demo.ckan.org/
-
-  ckan_key: string
-
-    Chave CKAN do usuário e ambiente para a qual se deseja publicar conjunto de dados.
-
-  datapackage: string
-
-    Caminho local para arquivo datapackage.json.
-
-  Retorna:
-
-  -------
-
-  Conjunto de dados publicado no ambiente desejado.
-  """
+def create(ckan_host, ckan_key, datapackage, datastore):
   local_datapackage = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_dataset_validations(ckan_instance, local_datapackage, stop)
+  run_dataset_validations(ckan_instance, local_datapackage)
   try:
     dataset_create(ckan_instance, local_datapackage, datastore)
     print(f"Conjunto de dados {local_datapackage.name} criado.")
@@ -45,42 +19,9 @@ def create(ckan_host, ckan_key, datapackage, stop, datastore):
     sys.exit(1)
 
 @click.command(name='create')
-@click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
-              help="Ckan host, exemplo: https://demo.ckan.org/")  # -H para respeitar convenção de -h ser help
-@click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
-              help="Ckan key autorizando o usuário a realizar publicações/atualizações em datasets")
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
-              help="Caminho para arquivo datapackage.json")
-@click.option('--stop', '-s', is_flag=True, help="Parar execução caso validação frictionless retorne algum erro")
-@click.option('--datastore/--no-datastore', default=False, help="Indica se os recursos publicados terão dados e metadados carregados no DataStore")
-def create_cli(ckan_host, ckan_key, datapackage, stop, datastore):
+@click.pass_context
+def create_cli(ctx):
   """
-  Função CLI responsável pela publicação de um conjunto de dados na instância CKAN desejada.
-
-  Por padrão, função buscará host e key da instância CKAN nas variáveis de ambiente CKAN_HOST e CKAN_KEY cadastradas na máquina ou
-  em arquivo .env na raiz do dataset.
-
-  Parâmetros:
-
-  ----------
-
-  ckan_host: string (não obrigatório caso variável CKAN_HOST esteja cadastrada na máquina ou em arquivo .env)
-
-    host ou ambiente da instância CKAN para a qual se deseja publicar conjunto de dados.
-    Exemplo: https://demo.ckan.org/
-
-  ckan_key: string (não obrigatório caso variável CKAN_KEY esteja cadastrada na máquina ou em arquivo .env)
-
-    Chave CKAN do usuário e ambiente para a qual se deseja publicar conjunto de dados.
-
-  datapackage: string (não obrigatório caso comando seja executado no mesmo diretório do arquivo datapackage.json)
-
-    Caminho local para arquivo datapackage.json.
-
-  Retorna:
-
-  -------
-
-  Conjunto de dados publicado no ambiente desejado.
+  Create dataset in a CKAN instance.
   """
-  create(ckan_host, ckan_key, datapackage, stop, datastore)
+  create(ctx.obj['CKAN_HOST'], ctx.obj['CKAN_KEY'], ctx.obj['DATAPACKAGE'], ctx.obj['DATASTORE'])
