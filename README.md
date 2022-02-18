@@ -117,6 +117,12 @@ E para atualizar o conjunto de dados, execute o comando no diretório aonde o ar
 $ dpckan dataset update
 ```
 
+CUIDADO: A atualização de conjunto de dados presupõe:
+
+* Criação do conjunto de dados via comando `dpckan dataset create`;
+* Criação de recursos via comando `dpckan resource create`; e
+* Igualdade entre o número e nome dos recursos locais e da instância CKAN.
+
 ### Criando e atualizando recursos via terminal
 
 CUIDADO: Recursos com nomes iguais além de desrespeitar a [especificação frictionless](https://specs.frictionlessdata.io/data-resource/#metadata-properties) confundem o usuário.

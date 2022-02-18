@@ -1,3 +1,4 @@
+import sys
 import os
 import click
 import hashlib
@@ -17,8 +18,9 @@ def load_complete_datapackage(source):
 def dataset_create(ckan_instance, datapackage, datastore):
   # In this context datapackage is frictionless package object from datapackage.json local file
   remote_datapackage = frictionless_to_ckan(datapackage)
+  click.echo(f"Criando conjunto: {datapackage.name}")
   ckan_instance.call_action('package_create', remote_datapackage)
-  clean_datapackage_with_ckan_ids(ckan_instance, datapackage)
+  resources_ids = {}
   for resource_name in datapackage.resource_names:
     resource_ckan = resource_create(ckan_instance,
                                     datapackage.name,
@@ -28,8 +30,11 @@ def dataset_create(ckan_instance, datapackage, datastore):
                                 resource_ckan['id'],
                                 datapackage.get_resource(resource_name)
                                 )
-    update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_ckan['id'])
-  create_datapackage_json_resource(ckan_instance, datapackage)
+    resources_ids[resource_name] = resource_ckan['id']
+  ckan_datapackage_resource_id = create_datapackage_json_resource(ckan_instance, datapackage)
+  resources_ids['datapackage.json'] = ckan_datapackage_resource_id
+  datapackage['resources_ids'] = resources_ids
+  dataset_patch_resources_ids(ckan_instance, datapackage)
 
 def resource_create(ckan_instance, datapackage_id, resource):
   click.echo(f"Criando recurso: {resource.name}")
@@ -44,28 +49,6 @@ def resource_create(ckan_instance, datapackage_id, resource):
     result = ckan_instance.call_action('resource_create', payload, files=upload_files)
   return result
 
-def update_datapackage_with_ckan_ids(ckan_instance, datapackage, resource_name, resource_id):
-  basepath = find_dataset_basepath(datapackage)
-  dp = Package(f"{basepath}/datapackage.json")
-  if 'ckan_hosts' not in dp:
-    dp['ckan_hosts'] = {}
-    dp['ckan_hosts'][ckan_instance.address] = {}
-    dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-  else:
-    if ckan_instance.address not in dp['ckan_hosts']:
-      dp['ckan_hosts'][ckan_instance.address] = {}
-      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-    else:
-      dp['ckan_hosts'][ckan_instance.address][resource_name] = resource_id
-  dp.to_json(f"{basepath}/datapackage.json")
-
-def clean_datapackage_with_ckan_ids(ckan_instance, package):
-  basepath = find_dataset_basepath(package)
-  package = Package(f'{basepath}/datapackage.json')
-  if 'ckan_hosts' in package and ckan_instance.address in package['ckan_hosts']:
-    package['ckan_hosts'].pop(ckan_instance.address)
-    package.to_json(f'{basepath}/datapackage.json')
-
 def find_dataset_basepath(datapackage):
   if datapackage.basepath == '':
     return '.'
@@ -73,7 +56,7 @@ def find_dataset_basepath(datapackage):
     return datapackage.basepath
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
-  click.echo(f"Atualizando metadado de recurso: {resource.name}")
+  click.echo(f"Updating resource {resource.name} datastore.")
   if resource.schema.fields == []:
     pass
   else:
@@ -105,7 +88,7 @@ def is_dataset_published(ckan_instance, datapackage):
   return True
 
 def resource_update(ckan_instance, resource_id, resource):
-  click.echo(f"Atualizando recurso: {resource.name}")
+  click.echo(f"Updating data and metadata of resource {resource.name}.")
   payload = {"id": resource_id,
              "name": resource.title,
              "description": resource.description,
@@ -118,20 +101,19 @@ def resource_update(ckan_instance, resource_id, resource):
   return result
 
 def create_datapackage_json_resource(ckan_instance, datapackage):
-  click.echo("Criando datapackage.json")
+  click.echo("Criando recurso: datapackage.json")
   basepath = find_dataset_basepath(datapackage)
   expand_datapackage(datapackage, basepath)
   resource_ckan = ckan_instance.action.resource_create(package_id = datapackage.name,
                                        name = 'datapackage.json',
                                        upload = open(f"{basepath}/temp/datapackage.json", 'rb'))
-  update_datapackage_with_ckan_ids(ckan_instance, datapackage, 'datapackage.json', resource_ckan['id'])
-  update_datapackage_json_resource(ckan_instance, datapackage, resource_ckan['id'])
+  os.system(f'rm -rf {basepath}/temp')
+  return resource_ckan['id']
 
 def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
-  click.echo(f"Atualizando datapackage.json")
+  click.echo(f"Updating resource datapackage.json.")
   basepath = find_dataset_basepath(datapackage)
-  updated_datapackage = load_complete_datapackage(f'{basepath}/datapackage.json')
-  expand_datapackage(updated_datapackage, basepath)
+  expand_datapackage(datapackage, basepath)
   ckan_instance.action.resource_update(id = resource_id,
                                        upload = open(f"{basepath}/temp/datapackage.json", 'rb'))
   os.system(f'rm -rf {basepath}/temp')
@@ -140,59 +122,78 @@ def expand_datapackage(datapackage, basepath):
   datapackage.to_json(f'{basepath}/temp/datapackage.json')
 
 def dataset_update(ckan_instance, datapackage, datastore):
-  click.echo(f"Atualizando conjunto de dados: {datapackage.name}")
-  # Find ckan host url
-  ckan_host = ckan_instance.address
-  # Find datapackage.json id for ckan instance in local datapackage.json file
-  datapackage_id = datapackage['ckan_hosts'][ckan_instance.address]['datapackage.json']
-  # Find datapackage resource in ckan instance
-  ckan_datapackage_resource = ckan_instance.action.resource_show(id = datapackage_id)
-  # Load ckan_datapackage_resource as json
-  remote_datapackage = load_complete_datapackage(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
-  dataset_diff(ckan_instance, datapackage, remote_datapackage, datastore)
+  different_resources = dataset_diff(ckan_instance, datapackage)
+  if len(different_resources) > 0:
+    click.echo(f'Updating dataset {ckan_instance.address}/dataset/{datapackage.name}.')
+    for resource in different_resources:
+      if resource['data_diff'] or resource['metadada_diff']:
+        resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
+        if datastore == True:
+          resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
+    ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
+    update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
+    click.echo(f'Dataset {datapackage.name} updated.')
+  else:
+    click.echo(f'Nothing to be updated in dataset {ckan_instance.address}/dataset/{datapackage.name}.')
 
-def dataset_diff(ckan_instance, datapackage, dataset, datastore):
-  # Remote datapackage.json resources
-  dataset_remote_resources = dataset['ckan_hosts'][ckan_instance.address]
-  # Local datapackage.json resource
-  datapackage_local_resources = datapackage['ckan_hosts'][ckan_instance.address]
-  # Compare resources in datapackage.json remote with local
-  for name in dataset_remote_resources.keys(): # Iterate through remote ckan_hosts property
-    if name != 'datapackage.json':
-      if name in datapackage_local_resources.keys() and name in datapackage.resource_names: # Is this name valid in local ckan_hosts?
-        if name in datapackage.resource_names: # Is this name valid in local resources?
-          local_data_hash = resource_hash(datapackage, name)
-          remote_data_hash = resource_url_hash(ckan_instance, dataset_remote_resources[name])
-          if local_data_hash != remote_data_hash:
-            click.echo(f"Diferenças nos dados do recurso: {name}")
-            resource_update(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
-          if datapackage.get_resource(name) != dataset.get_resource(name) and datastore == True:
-            click.echo(f"Diferenças nos metadados recurso: {name}")
-            resource_update_datastore_metadata(ckan_instance, datapackage_local_resources[name], datapackage.get_resource(name))
-            update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
-            dataset_patch(ckan_instance, datapackage)
-          if datapackage.get_resource(name) != dataset.get_resource(name):
-            update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
-            dataset_patch(ckan_instance, datapackage)
-      else:
-        print(f'Recurso {name} inexistente localmente, `dpckan resource delete` para excluí-lo da instância {ckan_instance.address}')
-    if name == 'datapackage.json':
-      local_data_hash = resource_hash(datapackage, name)
-      remote_data_hash = resource_url_hash(ckan_instance, dataset_remote_resources[name])
-      if local_data_hash != remote_data_hash:
-        click.echo(f"Diferenças nos metadados do conjunto: {dataset.name}")
-        update_datapackage_json_resource(ckan_instance, datapackage, datapackage_local_resources['datapackage.json'])
-        dataset_patch(ckan_instance, datapackage)
-  # Compare resources in datapackage.json local with remote
-  for name in datapackage.resource_names:
-    if name != 'datapackage.json':
-      if name not in dataset.resource_names:
-        print(f'Recurso {name} não existe na instância {ckan_instance.address}. utilize `dpckan resource create` para cria-lo')
+def dataset_diff(ckan_instance, datapackage):
+  different_resources = list()
+  ckan_dataset_resources_ids = get_ckan_dataset_resources_ids(ckan_instance, datapackage)
+  ckan_dataset_resources_names = get_ckan_dataset_resources_names(ckan_dataset_resources_ids)
+  for resource_name in ckan_dataset_resources_names:
+    if resource_name in datapackage.resource_names:
+      resource_id = ckan_dataset_resources_ids[resource_name]
+      resource_diff = get_resource_diff(ckan_instance, datapackage, resource_name, resource_id)
+      if resource_diff['data_diff'] or resource_diff['metadada_diff']:
+        different_resources.append(resource_diff)
+  return different_resources
 
-def dataset_patch(ckan_instance, datapackage):
-  ckan_datapackage = frictionless_to_ckan(datapackage)
-  ckan_datapackage['id'] = datapackage.name
-  ckan_instance.call_action('package_patch', ckan_datapackage)
+def get_ckan_dataset_resources_ids(ckan_instance, datapackage):
+  ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
+  ckan_dataset_extras_property = ckan_dataset.get('extras')
+  ckan_dataset_resources_ids = [i.get('value') for i in ckan_dataset_extras_property if i.get('key') == 'resources_ids']
+  if len(ckan_dataset_resources_ids) == 0:
+    click.echo(f"'resources_ids' property not found in 'extras' field of dataset {ckan_instance.address}/dataset/{datapackage.name}.")
+    sys.exit(1)
+  elif len(ckan_dataset_resources_ids) > 0:
+    ckan_dataset_resources_ids = json.loads(ckan_dataset_resources_ids[0])
+  return ckan_dataset_resources_ids
+
+def get_ckan_dataset_resources_names(ckan_dataset_resources_ids):
+  return [*ckan_dataset_resources_ids.keys()]
+
+def get_resource_diff(ckan_instance, datapackage, resource_name, resource_id):
+  resource_diff = dict()
+  resource_diff['id'] = resource_id
+  resource_diff['name'] = resource_name
+  resource_diff['data_diff'] = is_resource_data_diff(ckan_instance,
+                                                     datapackage,
+                                                     resource_name,
+                                                     resource_id)
+  resource_diff['metadada_diff'] = is_resource_metadata_diff(ckan_instance,
+                                                     datapackage,
+                                                     resource_name,
+                                                     resource_id)
+  return resource_diff
+
+def is_resource_data_diff(ckan_instance, datapackage, resource_name, resource_id):
+  local_data_hash = resource_hash(datapackage, resource_name)
+  ckan_data_hash = resource_url_hash(ckan_instance, resource_id)
+  if local_data_hash != ckan_data_hash:
+    return True
+  else:
+    return False
+
+def is_resource_metadata_diff(ckan_instance, datapackage, resource_name, resource_id):
+  local_resource_metadata = datapackage.get_resource(resource_name)
+  ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
+  ckan_datapackage_resource = ckan_instance.action.resource_show(id=ckan_datapackage_resource_id)
+  remote_dataset_metadata = Package(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
+  remote_resource_metadata = remote_dataset_metadata.get_resource(resource_name)
+  if local_resource_metadata != remote_resource_metadata:
+    return True
+  else:
+    return False
 
 def resource_hash(datapackage, name):
   resource_content = ''
@@ -230,6 +231,12 @@ def resource_url_hash(ckan_instance, resource_id):
   resource_hash = md5_hash.hexdigest()
   return resource_hash
 
+def dataset_patch_resources_ids(ckan_instance, datapackage):
+  ckan_datapackage = dict()
+  ckan_datapackage['extras'] = frictionless_to_ckan(datapackage)['extras']
+  ckan_datapackage['id'] = datapackage.name
+  ckan_instance.call_action('package_patch', ckan_datapackage)
+
 def frictionless_to_ckan(datapackage):
   dataset = f2c.package(datapackage)
   dataset.pop('resources') # Withdraw resources from dataset dictionary to avoid dataset creation with them
@@ -249,125 +256,9 @@ def frictionless_to_ckan(datapackage):
     dataset.update({ "id" : datapackage.name})
   return dataset
 
-def resource_diff(ckan_instance, datapackage, resource_name):
-  dp_dataset = f2c.package(datapackage)
-  ckan_dataset = ckan_instance.action.package_show(id=datapackage.name)
-
-  # to return results
-  diffs = []
-  oks = []
-
-  for res in dp_dataset.get('resources', []):
-    if res['title'] == resource_name:
-      dp_resource = res
-      break
-  else:
-    dp_resource = None
-
-  # it's not easy to detect which is the right resource, because we use the title as name
-  for res in ckan_dataset.get('resources', []):
-    if res['name'] == resource_name:
-      ckan_resource = res
-      break
-  else:
-    ckan_resource = None
-
-  if ckan_resource is None or dp_resource is None:
-    if ckan_resource is None:
-      diffs.append({'field_name': 'ALL', 'error': 'Resource not found in CKAN'})
-    if dp_resource is None:
-      diffs.append({'field_name': 'ALL', 'error': 'Resource not found in DataPackage'})
-    return diffs, []
-
-  fields = ["format", "description"]
-  # TODO use hash functions for the resource file
-
-  for field in fields:
-    if dp_resource.get(field) == ckan_resource.get(field):
-      oks.append(field)
-    else:
-      diffs.append(
-        {
-          'field_name': field,
-          'ckan_value': ckan_resource.get(field),
-          'datapackage_value': dp_resource.get(field)
-        }
-      )
-
-  return diffs, oks
-
 def get_ckan_datapackage_resource_id(ckan_instance, dataset_id):
   # Use show_package endpoint in ckan api to retrieve all dataset's resources
   ckan_datapackage_resources = ckan_instance.action.package_show(id=dataset_id)["resources"]
   # Filtering datackage_id - https://stackoverflow.com/a/48192370/11755155
   ckan_datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
   return ckan_datapackage_resource_id
-
-# def dataset_diff(ckan_instance, datapackage):
-#   dp_dataset = frictionless_to_ckan(datapackage)
-#   ckan_dataset = ckan_instance.action.package_show(id = datapackage.name)
-
-#   diffs = []
-#   oks = []
-#   # TODO, add more
-#   fields = ["title", "version", "url", "license_id"]
-
-#   for field in fields:
-#     if dp_dataset.get(field) == ckan_dataset.get(field):
-#       oks.append(field)
-#     else:
-#       diffs.append(
-#         {
-#           'field_name': field,
-#           'ckan_value': ckan_dataset.get(field),
-#           'datapackage_value': dp_dataset.get(field)
-#         }
-#       )
-
-#   # check org (dataset use ID, datapackage uses name)
-#   if dp_dataset['owner_org'] == ckan_dataset['organization']['name']:
-#     oks.append('owner_org')
-#   else:
-#     diffs.append(
-#         {
-#           'field_name': 'owner_org',
-#           'ckan_value': ckan_dataset['organization']['name'],
-#           'datapackage_value': dp_dataset['owner_org']
-#         }
-#       )
-
-#   # Analyze tags
-#   dp_tags = sorted([t['name'] for t in dp_dataset['tags']])
-#   ckan_tags = sorted([t['name'] for t in ckan_dataset['tags']])
-#   if dp_tags == ckan_tags:
-#     oks.append('tags')
-#   else:
-#     diffs.append(
-#         {
-#           'field_name': 'tags',
-#           'ckan_value': ckan_tags,
-#           'datapackage_value': dp_tags
-#         }
-#       )
-
-#   # Analyze notes
-#   dp_notes = dp_dataset['notes'].replace('\n', '')
-#   ckan_notes = ckan_dataset['notes'].replace('\n', '')
-#   if dp_tags == ckan_tags:
-#     oks.append('notes')
-#   else:
-#     diffs.append(
-#         {
-#           'field_name': 'notes',
-#           'ckan_value': ckan_tags,
-#           'datapackage_value': dp_tags
-#         }
-#       )
-
-#   return diffs, oks
-
-# def resource_hash(package, resouce_name):
-#   if resouce_name != 'datapackage.json':
-#     resource = package.get_resource(resouce_name)
-#     resource.infer(stats=True)
-#     return resource['stats']['hash']

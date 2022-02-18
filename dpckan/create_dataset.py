@@ -4,8 +4,7 @@ from ckanapi import RemoteCKAN
 from dpckan.validations import run_dataset_validations
 from dpckan.functions import (delete_dataset, 
                               dataset_create,
-                              is_dataset_published,
-                              load_complete_datapackage)
+                              load_complete_datapackage,)
 
 def create(ckan_host, ckan_key, datapackage, stop, datastore):
   """
@@ -39,7 +38,7 @@ def create(ckan_host, ckan_key, datapackage, stop, datastore):
   run_dataset_validations(ckan_instance, local_datapackage, stop)
   try:
     dataset_create(ckan_instance, local_datapackage, datastore)
-    print(f"Conjunto de dados {local_datapackage.name} publicado. Datapackage.json Atualizado com id dos recursos publicados.")
+    print(f"Conjunto de dados {local_datapackage.name} criado.")
   except Exception:
     delete_dataset(ckan_instance, local_datapackage.name)
     print(f"Erro durante criação do conjunto de dados {local_datapackage.name}")
