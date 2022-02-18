@@ -1,12 +1,6 @@
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_resource_validations
-from dpckan.docstrings_common_definitions import (host_flag_,
-                                                 key_flag_,
-                                                 datapackage_flag_,
-                                                 resource_id_flag_,
-                                                 resource_name_flag_,
-                                                 stop_flag_,)
 from dpckan.functions import (load_complete_datapackage, 
                               update_datapackage_json_resource, 
                               resource_update,
@@ -14,10 +8,10 @@ from dpckan.functions import (load_complete_datapackage,
                               dataset_update,
                               get_ckan_datapackage_resource_id,)
 
-def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name, stop):
+def update_resource(ckan_host, ckan_key, datapackage, resource_name, resource_id):
   package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_resource_validations(ckan_instance, package, stop)
+  run_resource_validations(ckan_instance, package)
   resource_update(ckan_instance,
                   resource_id,
                   package.get_resource(resource_name))
@@ -29,20 +23,12 @@ def update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name
   # Update ckan datapackage resource
   update_datapackage_json_resource(ckan_instance, package, ckan_datapackage_resource_id)
 
-@click.command()
-@click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
-              help=host_flag_) # -H to respect convention of -h in help option
-@click.option('--ckan-key', '-k', envvar='CKAN_KEY', required=True,
-              help=key_flag_)
-@click.option('--datapackage', '-dp', required=True, default='datapackage.json',
-              help=datapackage_flag_)
-@click.option('--resource-id', '-id', required=True,
-              help=resource_id_flag_)
-@click.option('--resource-name', '-rn', required=True,
-              help=resource_name_flag_)
-@click.option('--stop', '-s', is_flag=True, help=stop_flag_)
-def update_resource_cli(ckan_host, ckan_key, datapackage, resource_id, resource_name, stop):
+@click.command(name='update')
+@click.argument('resource_id', required=True)
+@click.pass_context
+def update_resource_cli(ctx, resource_id):
   """
-  Update resource in a dataset published in ckan.
+  Update dataset resource in a CKAN instance.
   """
-  update_resource(ckan_host, ckan_key, datapackage, resource_id, resource_name, stop)
+  update_resource(ctx.obj['CKAN_HOST'], ctx.obj['CKAN_KEY'], ctx.obj['DATAPACKAGE'], ctx.obj['RESOURCE_NAME'], resource_id)
+  
