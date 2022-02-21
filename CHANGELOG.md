@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+0.1.15 (21/02/2021)
+------------------
+- Registra ids de recursos publicados apenas na instância CKAN e não mais no arquivo datapackage.json local
+- Revisa/simplifica documentação CLI
+- Modifica chamada das funções
+
 0.1.14 (27/12/2021)
 ------------------
 - Corrige funcionamento da flag para acionamento do datastore nunca produzir efeitos
