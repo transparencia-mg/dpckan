@@ -94,6 +94,14 @@ During the execution of the dpckan commands the `frictionless` library will be u
 $ dpckan dataset create --stop
 ```
 
+### Downloading published CKAN dataset
+
+- To download an already published CKAN dataset run the command below:
+
+```bash
+$ dpckan dataset get --dataset-id dataset-link
+```
+
 ### Creating and Updating a Dataset via Terminal
 
 - To create a dataset, run the command in the directory where the datapackage.json file is located:

@@ -39,7 +39,7 @@ def diff_dataset(ckan_host, ckan_key, datapackage):
   package = load_complete_datapackage(datapackage)
 
   ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
-  if not is_dataset_published(ckan_instance, package):
+  if not is_dataset_published(ckan_instance, package.name):
     raise Exception('Conjunto de dados nao existente.')
 
   ckan_instance = RemoteCKAN(ckan_host, apikey=ckan_key)
