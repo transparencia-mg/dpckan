@@ -2,9 +2,11 @@ import sys
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_dataset_validations
-from dpckan.functions import (delete_dataset, 
+from dpckan.functions import (
+                              delete_dataset,
                               dataset_create,
-                              load_complete_datapackage,)
+                              load_complete_datapackage,
+                              )
 
 def create(ckan_host, ckan_key, datapackage, datastore):
   local_datapackage = load_complete_datapackage(datapackage)
@@ -24,4 +26,9 @@ def create_cli(ctx):
   """
   Create dataset in a CKAN instance.
   """
-  create(ctx.obj['CKAN_HOST'], ctx.obj['CKAN_KEY'], ctx.obj['DATAPACKAGE'], ctx.obj['DATASTORE'])
+  create(
+         ctx.obj['CKAN_HOST'],
+         ctx.obj['CKAN_KEY'],
+         ctx.obj['DATAPACKAGE'],
+         ctx.obj['DATASTORE'],
+         )
