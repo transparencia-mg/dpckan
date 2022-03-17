@@ -55,11 +55,22 @@ def resource_create(ckan_instance, datapackage_id, resource, datastore):
                               resource)
   return resource_ckan
 
-def find_dataset_basepath(datapackage):
-  if datapackage.basepath == '':
-    return '.'
+def resource_update(ckan_instance, resource_id, resource, datastore):
+  click.echo(f"Updating data and metadata of resource {resource.name}.")
+  payload = {"id": resource_id,
+             "name": resource.title,
+             "description": resource.description,
+             "url": resource.path}
+  if(resource.path.startswith('http')):
+    resource_ckan = ckan_instance.call_action('resource_update', payload)
   else:
-    return datapackage.basepath
+    resource_ckan = ckan_instance.call_action('resource_update', payload,
+                                       files={'upload': open(os.path.join(resource.basepath, resource.path), 'rb')})
+  if datastore == True:
+    resource_update_datastore_metadata(ckan_instance,
+                                  resource_ckan['id'],
+                                  resource)
+  return resource_ckan
 
 def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
   click.echo(f"Updating resource {resource.name} datastore.")
@@ -93,19 +104,6 @@ def is_dataset_published(ckan_instance, dataset_id):
 
   return True
 
-def resource_update(ckan_instance, resource_id, resource):
-  click.echo(f"Updating data and metadata of resource {resource.name}.")
-  payload = {"id": resource_id,
-             "name": resource.title,
-             "description": resource.description,
-             "url": resource.path}
-  if(resource.path.startswith('http')):
-    result = ckan_instance.call_action('resource_update', payload)
-  else:
-    result = ckan_instance.call_action('resource_update', payload, 
-                                       files={'upload': open(os.path.join(resource.basepath, resource.path), 'rb')})
-  return result
-
 def create_datapackage_json_resource(ckan_instance, datapackage):
   click.echo("Criando recurso: datapackage.json")
   basepath = find_dataset_basepath(datapackage)
@@ -123,6 +121,12 @@ def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
   ckan_instance.action.resource_update(id = resource_id,
                                        upload = open(f"{basepath}/temp/datapackage.json", 'rb'))
   os.system(f'rm -rf {basepath}/temp')
+
+def find_dataset_basepath(datapackage):
+  if datapackage.basepath == '':
+    return '.'
+  else:
+    return datapackage.basepath
 
 def expand_datapackage(datapackage, basepath):
   datapackage.to_json(f'{basepath}/temp/datapackage.json')
