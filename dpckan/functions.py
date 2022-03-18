@@ -190,7 +190,7 @@ def is_resource_data_diff(ckan_instance, datapackage, resource_name, resource_id
 
 def is_resource_metadata_diff(ckan_instance, datapackage, resource_name, resource_id):
   local_resource_metadata = datapackage.get_resource(resource_name)
-  remote_dataset_metadata = (ckan_instance, datapackage.name)
+  remote_dataset_metadata = get_remote_dataset_metadata(ckan_instance, datapackage.name)
   remote_resource_metadata = remote_dataset_metadata.get_resource(resource_name)
   if local_resource_metadata != remote_resource_metadata:
     return True
