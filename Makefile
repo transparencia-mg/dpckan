@@ -29,3 +29,7 @@ tests:
 coverage: ## Apura cobertura de testes
 	@echo "Calculando cobertura de testes"
 	@python -m pytest --cov-config=.coveragerc --cov-report html --cov-branch --cov=dpckan dpckan/tests/ 
+
+coverage-xml: ## Apura cobertura de testes
+	@echo "Calculando cobertura de testes"
+	@python -m pytest --cov-config=.coveragerc --cov-report xml --cov-branch --cov=dpckan dpckan/tests/ 

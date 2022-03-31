@@ -17,4 +17,8 @@ jobs:
           python-version: '3.9'
       - run: pip install .
       - run: pip install -r requirements.txt
-      - run: pytest
+      - run: make coverage-xml
+      - name: Use Codecov to track coverage
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./coverage.xml   # coverage report
