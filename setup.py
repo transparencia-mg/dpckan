@@ -12,7 +12,8 @@ INSTALL_REQUIRES = [
     "python-dotenv>=0.19.1",
     "ckanapi>=4.0.0",
     "frictionless>=4.16.6",
-    "click>=8.0.1"
+    "click>=8.0.1",
+    "validators==0.18.2",
 ]
 
 if __name__ == '__main__':

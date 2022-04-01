@@ -200,7 +200,7 @@ def is_resource_metadata_diff(ckan_instance, datapackage, resource_name, resourc
 def get_remote_dataset_metadata(ckan_instance, dataset_name):
   ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, dataset_name)
   ckan_datapackage_resource = ckan_instance.action.resource_show(id=ckan_datapackage_resource_id)
-  remote_dataset_metadata = Package(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
+  remote_dataset_metadata = Package(ckan_datapackage_resource['url'])
   return remote_dataset_metadata
 
 def resource_hash(datapackage, name):
@@ -268,8 +268,12 @@ def get_ckan_datapackage_resource_id(ckan_instance, dataset_id):
   # Use show_package endpoint in ckan api to retrieve all dataset's resources
   ckan_datapackage_resources = ckan_instance.action.package_show(id=dataset_id)["resources"]
   # Filtering datackage_id - https://stackoverflow.com/a/48192370/11755155
-  ckan_datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
-  return ckan_datapackage_resource_id
+  try:
+    ckan_datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
+    return ckan_datapackage_resource_id
+  except IndexError:
+    click.echo("Aborted: CKAN Dataset doesn't have required datapackage.json resource to complete the job.")
+    sys.exit(1)
 
 def get_dataset(ckan_host, link_id, path):
   if validate_url(link_id) and valid_dataset_url(link_id):
@@ -288,30 +292,32 @@ def download_dataset_resources(ckan_host, dataset_id, path):
   ckan_instance = RemoteCKAN(ckan_host)
   dataset_information = ckan_instance.action.package_show(id = dataset_id)
   dataset_name = dataset_information["name"]
-  clean_dataset_name = dataset_name.replace('-', '_')
   remote_dataset_metadata = get_remote_dataset_metadata(ckan_instance, dataset_name)
   path = path.split("/")
   path = list(filter(None, path))
   path = "/".join(path)
-  if not os.path.exists(f'{path}/{clean_dataset_name}'):
-    click.echo(f'Creating {path}/{clean_dataset_name} folder.')
-    os.makedirs(f'{path}/{clean_dataset_name}')
+  if not os.path.exists(f'{path}/{dataset_name}'):
+    click.echo(f'Creating {path}/{dataset_name} folder.')
+    os.makedirs(f'{path}/{dataset_name}')
   else:
-    click.echo(f"Cleaning {path}/{clean_dataset_name}'s folder contents already existent.")
-    shutil.rmtree(f'{path}/{clean_dataset_name}')
-    os.makedirs(f'{path}/{clean_dataset_name}')
-  for resource in dataset_information["resources"]:
-    resource_url = resource["url"]
-    if resource["name"] == 'datapackage.json':
-      click.echo('Downloading datapackage.json.')
-      request.urlretrieve(resource_url, f'{path}/{clean_dataset_name}/datapackage.json')
+    if click.confirm(f'Folder {path}/{dataset_name} already exist. Do you want to delete it and continue?'):
+      click.echo(f"Cleaning {path}/{dataset_name}'s folder contents.")
+      shutil.rmtree(f'{path}/{dataset_name}')
+      os.makedirs(f'{path}/{dataset_name}')
+      for resource in dataset_information["resources"]:
+        resource_url = resource["url"]
+        if resource_url.split('/')[-1] == 'datapackage.json':
+          click.echo('Downloading datapackage.json.')
+          request.urlretrieve(resource_url, f'{path}/{dataset_name}/datapackage.json')
+        else:
+          file_name = resource_url.split('/')[-1].split('.')[0]
+          file_path = remote_dataset_metadata.get_resource(file_name).path
+          file_path = "/".join(file_path.split("/")[0:-1])
+          os.makedirs(f'{path}/{dataset_name}/{file_path}', exist_ok=True)
+          click.echo(f'Downloading {file_name} resource to {path}/{dataset_name}/{file_path}.')
+          request.urlretrieve(resource_url, f'{path}/{dataset_name}/{file_path}/{file_name}.csv')
     else:
-      file_name = resource_url.split('/')[-1].split('.')[0]
-      file_path = remote_dataset_metadata.get_resource(file_name).path
-      file_path = "/".join(file_path.split("/")[0:-1])
-      os.makedirs(f'{path}/{clean_dataset_name}/{file_path}', exist_ok=True)
-      click.echo(f'Downloading {file_name} resource to {path}/{clean_dataset_name}/{file_path}.')
-      request.urlretrieve(resource_url, f'{path}/{clean_dataset_name}/{file_path}/{file_name}.csv')
+      click.echo('Process aborted.')
 
 def split_dataset_url(dataset_url):
   dataset_url_list = list()
