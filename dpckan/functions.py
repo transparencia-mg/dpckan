@@ -116,6 +116,7 @@ def create_datapackage_json_resource(ckan_instance, datapackage):
 
 def update_datapackage_json_resource(ckan_instance, datapackage, resource_id):
   click.echo(f"Updating resource datapackage.json.")
+  datapackage.pop('resources_ids', None)
   basepath = find_dataset_basepath(datapackage)
   expand_datapackage(datapackage, basepath)
   ckan_instance.action.resource_update(id = resource_id,
