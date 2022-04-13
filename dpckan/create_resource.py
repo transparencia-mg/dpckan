@@ -1,3 +1,4 @@
+import sys
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_resource_validations
@@ -21,14 +22,14 @@ def create(ckan_host, ckan_key, datapackage, datastore, resource_name):
                                     local_datapackage.get_resource(resource_name),
                                     datastore,
                                     )
-      # Update dataset with new resource id
+    # Update dataset with new resource id
     local_datapackage['resources_ids'] = get_ckan_dataset_resources_ids(ckan_instance, local_datapackage)
     local_datapackage['resources_ids'][resource_name] = resource_ckan['id']
     ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, local_datapackage.name)
     dataset_patch_resources_ids(ckan_instance, local_datapackage)
     update_datapackage_json_resource(ckan_instance, local_datapackage, ckan_datapackage_resource_id)
   except Exception:
-    print(f"Something went wrong during resource {local_datapackage.name} creation")
+    print(f"Something went wrong during resource {resource_name} creation")
     sys.exit(1)
 
 @click.command(name='create')
