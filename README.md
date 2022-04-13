@@ -1,6 +1,6 @@
-[![Coverage](https://img.shields.io/codecov/c/github/transparencia-mg/dpckan/dev)](https://codecov.io/gh/transparencia-mg/dpckan)
-
 # Data package manager para CKAN (dpckan)
+
+[![Coverage](https://img.shields.io/codecov/c/github/transparencia-mg/dpckan/dev)](https://codecov.io/gh/transparencia-mg/dpckan)
 
 O `dpckan` é um pacote Python, acessível via interface [CLI](https://pt.wikipedia.org/wiki/Interface_de_linha_de_comandos), utilizado para criação e atualização de conjuntos de dados e recursos (documentados de acordo com o padrão de metadados [Frictionless Data](https://frictionlessdata.io/)) em uma instância do [CKAN](https://ckan.org/).
 
