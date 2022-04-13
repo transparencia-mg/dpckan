@@ -1,27 +1,28 @@
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_resource_validations
-from dpckan.functions import (load_complete_datapackage, 
+from dpckan.functions import (
+                              load_complete_datapackage,
                               update_datapackage_json_resource, 
                               resource_update,
                               resource_update_datastore_metadata,
-                              dataset_update,
-                              get_ckan_datapackage_resource_id,)
+                              get_ckan_datapackage_resource_id,
+                              )
 
-def update_resource(ckan_host, ckan_key, datapackage, resource_name, resource_id):
-  package = load_complete_datapackage(datapackage)
+def update_resource(ckan_host, ckan_key, datapackage, datastore, resource_name, resource_id):
+  local_package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_resource_validations(ckan_instance, package)
+  run_resource_validations(ckan_instance, local_package)
   resource_update(ckan_instance,
                   resource_id,
-                  package.get_resource(resource_name))
+                  local_package.get_resource(resource_name))
   resource_update_datastore_metadata(ckan_instance,
                             resource_id,
-                            package.get_resource(resource_name))
+                            local_package.get_resource(resource_name))
   # Find ckan datapackage resource id
-  ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, package.name)
+  ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, local_package.name)
   # Update ckan datapackage resource
-  update_datapackage_json_resource(ckan_instance, package, ckan_datapackage_resource_id)
+  update_datapackage_json_resource(ckan_instance, local_package, ckan_datapackage_resource_id)
 
 @click.command(name='update')
 @click.argument('resource_id', required=True)
@@ -30,5 +31,12 @@ def update_resource_cli(ctx, resource_id):
   """
   Update dataset resource in a CKAN instance.
   """
-  update_resource(ctx.obj['CKAN_HOST'], ctx.obj['CKAN_KEY'], ctx.obj['DATAPACKAGE'], ctx.obj['RESOURCE_NAME'], resource_id)
+  update_resource(
+                  ctx.obj['CKAN_HOST'],
+                  ctx.obj['CKAN_KEY'],
+                  ctx.obj['DATAPACKAGE'],
+                  ctx.obj['DATASTORE'],
+                  ctx.obj['RESOURCE_NAME'],
+                  resource_id,
+                  )
   

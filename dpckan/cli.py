@@ -1,8 +1,8 @@
 import click
-from dpckan.create_dataset import create_cli
-from dpckan.update_dataset import update_cli
-from dpckan.create_resource import create_resource_cli
-from dpckan.update_resource import update_resource_cli
+from dpckan.create_dataset import create_cli as dc
+from dpckan.update_dataset import update_cli as du
+from dpckan.create_resource import create_cli as rc
+from dpckan.update_resource import update_resource_cli as ru
 from dpckan.diff_dataset import diff_dataset_cli
 from dpckan.diff_resource import diff_resource_cli
 from dpckan.get_dataset import get_dataset_cli
@@ -24,7 +24,12 @@ from dpckan.get_dataset import get_dataset_cli
                    Local path to datapackage.json file.
                    Not required if the command run in the same directory as the datapackage.json file.
                    ''')
-@click.option('--datastore/--no-datastore', default=False, help='Load resource table schema to DataStore Data Dictionary.')
+@click.option('--datastore/--no-datastore', default=False,
+             help='''
+             Load resource table schema to Data Store Data Dictionary.
+             -no--datastore = False set as default.
+             If you want load Data Store Data Dictionary --datastore flag must be informed.
+             ''')
 @click.pass_context
 def cli(ctx, ckan_host, ckan_key, datapackage, datastore):
   """
@@ -43,8 +48,8 @@ def dataset():
   """
   pass
 
-dataset.add_command(create_cli)
-dataset.add_command(update_cli)
+dataset.add_command(dc)
+dataset.add_command(du)
 dataset.add_command(diff_dataset_cli)
 dataset.add_command(get_dataset_cli)
 
@@ -58,6 +63,6 @@ def resource(ctx, resource_name):
   ctx.ensure_object(dict)
   ctx.obj['RESOURCE_NAME'] = resource_name
 
-resource.add_command(create_resource_cli)
-resource.add_command(update_resource_cli)
+resource.add_command(rc)
+resource.add_command(ru)
 resource.add_command(diff_resource_cli)

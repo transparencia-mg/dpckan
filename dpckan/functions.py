@@ -26,32 +26,34 @@ def dataset_create(ckan_instance, datapackage, datastore):
   ckan_instance.call_action('package_create', remote_datapackage)
   resources_ids = {}
   for resource_name in datapackage.resource_names:
-    resource_ckan = resource_create(ckan_instance,
+    resource_ckan = resource_create(
+                                    ckan_instance,
                                     datapackage.name,
-                                    datapackage.get_resource(resource_name))
-    if datastore == True:
-      resource_update_datastore_metadata(ckan_instance,
-                                resource_ckan['id'],
-                                datapackage.get_resource(resource_name)
-                                )
+                                    datapackage.get_resource(resource_name),
+                                    datastore,
+                                    )
     resources_ids[resource_name] = resource_ckan['id']
   ckan_datapackage_resource_id = create_datapackage_json_resource(ckan_instance, datapackage)
   resources_ids['datapackage.json'] = ckan_datapackage_resource_id
   datapackage['resources_ids'] = resources_ids
   dataset_patch_resources_ids(ckan_instance, datapackage)
 
-def resource_create(ckan_instance, datapackage_id, resource):
-  click.echo(f"Criando recurso: {resource.name}")
+def resource_create(ckan_instance, datapackage_id, resource, datastore):
+  click.echo(f"Creating resource: {resource.name}")
   payload = {"package_id":datapackage_id,
                "name": resource.title,
                "description": resource.description,
                "url": resource.path}
   if(resource.path.startswith('http')):
-    result = ckan_instance.call_action('resource_create', payload)
+    resource_ckan = ckan_instance.call_action('resource_create', payload)
   else:
     upload_files = {'upload': open(os.path.join(resource.basepath, resource.path), 'rb')}
-    result = ckan_instance.call_action('resource_create', payload, files=upload_files)
-  return result
+    resource_ckan = ckan_instance.call_action('resource_create', payload, files=upload_files)
+  if datastore == True:
+    resource_update_datastore_metadata(ckan_instance,
+                              resource_ckan['id'],
+                              resource)
+  return resource_ckan
 
 def find_dataset_basepath(datapackage):
   if datapackage.basepath == '':
