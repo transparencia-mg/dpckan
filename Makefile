@@ -1,3 +1,5 @@
+.PHONY: coverage
+
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
@@ -23,3 +25,11 @@ publish-build: ## Publica pacote em Pypi
 tests:
 	@echo "Realizando Testes"
 	@python dpckan/tests/dpckan_test.py
+
+coverage: ## Apura cobertura de testes
+	@echo "Calculando cobertura de testes"
+	@python -m pytest --cov-config=.coveragerc --cov-report html --cov-branch --cov=dpckan dpckan/tests/ 
+
+coverage-xml: ## Apura cobertura de testes
+	@echo "Calculando cobertura de testes"
+	@python -m pytest --cov-config=.coveragerc --cov-report xml --cov-branch --cov=dpckan dpckan/tests/ 
