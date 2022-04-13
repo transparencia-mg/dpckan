@@ -5,7 +5,7 @@ from dpckan.create_resource import create_resource_cli
 from dpckan.update_resource import update_resource_cli
 from dpckan.diff_dataset import diff_dataset_cli
 from dpckan.diff_resource import diff_resource_cli
-
+from dpckan.get_dataset import get_dataset_cli
 
 @click.group(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option('--ckan-host', '-H', envvar='CKAN_HOST', required=True,
@@ -46,6 +46,7 @@ def dataset():
 dataset.add_command(create_cli)
 dataset.add_command(update_cli)
 dataset.add_command(diff_dataset_cli)
+dataset.add_command(get_dataset_cli)
 
 @cli.group()
 @click.argument('resource_name', required=True)

@@ -31,7 +31,7 @@ def is_host_valid(ckan_instance):
     sys.exit(1)
 
 def is_dataset_published_check(ckan_instance, package):
-  if is_dataset_published(ckan_instance, package):
+  if is_dataset_published(ckan_instance, package.name):
     click.echo(f'Dataset {package.name} já publicado acesse {ckan_instance.address}/dataset/{package.name}')
     sys.exit(1)
 

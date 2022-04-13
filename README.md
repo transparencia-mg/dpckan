@@ -102,6 +102,13 @@ Durante a execução dos comandos dpckan a biblioteca `frictionless` será utili
 ```bash
 $ dpckan dataset create --stop
 ```
+### Baixando conjuntos de dados publicados em instância CKAN
+
+- Para baixar um conjunto de dados publicado em alguma instância do CKAN utilize o comando abaixo:
+
+```bash
+$ dpckan dataset get --dataset-id dataset-link
+```
 
 ### Criando e atualizando um conjunto de dados via terminal
 

@@ -4,9 +4,13 @@ import click
 import hashlib
 import json
 from urllib.request import urlopen
+from urllib import request
 from frictionless_ckan_mapper import frictionless_to_ckan as f2c
 from ckanapi import RemoteCKAN
 from frictionless import Package
+import shutil
+import validators
+import re
 
 def load_complete_datapackage(source):
   datapackage = Package(source)
@@ -76,9 +80,9 @@ def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
 def delete_dataset(ckan_instance, dataset_name):
   ckan_instance.action.package_delete(id = dataset_name)
 
-def is_dataset_published(ckan_instance, datapackage):
-  try: 
-    result = ckan_instance.action.package_show(id = datapackage.name)
+def is_dataset_published(ckan_instance, dataset_id):
+  try:
+    result = ckan_instance.action.package_show(id = dataset_id)
   except Exception:
     return False
 
@@ -186,14 +190,18 @@ def is_resource_data_diff(ckan_instance, datapackage, resource_name, resource_id
 
 def is_resource_metadata_diff(ckan_instance, datapackage, resource_name, resource_id):
   local_resource_metadata = datapackage.get_resource(resource_name)
-  ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
-  ckan_datapackage_resource = ckan_instance.action.resource_show(id=ckan_datapackage_resource_id)
-  remote_dataset_metadata = Package(json.loads(urlopen(ckan_datapackage_resource['url']).read()))
+  remote_dataset_metadata = get_remote_dataset_metadata(ckan_instance, datapackage.name)
   remote_resource_metadata = remote_dataset_metadata.get_resource(resource_name)
   if local_resource_metadata != remote_resource_metadata:
     return True
   else:
     return False
+
+def get_remote_dataset_metadata(ckan_instance, dataset_name):
+  ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, dataset_name)
+  ckan_datapackage_resource = ckan_instance.action.resource_show(id=ckan_datapackage_resource_id)
+  remote_dataset_metadata = Package(ckan_datapackage_resource['url'])
+  return remote_dataset_metadata
 
 def resource_hash(datapackage, name):
   resource_content = ''
@@ -260,5 +268,89 @@ def get_ckan_datapackage_resource_id(ckan_instance, dataset_id):
   # Use show_package endpoint in ckan api to retrieve all dataset's resources
   ckan_datapackage_resources = ckan_instance.action.package_show(id=dataset_id)["resources"]
   # Filtering datackage_id - https://stackoverflow.com/a/48192370/11755155
-  ckan_datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
-  return ckan_datapackage_resource_id
+  try:
+    ckan_datapackage_resource_id = [i["id"] for i in ckan_datapackage_resources if i["url"].split('/')[-1] == "datapackage.json"][0]
+    return ckan_datapackage_resource_id
+  except IndexError:
+    click.echo("Aborted: CKAN Dataset doesn't have required datapackage.json resource to complete the job.")
+    sys.exit(1)
+
+def get_dataset(ckan_host, link_id, path):
+  if validate_url(link_id) and valid_dataset_url(link_id):
+    ckan_host = split_dataset_url(link_id)[0]
+    dataset_id = split_dataset_url(link_id)[1]
+    download_dataset_resources(ckan_host, dataset_id, path)
+  elif is_uuid(link_id):
+    download_dataset_resources(ckan_host, link_id, path)
+  elif not is_uuid(link_id) and valid_dataset_url(f"{ckan_host}/dataset/{link_id}"):
+    download_dataset_resources(ckan_host, link_id, path)
+  else:
+    click.echo('Wrong arguments to get dataset. Chek dataset link or CKAN_HOST with dataset id or name informed.')
+    sys.exit(1)
+
+def download_dataset_resources(ckan_host, dataset_id, path):
+  ckan_instance = RemoteCKAN(ckan_host)
+  dataset_information = ckan_instance.action.package_show(id = dataset_id)
+  dataset_name = dataset_information["name"]
+  remote_dataset_metadata = get_remote_dataset_metadata(ckan_instance, dataset_name)
+  path = path.split("/")
+  path = list(filter(None, path))
+  path = "/".join(path)
+  if not os.path.exists(f'{path}/{dataset_name}'):
+    click.echo(f'Creating {path}/{dataset_name} folder.')
+    os.makedirs(f'{path}/{dataset_name}')
+  else:
+    if click.confirm(f'Folder {path}/{dataset_name} already exist. Do you want to delete it and continue?'):
+      click.echo(f"Cleaning {path}/{dataset_name}'s folder contents.")
+      shutil.rmtree(f'{path}/{dataset_name}')
+      os.makedirs(f'{path}/{dataset_name}')
+      for resource in dataset_information["resources"]:
+        resource_url = resource["url"]
+        if resource_url.split('/')[-1] == 'datapackage.json':
+          click.echo('Downloading datapackage.json.')
+          request.urlretrieve(resource_url, f'{path}/{dataset_name}/datapackage.json')
+        else:
+          file_name = resource_url.split('/')[-1].split('.')[0]
+          file_path = remote_dataset_metadata.get_resource(file_name).path
+          file_path = "/".join(file_path.split("/")[0:-1])
+          os.makedirs(f'{path}/{dataset_name}/{file_path}', exist_ok=True)
+          click.echo(f'Downloading {file_name} resource to {path}/{dataset_name}/{file_path}.')
+          request.urlretrieve(resource_url, f'{path}/{dataset_name}/{file_path}/{file_name}.csv')
+    else:
+      click.echo('Process aborted.')
+
+def split_dataset_url(dataset_url):
+  dataset_url_list = list()
+  dataset_url_splited = dataset_url.split('//')
+  url_first_part = dataset_url_splited[0]
+  url_second_part = dataset_url_splited[1].split('/')[0]
+  host = f'{url_first_part}//{url_second_part}'
+  dataset_id = dataset_url_splited[1].split('/')[2]
+  dataset_url_list.append(host)
+  dataset_url_list.append(dataset_id)
+  return dataset_url_list
+
+def valid_dataset_url(dataset_url):
+  dataset_len = len(dataset_url.split('/'))
+  if dataset_len >= 5:
+    ckan_host = split_dataset_url(dataset_url)[0]
+    dataset_id = split_dataset_url(dataset_url)[1]
+    ckan_instance = RemoteCKAN(ckan_host)
+    if is_dataset_published(ckan_instance, dataset_id):
+      return True
+    else:
+      return False
+
+def validate_url(url):
+  response = validators.url(url)
+  if response:
+    return True
+  else:
+    return False
+
+def is_uuid(uuid):
+  matched = re.match('[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}', uuid)
+  if bool(matched) == True:
+    return True
+  else:
+    return False
