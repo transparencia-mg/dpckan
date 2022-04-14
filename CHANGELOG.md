@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.17 (14/03/2022)
+------------------
+- Bug Fix na chamada da função `resource_update` dentro de `dataset_update`
+
 0.1.16 (14/03/2022)
 ------------------
 - Inclusão função `dpckan dataset get`
