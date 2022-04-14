@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+0.1.16 (14/03/2022)
+------------------
+- Inclusão função `dpckan dataset get`
+- Correções flag `--datastore`
+- Correções `dpckan resource create`
+
 0.1.15 (21/02/2021)
 ------------------
 - Registra ids de recursos publicados apenas na instância CKAN e não mais no arquivo datapackage.json local
