@@ -3,11 +3,13 @@ from dpckan.functions import (
                               load_complete_datapackage,
                               get_ckan_dataset_resources_names,
                               find_dataset_basepath,
+                              resource_hash,
                               is_uuid,
                               )
 import pytest
 
 source = './dpckan/tests/dataset_test_1/datapackage.json'
+package = Package(source)
 
 def test_load_complete_datapackage_dict():
     package = load_complete_datapackage(source)
@@ -26,7 +28,6 @@ def test_get_ckan_dataset_resources_names_list():
 
 @pytest.mark.parametrize("expect",[('./dpckan/tests/dataset_test_1'),('.')])
 def test_find_dataset_basepath(expect):
-  package = Package(source)
   if expect == './dpckan/tests/dataset_test_1':
     assert find_dataset_basepath(package) == './dpckan/tests/dataset_test_1'
   else:

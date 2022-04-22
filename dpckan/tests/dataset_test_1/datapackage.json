@@ -3,7 +3,7 @@
   "resources": [
     {
       "name": "letters-consonants",
-      "path": "./data/letters-consonants.csv",
+      "path": "./dpckan/tests/dataset_test_1/data/letters-consonants.csv",
       "profile": "tabular-data-resource",
       "schema": {
         "fields": [
@@ -40,7 +40,7 @@
     },
     {
       "name": "letters",
-      "path": "./data/letters-vowels.csv",
+      "path": "./dpckan/tests/dataset_test_1/data/letters-vowels.csv",
       "profile": "tabular-data-resource",
       "schema": "./schema.json",
       "dialect": {
@@ -82,12 +82,5 @@
       "path": "http://www.cboe.com/micro/vix/historical.aspx",
       "title": "CBOE VIX Page"
     }
-  ],
-  "ckan_hosts": {
-    "https://homologa.cge.mg.gov.br": {
-      "letters-consonants": "aa4c800d-63c2-41c1-ac41-7a83e08ee819",
-      "letters": "c7da457b-9da0-4a82-a173-a513fc416dda",
-      "datapackage.json": "8b9c659b-23c2-4bdf-9e7b-023f99c4ab62"
-    }
-  }
+  ]
 }
