@@ -2,6 +2,7 @@ from frictionless import Package
 from dpckan.functions import (
                               load_complete_datapackage,
                               get_ckan_dataset_resources_names,
+                              find_dataset_basepath,
                               is_uuid,
                               )
 import pytest
@@ -22,6 +23,15 @@ def test_get_ckan_dataset_resources_names_list():
                                 'datapackage.json': 'd19de465-16d1-445a-934f-d11f29cadbee',}
   ckan_dataset_resources_names = get_ckan_dataset_resources_names(ckan_dataset_resources_ids)
   assert isinstance(ckan_dataset_resources_names, list) == True
+
+@pytest.mark.parametrize("expect",[('./dpckan/tests/dataset_test_1'),('.')])
+def test_find_dataset_basepath(expect):
+  package = Package(source)
+  if expect == './dpckan/tests/dataset_test_1':
+    assert find_dataset_basepath(package) == './dpckan/tests/dataset_test_1'
+  else:
+    package.basepath = ''
+    assert find_dataset_basepath(package) == '.'
 
 @pytest.mark.parametrize(
                           "_input,expect",
