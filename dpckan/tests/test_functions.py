@@ -35,6 +35,16 @@ def test_find_dataset_basepath(expect):
     assert find_dataset_basepath(package) == '.'
 
 @pytest.mark.parametrize(
+                          "name,expect",
+                          [
+                           ('letters-consonants', 'a4a881d0d7070e3357a2ded041c51010'),
+                           ('letters', 'b8f894cd1bbbaac091920d7d5bf681ea'),
+                           # ('datapackage.json', 'bf39f25e44d331fb44e67fb32b6e795b'),                           
+                          ])
+def test_resource_hash(name,expect):
+  assert resource_hash(package, name) == expect
+
+@pytest.mark.parametrize(
                           "_input,expect",
                           [
                            ('078c9abe-d53d-4e3c-8165-fabbe2d20e0c', True),
