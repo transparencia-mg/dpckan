@@ -136,16 +136,24 @@ def dataset_update(ckan_instance, datapackage, datastore):
   different_resources = dataset_diff(ckan_instance, datapackage)
   if len(different_resources) > 0:
     click.echo(f'Updating dataset {ckan_instance.address}/dataset/{datapackage.name}.')
-    for resource in different_resources:
-      if resource['data_diff'] or resource['metadada_diff']:
-        resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']), datastore)
-        if datastore == True:
-          resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
     ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
+    for resource in different_resources:
+      if resource['name'] != 'datapackage.json':
+        if resource['data_diff'] or resource['metadada_diff']:
+          resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']), datastore)
+          if datastore == True:
+            resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
     update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
+    dataset_patch(ckan_instance, datapackage)
     click.echo(f'Dataset {datapackage.name} updated.')
   else:
     click.echo(f'Nothing to be updated in dataset {ckan_instance.address}/dataset/{datapackage.name}.')
+
+def dataset_patch(ckan_instance, datapackage):
+  datapackage['resources_ids'] = get_ckan_dataset_resources_ids(ckan_instance, datapackage)
+  ckan_datapackage = frictionless_to_ckan(datapackage)
+  ckan_datapackage['id'] = datapackage.name
+  ckan_instance.call_action('package_patch', ckan_datapackage)
 
 def dataset_diff(ckan_instance, datapackage):
   different_resources = list()
