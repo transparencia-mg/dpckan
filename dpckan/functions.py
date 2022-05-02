@@ -132,7 +132,7 @@ def find_dataset_basepath(datapackage):
 def expand_datapackage(datapackage, basepath):
   datapackage.to_json(f'{basepath}/temp/datapackage.json')
 
-def dataset_update(ckan_instance, datapackage, datastore):
+def dataset_update(ckan_instance, datapackage, datastore, exit_code):
   different_resources = dataset_diff(ckan_instance, datapackage)
   if len(different_resources) > 0:
     click.echo(f'Updating dataset {ckan_instance.address}/dataset/{datapackage.name}.')
@@ -148,6 +148,8 @@ def dataset_update(ckan_instance, datapackage, datastore):
     click.echo(f'Dataset {datapackage.name} updated.')
   else:
     click.echo(f'Nothing to be updated in dataset {ckan_instance.address}/dataset/{datapackage.name}.')
+    if exit_code == True:
+      sys.exit(1)
 
 def dataset_patch(ckan_instance, datapackage):
   datapackage['resources_ids'] = get_ckan_dataset_resources_ids(ckan_instance, datapackage)

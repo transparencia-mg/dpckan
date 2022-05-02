@@ -9,7 +9,7 @@ from dpckan.functions import (
                               get_ckan_datapackage_resource_id,
                               )
 
-def update_resource(ckan_host, ckan_key, datapackage, datastore, resource_name, resource_id):
+def update_resource(ckan_host, ckan_key, datapackage, datastore, exit_code, resource_name, resource_id):
   local_package = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   run_resource_validations(ckan_instance, local_package)
@@ -24,8 +24,9 @@ def update_resource(ckan_host, ckan_key, datapackage, datastore, resource_name, 
     # Update ckan datapackage resource
     update_datapackage_json_resource(ckan_instance, local_package, ckan_datapackage_resource_id)
   except Exception:
-    print(f"Something went wrong during resource {resource_name} updating")
-    sys.exit(1)
+    print(f"Something went wrong during resource {resource_name} updating")    
+    if exit_code == True:
+      sys.exit(1)
 
 @click.command(name='update')
 @click.argument('resource_id', required=True)
@@ -39,6 +40,7 @@ def update_resource_cli(ctx, resource_id):
                   ctx.obj['CKAN_KEY'],
                   ctx.obj['DATAPACKAGE'],
                   ctx.obj['DATASTORE'],
+                  ctx.obj['EXIT_CODE'],
                   ctx.obj['RESOURCE_NAME'],
                   resource_id,
                   )
