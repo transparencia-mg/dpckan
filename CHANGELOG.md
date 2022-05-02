@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+0.1.18 (02/04/2022)
+------------------
+- Adiciona flag --exit-code
+- Bug Fix na chamada da função `dataset update` que não estava atualizando metadados do conjunto
+
 0.1.17 (14/03/2022)
 ------------------
 - Bug Fix na chamada da função `resource_update` dentro de `dataset_update`
