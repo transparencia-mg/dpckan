@@ -11,7 +11,7 @@ from dpckan.functions import (
                               dataset_patch_resources_ids,
                               )
 
-def create(ckan_host, ckan_key, datapackage, datastore, resource_name):
+def create(ckan_host, ckan_key, datapackage, datastore, exit_code, resource_name):
   local_datapackage = load_complete_datapackage(datapackage)
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
   run_resource_validations(ckan_instance, local_datapackage)
@@ -30,7 +30,8 @@ def create(ckan_host, ckan_key, datapackage, datastore, resource_name):
     update_datapackage_json_resource(ckan_instance, local_datapackage, ckan_datapackage_resource_id)
   except Exception:
     print(f"Something went wrong during resource {resource_name} creation")
-    sys.exit(1)
+    if exit_code == True:
+      sys.exit(1)
 
 @click.command(name='create')
 @click.pass_context
@@ -43,5 +44,6 @@ def create_cli(ctx):
          ctx.obj['CKAN_KEY'],
          ctx.obj['DATAPACKAGE'],
          ctx.obj['DATASTORE'],
+         ctx.obj['EXIT_CODE'],
          ctx.obj['RESOURCE_NAME'],
         )

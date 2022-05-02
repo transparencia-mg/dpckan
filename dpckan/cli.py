@@ -30,8 +30,14 @@ from dpckan.get_dataset import get_dataset_cli
              -no--datastore = False set as default.
              If you want load Data Store Data Dictionary --datastore flag must be informed.
              ''')
+@click.option('--exit-code/--no-exit-code', default=False,
+             help='''
+             Set exit code to 1.
+             --no-exit-code = False set as default.
+             If you want exit code set to 1 exit-code flag must be informed.
+             ''')
 @click.pass_context
-def cli(ctx, ckan_host, ckan_key, datapackage, datastore):
+def cli(ctx, ckan_host, ckan_key, datapackage, datastore, exit_code):
   """
     Conjunto de comandos criados para publicações/atualizações de datasets em instâncias CKAN
   """
@@ -40,6 +46,7 @@ def cli(ctx, ckan_host, ckan_key, datapackage, datastore):
   ctx.obj['CKAN_KEY'] = ckan_key
   ctx.obj['DATAPACKAGE'] = datapackage
   ctx.obj['DATASTORE'] = datastore
+  ctx.obj['EXIT_CODE'] = exit_code
 
 @cli.group()
 def dataset():
