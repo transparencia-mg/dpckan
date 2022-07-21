@@ -343,16 +343,17 @@ def download_dataset(ckan_host, dataset_id, path):
 def download_dataset_resources(resources, remote_dataset_metadata, path, dataset_name):
   for resource in resources:
     resource_url = resource["url"]
-    if resource_url.split('/')[-1] == 'datapackage.json':
+    filename = os.path.basename(resource_url)
+    stem = filename.split('.')[0] # filename.csv.gz should return filename, not filename.csv
+    if filename == 'datapackage.json':
       click.echo('Downloading datapackage.json.')
       request.urlretrieve(resource_url, f'{path}/{dataset_name}/datapackage.json')
     else:
-      file_name = resource_url.split('/')[-1].split('.')[0]
-      file_path = remote_dataset_metadata.get_resource(file_name).path
-      file_dir = "/".join(file_path.split("/")[0:-1])
-      os.makedirs(f'{path}/{dataset_name}/{file_dir}', exist_ok=True)
-      click.echo(f'Downloading {file_name} resource to {path}/{dataset_name}/{file_dir}.')
-      request.urlretrieve(resource_url, f'{path}/{dataset_name}/{file_path}')
+      filepath = remote_dataset_metadata.get_resource(stem).path # if the resource name is not equal to the filename this code breaks
+      dir = os.path.dirname(filepath)
+      os.makedirs(f'{path}/{dataset_name}/{dir}', exist_ok=True)
+      click.echo(f'Downloading {filename} resource to {path}/{dataset_name}/{dir}.')
+      request.urlretrieve(resource_url, f'{path}/{dataset_name}/{filepath}')
 
 def split_dataset_url(dataset_url):
   dataset_url_list = list()
