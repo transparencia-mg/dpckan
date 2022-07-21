@@ -349,10 +349,10 @@ def download_dataset_resources(resources, remote_dataset_metadata, path, dataset
     else:
       file_name = resource_url.split('/')[-1].split('.')[0]
       file_path = remote_dataset_metadata.get_resource(file_name).path
-      file_path = "/".join(file_path.split("/")[0:-1])
-      os.makedirs(f'{path}/{dataset_name}/{file_path}', exist_ok=True)
-      click.echo(f'Downloading {file_name} resource to {path}/{dataset_name}/{file_path}.')
-      request.urlretrieve(resource_url, f'{path}/{dataset_name}/{file_path}/{file_name}.csv')
+      file_dir = "/".join(file_path.split("/")[0:-1])
+      os.makedirs(f'{path}/{dataset_name}/{file_dir}', exist_ok=True)
+      click.echo(f'Downloading {file_name} resource to {path}/{dataset_name}/{file_dir}.')
+      request.urlretrieve(resource_url, f'{path}/{dataset_name}/{file_path}')
 
 def split_dataset_url(dataset_url):
   dataset_url_list = list()
