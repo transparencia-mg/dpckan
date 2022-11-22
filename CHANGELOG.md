@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.19 (22/11/2022)
+------------------
+- Melhora mensagens de log informando qual host está sendo utilizado
+
 0.1.18 (02/04/2022)
 ------------------
 - Adiciona flag --exit-code
