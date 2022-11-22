@@ -22,7 +22,6 @@ def load_complete_datapackage(source):
 def dataset_create(ckan_instance, datapackage, datastore):
   # In this context datapackage is frictionless package object from datapackage.json local file
   remote_datapackage = frictionless_to_ckan(datapackage)
-  click.echo(f"Criando conjunto: {datapackage.name}")
   ckan_instance.call_action('package_create', remote_datapackage)
   resources_ids = {}
   for resource_name in datapackage.resource_names:
@@ -135,7 +134,6 @@ def expand_datapackage(datapackage, basepath):
 def dataset_update(ckan_instance, datapackage, datastore, exit_code):
   different_resources = dataset_diff(ckan_instance, datapackage)
   if len(different_resources) > 0:
-    click.echo(f'Updating dataset {ckan_instance.address}/dataset/{datapackage.name}.')
     ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
     for resource in different_resources:
       if resource['name'] != 'datapackage.json':
@@ -145,7 +143,6 @@ def dataset_update(ckan_instance, datapackage, datastore, exit_code):
             resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
     update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
     dataset_patch(ckan_instance, datapackage)
-    click.echo(f'Dataset {datapackage.name} updated.')
   else:
     click.echo(f'Nothing to be updated in dataset {ckan_instance.address}/dataset/{datapackage.name}.')
     if exit_code == True:
@@ -374,3 +371,7 @@ def is_uuid(uuid):
     return True
   else:
     return False
+
+def dataset_path(ckan_host, datapackage):
+  dataset = f"{ckan_host}/dataset/{datapackage.name}"
+  return dataset

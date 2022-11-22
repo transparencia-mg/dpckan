@@ -9,13 +9,16 @@ from dpckan.functions import (
                               get_ckan_dataset_resources_ids,
                               get_ckan_datapackage_resource_id,
                               dataset_patch_resources_ids,
+                              dataset_path,
                               )
 
 def create(ckan_host, ckan_key, datapackage, datastore, exit_code, resource_name):
   local_datapackage = load_complete_datapackage(datapackage)
+  dataset = dataset_path(ckan_host, local_datapackage)
+  click.echo(f"Creating resource on {dataset}")
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_resource_validations(ckan_instance, local_datapackage)
   try:
+    run_resource_validations(ckan_instance, local_datapackage)
     resource_ckan = resource_create(
                                     ckan_instance,
                                     local_datapackage.name,
@@ -28,8 +31,9 @@ def create(ckan_host, ckan_key, datapackage, datastore, exit_code, resource_name
     ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, local_datapackage.name)
     dataset_patch_resources_ids(ckan_instance, local_datapackage)
     update_datapackage_json_resource(ckan_instance, local_datapackage, ckan_datapackage_resource_id)
+    click.echo(f"Resource {resource_name} created on {dataset}")
   except Exception:
-    print(f"Something went wrong during resource {resource_name} creation")
+    print(f"Error creating {resource_name} resource on {dataset}")
     if exit_code == True:
       sys.exit(1)
 

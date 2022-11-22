@@ -1,8 +1,11 @@
 import json
 import sys
 import click
-from dpckan.functions import is_dataset_published
 from frictionless import validate
+from dpckan.functions import (
+                              is_dataset_published,
+                              dataset_path,
+                              )
 
 def run_dataset_validations(ckan_instance, package):
   """
@@ -27,18 +30,20 @@ def is_host_valid(ckan_instance):
   try:
     ckan_exist = demo.action.site_read()
   except:
-    print(f'CKAN Host {ckan_instance.address} inexistente.')
+    print(f'Host {ckan_instance.address} not exist')
     sys.exit(1)
 
 def is_dataset_published_check(ckan_instance, package):
+  dataset = dataset_path(ckan_instance.address, package)
   if is_dataset_published(ckan_instance, package.name):
-    click.echo(f'Dataset {package.name} já publicado acesse {ckan_instance.address}/dataset/{package.name}')
+    click.echo(f'Dataset {dataset} already published')
     sys.exit(1)
 
 def is_owner_org_valid(ckan_instance, package):
+  dataset = dataset_path(ckan_instance.address, package)
   result = ckan_instance.action.organization_list(id = package.name)
   if package['owner_org'] not in result:
-    click.echo(f"Propriedade `owner_org` {package['owner_org']} não existente na instância CKAN {ckan_instance.address}")
+    click.echo(f"{package['owner_org']} not exist in {dataset}")
     sys.exit(1)
 
 def is_datapackage_valid(package):

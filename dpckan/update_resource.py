@@ -7,13 +7,16 @@ from dpckan.functions import (
                               update_datapackage_json_resource, 
                               resource_update,
                               get_ckan_datapackage_resource_id,
+                              dataset_path,
                               )
 
 def update_resource(ckan_host, ckan_key, datapackage, datastore, exit_code, resource_name, resource_id):
   local_package = load_complete_datapackage(datapackage)
+  dataset = dataset_path(ckan_host, local_package)
+  click.echo(f"Updating resource on {dataset}")
   ckan_instance = RemoteCKAN(ckan_host, apikey = ckan_key)
-  run_resource_validations(ckan_instance, local_package)
   try:
+    run_resource_validations(ckan_instance, local_package)
     resource_update(ckan_instance,
                     resource_id,
                     local_package.get_resource(resource_name),
@@ -23,8 +26,9 @@ def update_resource(ckan_host, ckan_key, datapackage, datastore, exit_code, reso
     ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, local_package.name)
     # Update ckan datapackage resource
     update_datapackage_json_resource(ckan_instance, local_package, ckan_datapackage_resource_id)
+    click.echo(f"Resource {resource_name} updated on {dataset}")
   except Exception:
-    print(f"Something went wrong during resource {resource_name} updating")    
+    print(f"Error updating {resource_name} resource on {dataset}")    
     if exit_code == True:
       sys.exit(1)
 
