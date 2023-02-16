@@ -8,11 +8,11 @@ import package_information
 # PREPARE
 
 INSTALL_REQUIRES = [
-    "frictionless-ckan-mapper>=1.0.6",
-    "python-dotenv>=0.19.1",
-    "ckanapi>=4.0.0",
-    "frictionless>=4.16.6",
-    "click>=8.0.1",
+    "frictionless-ckan-mapper==1.0.6",
+    "python-dotenv==0.19.1",
+    "ckanapi==4.0.0",
+    "frictionless==4.16.6",
+    "click==8.0.1",
     "validators==0.18.2",
 ]
 
