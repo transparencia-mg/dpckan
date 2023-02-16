@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+0.1.20 (16/02/2023)
+------------------
+- Fixa versões de pacotes dependentes - erro de atualização versão frictionless 5
+
 0.1.19 (22/11/2022)
 ------------------
 - Melhora mensagens de log informando qual host está sendo utilizado
