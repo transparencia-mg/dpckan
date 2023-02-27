@@ -139,13 +139,13 @@ CUIDADO: Recursos com nomes iguais além de desrespeitar a [especificação fric
 Para criar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra.
 
 ```bash
-$ dpckan resource create --resource-name <nome-recurso>
+$ dpckan resource create <nome-recurso>
 ```
 
 Para atualizar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra.
 
 ```bash
-$ dpckan resource update --resource-name <nome-recurso> --resource-id <id-recurso>
+$ dpckan resource update <nome-recurso> --resource-id <id-recurso>
 ```
 
 ## Contribuições
