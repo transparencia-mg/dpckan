@@ -139,13 +139,13 @@ CUIDADO: Recursos com nomes iguais além de desrespeitar a [especificação fric
 Para criar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra.
 
 ```bash
-$ dpckan resource create <nome-recurso>
+$ dpckan resource <nome-recurso> create
 ```
 
 Para atualizar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra.
 
 ```bash
-$ dpckan resource update <nome-recurso> <id-recurso>
+$ dpckan resource <nome-recurso> <id-recurso> update
 ```
 
 Em ambiente de homologação cadastrado na máquina,
@@ -155,7 +155,7 @@ $ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource <nome_recu
 ````
 ou 
 ````
-$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource <nome_recurso> update
+$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource <nome_recurso> <id-recurso> update
 ````
 para atualizar
 
