@@ -145,18 +145,17 @@ $ dpckan resource create <nome-recurso>
 Para atualizar um recurso, execute o seguinte comando no diretório aonde o arquivo datapackage.json se encontra.
 
 ```bash
-$ dpckan resource update <nome-recurso> --resource-id <id-recurso>
+$ dpckan resource update <nome-recurso> <id-recurso>
 ```
 
 Em ambiente de homologação cadastrado na máquina,
 
 ````
-$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource create crib_2023
-
+$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource <nome_recurso> create
 ````
 ou 
 ````
-$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource update crib_2023
+$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource <nome_recurso> update
 ````
 para atualizar
 
