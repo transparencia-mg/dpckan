@@ -148,6 +148,18 @@ Para atualizar um recurso, execute o seguinte comando no diretório aonde o arqu
 $ dpckan resource update <nome-recurso> --resource-id <id-recurso>
 ```
 
+Em ambiente de homologação cadastrado na máquina,
+
+````
+$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource create crib_2023
+
+````
+ou 
+````
+$ dpckan --ckan-host $HOMOLOGA_HOST --ckan-key $HOMOLOGA_KEY resource update crib_2023
+````
+para atualizar
+
 ## Contribuições
 
 Pré-requisitos: Python 3.9 ou superior
