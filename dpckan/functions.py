@@ -132,21 +132,36 @@ def expand_datapackage(datapackage, basepath):
   datapackage.to_json(f'{basepath}/temp/datapackage.json')
 
 def dataset_update(ckan_instance, datapackage, datastore, exit_code):
-  different_resources = dataset_diff(ckan_instance, datapackage)
-  if len(different_resources) > 0:
-    ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
-    for resource in different_resources:
-      if resource['name'] != 'datapackage.json':
-        if resource['data_diff'] or resource['metadada_diff']:
-          resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']), datastore)
-          if datastore == True:
-            resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
-    update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
-    dataset_patch(ckan_instance, datapackage)
+  ckan_metadata = ckan_instance.action.package_show(id=datapackage.name)
+  resources_ids = [x['value'] for x in ckan_metadata['extras'] if x['key'] == 'resources_ids'][0]
+  resources_ids_dict = eval(resources_ids)
+  ckan_datapackage_resource_id = resources_ids_dict['datapackage.json']
+  is_public = ckan_metadata['isopen']
+  if is_public:
+    different_resources = dataset_diff(ckan_instance, datapackage)
+    if len(different_resources) > 0:
+      ckan_datapackage_resource_id = get_ckan_datapackage_resource_id(ckan_instance, datapackage.name)
+      for resource in different_resources:
+        if resource['name'] != 'datapackage.json':
+          if resource['data_diff'] or resource['metadada_diff']:
+            resource_update(ckan_instance, resource['id'], datapackage.get_resource(resource['name']), datastore)
+            if datastore == True:
+              resource_update_datastore_metadata(ckan_instance, resource['id'], datapackage.get_resource(resource['name']))
+      update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
+      dataset_patch(ckan_instance, datapackage)
+    else:
+      click.echo(f'Nothing to be updated in dataset {ckan_instance.address}/dataset/{datapackage.name}.')
+      if exit_code == True:
+        sys.exit(1)
   else:
-    click.echo(f'Nothing to be updated in dataset {ckan_instance.address}/dataset/{datapackage.name}.')
-    if exit_code == True:
-      sys.exit(1)
+    for resource in resources_ids_dict:
+      if resource != 'datapackage.json':
+        resource_id = resources_ids_dict[resource]
+        resource_update(ckan_instance, resource_id, datapackage.get_resource(resource), datastore)
+        if datastore == True:
+          resource_update_datastore_metadata(ckan_instance, resource_id, datapackage.get_resource(resource))
+      update_datapackage_json_resource(ckan_instance, datapackage, ckan_datapackage_resource_id)
+      dataset_patch(ckan_instance, datapackage)
 
 def dataset_patch(ckan_instance, datapackage):
   datapackage['resources_ids'] = get_ckan_dataset_resources_ids(ckan_instance, datapackage)
