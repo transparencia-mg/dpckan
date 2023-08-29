@@ -77,10 +77,13 @@ def resource_update_datastore_metadata(ckan_instance, resource_id, resource):
     pass
   else:
     dataset_fields = {}
+    resource_show = ckan_instance.call_action('resource_show', { "id" : resource_id })
     resource_id = { "resource_id" : resource_id }
     dataset_fields.update(resource_id)
     force = { "force" : "True" }
     dataset_fields.update(force)
+    if resource_show['datastore_active']:
+        ckan_instance.call_action('datastore_delete', dataset_fields)
     fields = []
     for field in resource.schema.fields:
       meta_info = {"label": field.get("title", ""), "notes" : field.get("description", "") , "type_override" : 'text' }
