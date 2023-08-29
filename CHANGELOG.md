@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+0.1.22 (29/08/2023)
+------------------
+- Melhora processo de criação/atualização datastore
+
+0.1.21 (07/03/2023)
+------------------
+- Possibilita atualização de conjuntos privados
+
 0.1.20 (16/02/2023)
 ------------------
 - Fixa versões de pacotes dependentes - erro de atualização versão frictionless 5
