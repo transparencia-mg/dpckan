@@ -1,12 +1,13 @@
+import sys
 import click
 from ckanapi import RemoteCKAN
 from dpckan.validations import run_dataset_validations
-from dpckan.functions import (load_complete_datapackage, 
-                              dataset_update, 
+from dpckan.functions import (load_complete_datapackage,
+                              dataset_update,
                               update_datapackage_json_resource,
                               dataset_path,
                               )
-                              
+
 def update(ckan_host, ckan_key, datapackage, datastore, exit_code):
   local_datapackage = load_complete_datapackage(datapackage)
   dataset = dataset_path(ckan_host, local_datapackage)
@@ -28,9 +29,9 @@ def update_cli(ctx):
   Update dataset in a CKAN instance
   """
   update(
-         ctx.obj['CKAN_HOST'], 
-         ctx.obj['CKAN_KEY'], 
-         ctx.obj['DATAPACKAGE'], 
+         ctx.obj['CKAN_HOST'],
+         ctx.obj['CKAN_KEY'],
+         ctx.obj['DATAPACKAGE'],
          ctx.obj['DATASTORE'],
          ctx.obj['EXIT_CODE'],
          )
